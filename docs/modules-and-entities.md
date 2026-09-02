@@ -2,7 +2,7 @@
 
 ## 1. Criterios de modelado
 
-Este documento deriva el modelo exclusivamente de [proyect-description.md](proyect-description.md), la fuente funcional de verdad de FieldFlow.
+Este documento deriva el modelo exclusivamente de [project-description.md](project-description.md), la fuente funcional de verdad de FieldFlow.
 
 El eje de trazabilidad es:
 

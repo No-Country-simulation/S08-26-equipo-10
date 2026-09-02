@@ -2,6 +2,7 @@
 
 Esta carpeta alojará la documentación en formato Markdown, como el contrato de API, el stack tecnológico utilizado, decisiones técnicas y guías del proyecto.
 
+- [Descripción del proyecto](project-description.md)
 - [Contrato de API de FieldFlow](API.md)
 - [Modulos y esquema central de entidades](modules-and-entities.md)
 
