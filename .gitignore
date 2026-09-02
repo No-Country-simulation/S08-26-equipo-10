@@ -1,0 +1,129 @@
+# ---- Secretos: lo mas importante de este archivo ----
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+secrets/
+db.txt
+
+# ---- Structurizr (diagramas C4): artefactos del contenedor, no el modelo ----
+docs/architecture/structurizr/.structurizr/
+docs/architecture/structurizr/workspace.json
+
+# ---- Java / Maven ----
+target/
+!.mvn/wrapper/maven-wrapper.jar
+*.class
+*.jar
+!**/src/**/*.jar
+*.log
+hs_err_pid*
+backend/bin
+
+# ---- Gradle ----
+.gradle/
+
+# ---- Python (si se utiliza en scripts o servicios auxiliares) ----
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+
+# ---- Node / Next.js ----
+node_modules/
+.next/
+out/
+build/
+dist/
+npm-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+next-env.d.ts
+.turbo/
+.eslintcache
+.stylelintcache
+.parcel-cache/
+storybook-static/
+
+# ---- IDE ----
+.idea/
+*.iml
+.vscode/*
+!.vscode/extensions.json
+*.swp
+.settings/
+.project
+.classpath
+
+# ---- Sistema operativo ----
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---- Archivos de diseno (van enlazados desde design/README.md) ----
+*.fig
+*.psd
+*.ai
+*.sketch
+
+# ---- Pruebas ----
+testing/e2e/node_modules/
+testing/e2e/cypress/videos/
+testing/e2e/cypress/screenshots/
+testing/e2e/cypress/downloads/
+test-results/
+playwright-report/
+blob-report/
+coverage/
+
+# ---- Base de datos local ----
+pgdata/
+*.dump
+*.sql.bak
+*.sqlite
+*.sqlite3
+*.db
+*.db-*
+
+# ---- Documentos que se distribuyen por fuera del repositorio ----
+# El Project Manager y el equipo los reciben por otro medio, no por git.
+# Ojo: siguen existiendo en el historial de los commits anteriores a este cambio.
+/PROJECT.md
+/docs/ci-cd-notes.md
+
+# ---- Herramientas de IA (ver sección 11 de CONTRIBUTING.md) ----
+# Ninguna configuración de asistente de IA entra al repositorio.
+# Esto incluye el CLAUDE.md de la raíz: se hace llegar al equipo por otro medio.
+
+# Claude / Claude Code
+.claude/
+claude_files/
+**/CLAUDE.md
+
+# GitHub Copilot / Codex / OpenAI Agents
+AGENTS.md
+.github/copilot-instructions.md
+
+# Kiro (Amazon)
+.kiro/
+
+# Cursor
+.cursor/
+.cursorrules
+
+# Continue
+.continue/
+
+# Antigravity
+.antigravity/
+
+# Genérico: skills y archivos de reglas sueltos
+skills/
+*.rules
+*.mdc
+
+aux/
