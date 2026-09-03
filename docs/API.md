@@ -1,41 +1,49 @@
-# API.md - Contrato de API de FieldFlow
+# API.md - Contrato de API MVP de FieldFlow
 
-**Este documento es el contrato entre el backend y el frontend.** Define la API REST v1 para administrar, planificar, ejecutar y dar trazabilidad a los servicios técnicos en campo. El backend y el frontend deben mantenerse alineados con este documento.
+**Este documento es el contrato entre el backend y el frontend.** Define la API REST v1 para administrar, planificar, ejecutar y dar trazabilidad a servicios tecnicos en campo.
 
-- **Version:** v1
+- **Version:** v1 MVP
 - **Base URL local:** `http://localhost:8080/api/v1`
-- **Formato:** JSON, salvo carga de archivos de evidencia
+- **Formato:** JSON, salvo carga y descarga de archivos de evidencia
 - **Especificacion viva:** `http://localhost:8080/v3/api-docs`
+
+## Como cambiar este contrato
+
+1. Abrir un PR que modifique este archivo.
+2. Revisar el cambio con los equipos backend y frontend.
+3. Aprobar los cambios antes de implementar.
+
+Quitar o renombrar campos, cambiar tipos, cambiar obligatoriedad o cambiar codigos de estado son cambios incompatibles. Agregar campos opcionales o endpoints nuevos son cambios compatibles.
 
 ## Convenciones generales
 
 | Aspecto | Regla |
 |---|---|
-| Nombres JSON | `camelCase` |
-| Fechas | ISO-8601 con zona, siempre UTC. Ejemplo: `2026-09-02T14:30:00Z` |
+| Formato | JSON con `Content-Type: application/json; charset=utf-8` |
+| Nombres | `camelCase` en JSON; corresponden a los nombres `snake_case` del modelo |
+| Fechas | ISO-8601 con zona y siempre UTC; las fechas sin hora usan `YYYY-MM-DD` |
 | Identificadores | UUID como string |
-| Nulos | `null` explicito; no se reemplazan por `""` ni se omiten |
-| PATCH parcial | Solo los campos enviados se actualizan; los campos no enviados no se interpretan como `null` |
+| Nulos | `null` explicito; no se reemplaza por `""` |
 | Paginacion | `?page=0&size=20&sort=createdAt,desc` |
-| Orden | `sort=campo,asc` o `sort=campo,desc` |
-| Autenticacion | `Authorization: Bearer <token>` |
-| Idempotencia | `Idempotency-Key: <UUID>` en los POST indicados |
-| Respuestas | El cuerpo respeta `Content-Type: application/json; charset=utf-8` |
-| Archivos | `multipart/form-data`; el JSON asociado viaja en el campo `metadata` |
 | Limite de pagina | `size` entre 1 y 100; valor predeterminado 20 |
+| Idempotencia | Header `Idempotency-Key` UUID en los POST de creacion o carga |
+| Archivos | `multipart/form-data`; el JSON asociado viaja en el campo `metadata` |
+| Autenticacion | `Authorization: Bearer <token>` |
+
+Las fechas de negocio se almacenan como `timestamptz`. Las respuestas pueden incluir proyecciones de entidades relacionadas, pero sus campos deben corresponder al modelo definido.
 
 ### Roles
 
-- La fuente del proyecto distingue explícitamente al área administrativa y a los técnicos. Los únicos valores persistidos en `role.code` son `ADMINISTRATION` y `TECHNICIAN`.
-- `ADMINISTRATION`: administra usuarios, catalogos y toda la operacion.
-- `TECHNICIAN`: consulta sus trabajos y registra la intervencion, evidencia y conformidad.
-- Las etiquetas de autorización `ADMIN`, `DISPATCHER` y `VIEWER` usadas en algunas rutas son perfiles de permisos internos mapeados a `ADMINISTRATION`; no son valores adicionales de `role` ni roles de negocio.
+Los unicos codigos persistidos en `role.code` son:
 
-Las rutas autenticadas requieren el rol indicado. Una ruta que opera sobre un recurso restringido devuelve `404` si el recurso no pertenece al alcance del usuario, para no revelar su existencia.
+- `ADMINISTRATION`: administra clientes y activos, recibe solicitudes, crea OT, planifica, asigna y supervisa.
+- `TECHNICIAN`: consulta trabajos asignados, ejecuta intervenciones y registra checklist, notas, evidencia y conformidad.
+
+Un usuario puede tener uno o ambos roles mediante `userRole`. `ADMIN` y `VIEWER` no son roles persistidos en este contrato.
 
 ## Formato de error (RFC 9457)
 
-Todos los errores de la API usan `application/problem+json` y esta estructura:
+Todos los errores usan `application/problem+json`.
 
 ```json
 {
@@ -46,28 +54,30 @@ Todos los errores de la API usan `application/problem+json` y esta estructura:
   "instance": "/api/v1/work-orders",
   "traceId": "0af7651916cd43dd8448eb211c80319c",
   "errors": [
-    { "field": "priority", "message": "debe ser uno de: LOW, MEDIUM, HIGH, URGENT" }
+    { "field": "priority", "message": "Valor no permitido" }
   ]
 }
 ```
 
-`errors` es un arreglo (puede ser vacio). Los errores de negocio pueden usar `errors: []`. Los tipos de error son `validation`, `authentication`, `authorization`, `not-found`, `conflict`, `business-rule`, `rate-limit` y `internal`.
+`errors` es un arreglo y puede estar vacio. Los tipos de error son `validation`, `authentication`, `authorization`, `not-found`, `conflict`, `business-rule`, `rate-limit` e `internal`.
 
 ## Codigos de estado
 
-`200` OK · `201` Creado · `202` Aceptado · `204` Sin contenido · `400` Entrada invalida · `401` Sin autenticar · `403` Sin permiso · `404` No existe · `409` Conflicto · `422` Regla de negocio violada · `413` Archivo demasiado grande · `415` Tipo de archivo no soportado · `429` Demasiadas peticiones · `500` Error del servidor · `503` Servicio no disponible.
+`200` OK · `201` Creado · `204` Sin contenido · `400` Entrada invalida · `401` Sin autenticar · `403` Sin permiso · `404` No existe · `409` Conflicto · `422` Regla de negocio violada · `413` Archivo demasiado grande · `415` Tipo no soportado · `429` Demasiadas peticiones · `500` Error del servidor · `503` Servicio no disponible.
+
+---
 
 ## 1. Autenticacion y usuarios
 
 ### `POST /auth/login`
 
-Inicia sesion para un usuario interno. **Roles:** publico.
+Inicia sesion con email y contrasena. **Roles:** publico.
 
 **Request**
 
 ```json
 {
-  "email": "operador@fieldflow.com",
+  "email": "tecnico@fieldflow.com",
   "password": "secreto"
 }
 ```
@@ -81,10 +91,10 @@ Inicia sesion para un usuario interno. **Roles:** publico.
   "expiresAt": "2026-09-02T22:30:00Z",
   "user": {
     "id": "0192f3a1-0000-4000-8000-000000000001",
-    "name": "Ana Perez",
-    "email": "operador@fieldflow.com",
-    "role": "ADMINISTRATION",
-    "active": true
+    "name": "Luis Gomez",
+    "email": "tecnico@fieldflow.com",
+    "active": true,
+    "roles": ["TECHNICIAN"]
   }
 }
 ```
@@ -93,9 +103,7 @@ Inicia sesion para un usuario interno. **Roles:** publico.
 
 ### `POST /auth/logout`
 
-Invalida el token actual. **Autenticacion:** cualquier rol.
-
-**Request:** sin cuerpo.
+Invalida el token actual. **Autenticacion:** cualquier usuario autenticado.
 
 **Response `204`:** sin cuerpo.
 
@@ -103,19 +111,17 @@ Invalida el token actual. **Autenticacion:** cualquier rol.
 
 ### `GET /auth/me`
 
-Obtiene el usuario autenticado. **Autenticacion:** cualquier rol.
-
-**Request:** sin cuerpo.
+Devuelve el usuario autenticado. **Autenticacion:** cualquier usuario autenticado.
 
 **Response `200`**
 
 ```json
 {
   "id": "0192f3a1-0000-4000-8000-000000000001",
-  "name": "Ana Perez",
-  "email": "operador@fieldflow.com",
-  "role": "ADMINISTRATION",
-  "active": true
+  "name": "Luis Gomez",
+  "email": "tecnico@fieldflow.com",
+  "active": true,
+  "roles": ["TECHNICIAN"]
 }
 ```
 
@@ -123,16 +129,16 @@ Obtiene el usuario autenticado. **Autenticacion:** cualquier rol.
 
 ### `POST /users`
 
-Crea un usuario interno. **Roles:** `ADMIN`. Header `Idempotency-Key` requerido.
+Crea un usuario interno y sus roles. **Roles:** `ADMINISTRATION`. Header `Idempotency-Key` requerido.
 
 **Request**
 
 ```json
 {
   "name": "Luis Gomez",
-  "email": "luis@fieldflow.com",
+  "email": "tecnico@fieldflow.com",
   "password": "secreto",
-  "role": "TECHNICIAN"
+  "roles": ["TECHNICIAN"]
 }
 ```
 
@@ -140,22 +146,204 @@ Crea un usuario interno. **Roles:** `ADMIN`. Header `Idempotency-Key` requerido.
 
 ```json
 {
-  "id": "0192f3a1-0000-4000-8000-000000000002",
+  "id": "0192f3a1-0000-4000-8000-000000000001",
   "name": "Luis Gomez",
-  "email": "luis@fieldflow.com",
-  "role": "TECHNICIAN",
+  "email": "tecnico@fieldflow.com",
   "active": true,
-  "createdAt": "2026-09-02T14:30:00Z"
+  "roles": ["TECHNICIAN"],
+  "createdAt": "2026-09-02T14:30:00Z",
+  "updatedAt": "2026-09-02T14:30:00Z"
 }
 ```
 
 **Errores:** `400`, `401`, `403`, `409`, `422`, `500`.
 
-## 2. Solicitudes y activos operativos
+---
+
+## 2. Clientes y activos
+
+### `POST /clients`
+
+Crea un cliente. **Roles:** `ADMINISTRATION`. Header `Idempotency-Key` requerido.
+
+**Request**
+
+```json
+{
+  "legalName": "Acme Industrial",
+  "taxIdentifier": "30-71234567-8"
+}
+```
+
+**Response `201`**
+
+```json
+{
+  "id": "0192f3a1-0000-4000-8000-000000000010",
+  "legalName": "Acme Industrial",
+  "taxIdentifier": "30-71234567-8",
+  "active": true,
+  "createdAt": "2026-09-02T14:30:00Z",
+  "updatedAt": "2026-09-02T14:30:00Z"
+}
+```
+
+### `GET /clients`
+
+Lista clientes. **Roles:** `ADMINISTRATION`; un tecnico solo ve clientes relacionados con sus OT asignadas.
+
+**Response `200`**
+
+```json
+{
+  "content": [
+    {
+      "id": "0192f3a1-0000-4000-8000-000000000010",
+      "legalName": "Acme Industrial",
+      "taxIdentifier": "30-71234567-8",
+      "active": true
+    }
+  ],
+  "page": 0,
+  "size": 20,
+  "totalElements": 1,
+  "totalPages": 1
+}
+```
+
+### `GET /clients/{clientId}`
+
+Devuelve un cliente. **Roles:** `ADMINISTRATION`; un tecnico requiere alcance sobre una OT asignada.
+
+### `PATCH /clients/{clientId}`
+
+Actualiza `legalName`, `taxIdentifier` o `active`. **Roles:** `ADMINISTRATION`.
+
+**Request**
+
+```json
+{
+  "legalName": "Acme Industrial SA",
+  "active": true
+}
+```
+
+**Response:** `200` con el recurso actualizado.
+
+### `POST /clients/{clientId}/sites`
+
+Crea una sede perteneciente al cliente. **Roles:** `ADMINISTRATION`. Header `Idempotency-Key` requerido.
+
+**Request**
+
+```json
+{
+  "name": "Planta Norte",
+  "address": "Av. Central 123",
+  "operationalContact": "Carlos Ruiz"
+}
+```
+
+**Response `201`**
+
+```json
+{
+  "id": "0192f3a1-0000-4000-8000-000000000011",
+  "clientId": "0192f3a1-0000-4000-8000-000000000010",
+  "name": "Planta Norte",
+  "address": "Av. Central 123",
+  "operationalContact": "Carlos Ruiz",
+  "active": true
+}
+```
+
+### `GET /sites/{siteId}`
+
+Devuelve una sede, su cliente e instalaciones. **Roles:** `ADMINISTRATION`; un tecnico requiere alcance sobre una OT asignada.
+
+### `PATCH /sites/{siteId}`
+
+Actualiza los datos de una sede o su estado `active`. **Roles:** `ADMINISTRATION`.
+
+### `POST /sites/{siteId}/installations`
+
+Crea una instalacion dentro de una sede. **Roles:** `ADMINISTRATION`. Header `Idempotency-Key` requerido.
+
+**Request**
+
+```json
+{
+  "name": "Sala de compresores",
+  "description": "Area tecnica norte"
+}
+```
+
+**Response `201`**
+
+```json
+{
+  "id": "0192f3a1-0000-4000-8000-000000000012",
+  "siteId": "0192f3a1-0000-4000-8000-000000000011",
+  "name": "Sala de compresores",
+  "description": "Area tecnica norte",
+  "active": true
+}
+```
+
+### `GET /installations/{installationId}`
+
+Devuelve una instalacion y sus equipos. **Roles:** `ADMINISTRATION`; un tecnico requiere alcance sobre una OT asignada.
+
+### `POST /installations/{installationId}/equipment`
+
+Crea un equipo dentro de una instalacion. **Roles:** `ADMINISTRATION`. Header `Idempotency-Key` requerido.
+
+**Request**
+
+```json
+{
+  "assetIdentifier": "CMP-001",
+  "name": "Compresor principal",
+  "brand": "IndustrialTech",
+  "model": "AC-500",
+  "currentStatus": "OPERATIONAL"
+}
+```
+
+**Response `201`**
+
+```json
+{
+  "id": "0192f3a1-0000-4000-8000-000000000020",
+  "installationId": "0192f3a1-0000-4000-8000-000000000012",
+  "assetIdentifier": "CMP-001",
+  "name": "Compresor principal",
+  "brand": "IndustrialTech",
+  "model": "AC-500",
+  "currentStatus": "OPERATIONAL",
+  "active": true,
+  "createdAt": "2026-09-02T14:30:00Z",
+  "updatedAt": "2026-09-02T14:30:00Z"
+}
+```
+
+### `GET /equipment/{equipmentId}`
+
+Devuelve un equipo. **Roles:** `ADMINISTRATION`; un tecnico requiere alcance sobre una OT asignada.
+
+### `PATCH /equipment/{equipmentId}`
+
+Actualiza datos del equipo o su estado `active`. **Roles:** `ADMINISTRATION`.
+
+**Errores comunes del modulo:** `400`, `401`, `403`, `404`, `409`, `422`, `500`.
+
+---
+
+## 3. Solicitudes, tipos de servicio y ordenes de trabajo
 
 ### `POST /service-requests`
 
-Registra una solicitud o necesidad de mantenimiento recibida por administración. La solicitud es la entrada que puede convertirse en una OT. **Roles:** `ADMIN`, `DISPATCHER`. Header `Idempotency-Key` requerido.
+Registra una necesidad de mantenimiento. `equipmentId` es opcional cuando el activo aun no esta identificado. **Roles:** `ADMINISTRATION`. Header `Idempotency-Key` requerido.
 
 **Request**
 
@@ -165,8 +353,7 @@ Registra una solicitud o necesidad de mantenimiento recibida por administración
   "siteId": "0192f3a1-0000-4000-8000-000000000011",
   "equipmentId": "0192f3a1-0000-4000-8000-000000000020",
   "description": "El compresor presenta vibracion inusual",
-  "requestedAt": "2026-09-02T14:30:00Z",
-  "source": "CUSTOMER"
+  "receivedAt": "2026-09-02T14:30:00Z"
 }
 ```
 
@@ -179,386 +366,22 @@ Registra una solicitud o necesidad de mantenimiento recibida por administración
   "siteId": "0192f3a1-0000-4000-8000-000000000011",
   "equipmentId": "0192f3a1-0000-4000-8000-000000000020",
   "description": "El compresor presenta vibracion inusual",
-  "requestedAt": "2026-09-02T14:30:00Z",
-  "source": "CUSTOMER",
+  "receivedAt": "2026-09-02T14:30:00Z",
   "status": "RECEIVED",
-  "workOrderId": null,
   "createdAt": "2026-09-02T14:30:00Z"
 }
 ```
-
-**Errores:** `400`, `401`, `403`, `404`, `409`, `422`, `500`.
-
-### `POST /service-requests/{requestId}/work-order`
-
-Convierte una solicitud recibida en una OT. **Roles:** `ADMIN`, `DISPATCHER`. Header `Idempotency-Key` requerido.
-
-**Request**
-
-```json
-{
-  "title": "Revision de compresor",
-  "serviceTypeId": "0192f3a1-0000-4000-8000-000000000030",
-  "priority": "HIGH",
-  "estimatedDurationMinutes": 180,
-  "dueAt": "2026-09-10T23:59:59Z",
-  "instructions": "Coordinar parada con el responsable de planta"
-}
-```
-
-**Response `201`**
-
-```json
-{
-  "requestId": "0192f3a1-0000-4000-8000-000000000005",
-  "workOrderId": "0192f3a1-0000-4000-8000-000000000050",
-  "workOrderNumber": "OT-000050",
-  "status": "PENDING",
-  "createdAt": "2026-09-02T14:30:00Z"
-}
-```
-
-**Errores:** `400`, `401`, `403`, `404`, `409`, `422`, `500`.
-
-## 3. Clientes, sedes, instalaciones y equipos
-
-### `GET /clients`
-
-Lista clientes con sus sedes resumidas. **Roles:** `ADMIN`, `DISPATCHER`, `VIEWER`; un tecnico solo puede consultar clientes relacionados con sus OT asignadas.
-
-**Request:** sin cuerpo. Query opcional: `search`, `status=ACTIVE|INACTIVE`, `page`, `size`, `sort`.
-
-**Response `200`**
-
-```json
-{
-  "content": [
-    {
-      "id": "0192f3a1-0000-4000-8000-000000000010",
-      "name": "Acme Industrial",
-      "taxId": "30-71234567-8",
-      "contact": { "name": "Maria Silva", "email": "maria@acme.com", "phone": "+54 11 5555-0101" },
-      "status": "ACTIVE",
-      "siteCount": 2
-    }
-  ],
-  "page": 0,
-  "size": 20,
-  "totalElements": 1,
-  "totalPages": 1
-}
-```
-
-**Errores:** `401`, `403`, `400`, `500`.
-
-### `POST /clients`
-
-Crea un cliente. **Roles:** `ADMIN`, `DISPATCHER`. Header `Idempotency-Key` requerido.
-
-**Request**
-
-```json
-{
-  "name": "Acme Industrial",
-  "taxId": "30-71234567-8",
-  "contact": { "name": "Maria Silva", "email": "maria@acme.com", "phone": "+54 11 5555-0101" }
-}
-```
-
-**Response `201`**
-
-```json
-{
-  "id": "0192f3a1-0000-4000-8000-000000000010",
-  "name": "Acme Industrial",
-  "taxId": "30-71234567-8",
-  "contact": { "name": "Maria Silva", "email": "maria@acme.com", "phone": "+54 11 5555-0101" },
-  "status": "ACTIVE",
-  "createdAt": "2026-09-02T14:30:00Z",
-  "updatedAt": "2026-09-02T14:30:00Z"
-}
-```
-
-**Errores:** `400`, `401`, `403`, `409`, `422`, `500`.
-
-### `GET /clients/{clientId}`
-
-Devuelve el cliente, sus sedes, instalaciones y el resumen de equipos. **Roles:** `ADMIN`, `DISPATCHER`, `VIEWER`; un tecnico solo puede consultarlo si esta relacionado con una OT asignada.
-
-**Response `200`**
-
-```json
-{
-  "id": "0192f3a1-0000-4000-8000-000000000010",
-  "name": "Acme Industrial",
-  "taxId": "30-71234567-8",
-  "contact": { "name": "Maria Silva", "email": "maria@acme.com", "phone": "+54 11 5555-0101" },
-  "status": "ACTIVE",
-  "sites": [
-    { "id": "0192f3a1-0000-4000-8000-000000000011", "name": "Planta Norte", "address": "Av. Central 123", "equipmentCount": 8 }
-  ]
-}
-```
-
-**Errores:** `401`, `403`, `404`, `500`.
-
-### `PATCH /clients/{clientId}`
-
-Actualiza datos del cliente o lo desactiva. **Roles:** `ADMIN`, `DISPATCHER`.
-
-**Request**
-
-```json
-{
-  "name": "Acme Industrial SA",
-  "contact": { "name": "Maria Silva", "email": "maria@acme.com", "phone": "+54 11 5555-0199" },
-  "status": "ACTIVE"
-}
-```
-
-**Response `200`**
-
-```json
-{
-  "id": "0192f3a1-0000-4000-8000-000000000010",
-  "name": "Acme Industrial SA",
-  "taxId": "30-71234567-8",
-  "contact": { "name": "Maria Silva", "email": "maria@acme.com", "phone": "+54 11 5555-0199" },
-  "status": "ACTIVE",
-  "updatedAt": "2026-09-02T14:35:00Z"
-}
-```
-
-**Errores:** `400`, `401`, `403`, `404`, `409`, `422`, `500`.
-
-### `POST /clients/{clientId}/sites`
-
-Registra una sede o instalacion del cliente. **Roles:** `ADMIN`, `DISPATCHER`. Header `Idempotency-Key` requerido.
-
-**Request**
-
-```json
-{
-  "name": "Planta Norte",
-  "address": "Av. Central 123",
-  "city": "Cordoba",
-  "country": "AR",
-  "latitude": -31.4167,
-  "longitude": -64.1833,
-  "contact": { "name": "Carlos Ruiz", "phone": "+54 351 5555-0101" },
-  "accessNotes": "Ingreso por porteria norte"
-}
-```
-
-**Response `201`**
-
-```json
-{
-  "id": "0192f3a1-0000-4000-8000-000000000011",
-  "clientId": "0192f3a1-0000-4000-8000-000000000010",
-  "name": "Planta Norte",
-  "address": "Av. Central 123",
-  "city": "Cordoba",
-  "country": "AR",
-  "latitude": -31.4167,
-  "longitude": -64.1833,
-  "contact": { "name": "Carlos Ruiz", "phone": "+54 351 5555-0101" },
-  "accessNotes": "Ingreso por porteria norte",
-  "status": "ACTIVE"
-}
-```
-
-**Errores:** `400`, `401`, `403`, `404`, `409`, `422`, `500`.
-
-### `POST /sites/{siteId}/installations`
-
-Registra una instalacion dentro de una sede. La instalacion permite conservar el nivel intermedio entre la ubicacion del cliente y los equipos. **Roles:** `ADMIN`, `DISPATCHER`. Header `Idempotency-Key` requerido.
-
-**Request**
-
-```json
-{
-  "name": "Sala de compresores",
-  "description": "Area tecnica norte",
-  "locationNotes": "Acceso por pasillo lateral"
-}
-```
-
-**Response `201`**
-
-```json
-{
-  "id": "0192f3a1-0000-4000-8000-000000000012",
-  "siteId": "0192f3a1-0000-4000-8000-000000000011",
-  "name": "Sala de compresores",
-  "description": "Area tecnica norte",
-  "locationNotes": "Acceso por pasillo lateral",
-  "status": "ACTIVE",
-  "createdAt": "2026-09-02T14:30:00Z"
-}
-```
-
-**Errores:** `400`, `401`, `403`, `404`, `409`, `422`, `500`.
-
-### `GET /installations/{installationId}`
-
-Consulta una instalacion y sus equipos. **Roles:** `ADMIN`, `DISPATCHER`, `VIEWER`; un tecnico solo puede consultarla si esta relacionada con una OT asignada.
-
-**Request:** sin cuerpo.
-
-**Response `200`**
-
-```json
-{
-  "id": "0192f3a1-0000-4000-8000-000000000012",
-  "siteId": "0192f3a1-0000-4000-8000-000000000011",
-  "name": "Sala de compresores",
-  "description": "Area tecnica norte",
-  "locationNotes": "Acceso por pasillo lateral",
-  "status": "ACTIVE",
-  "equipment": []
-}
-```
-
-**Errores:** `401`, `403`, `404`, `500`.
-
-### `GET /sites/{siteId}`
-
-Devuelve la sede, sus instalaciones y equipos. **Roles:** `ADMIN`, `DISPATCHER`, `VIEWER`; un tecnico solo puede consultarla si esta relacionada con una OT asignada.
-
-**Response `200`**
-
-```json
-{
-  "id": "0192f3a1-0000-4000-8000-000000000011",
-  "client": { "id": "0192f3a1-0000-4000-8000-000000000010", "name": "Acme Industrial" },
-  "name": "Planta Norte",
-  "address": "Av. Central 123",
-  "city": "Cordoba",
-  "country": "AR",
-  "contact": { "name": "Carlos Ruiz", "phone": "+54 351 5555-0101" },
-  "accessNotes": "Ingreso por porteria norte",
-  "status": "ACTIVE",
-  "installations": [],
-  "equipment": []
-}
-```
-
-**Errores:** `401`, `403`, `404`, `500`.
-
-### `POST /sites/{siteId}/equipment`
-
-Registra un equipo en una sede. **Roles:** `ADMIN`, `DISPATCHER`. Header `Idempotency-Key` requerido.
-
-**Request**
-
-```json
-{
-  "name": "Compresor principal",
-  "installationId": "0192f3a1-0000-4000-8000-000000000012",
-  "assetTag": "CMP-001",
-  "serialNumber": "SN-88421",
-  "model": "AC-500",
-  "manufacturer": "IndustrialTech",
-  "equipmentType": "COMPRESSOR",
-  "installedAt": "2025-04-10T12:00:00Z",
-  "criticality": "HIGH",
-  "notes": "Requiere parada coordinada"
-}
-```
-
-**Response `201`**
-
-```json
-{
-  "id": "0192f3a1-0000-4000-8000-000000000020",
-  "siteId": "0192f3a1-0000-4000-8000-000000000011",
-  "installationId": "0192f3a1-0000-4000-8000-000000000012",
-  "name": "Compresor principal",
-  "assetTag": "CMP-001",
-  "serialNumber": "SN-88421",
-  "model": "AC-500",
-  "manufacturer": "IndustrialTech",
-  "equipmentType": "COMPRESSOR",
-  "installedAt": "2025-04-10T12:00:00Z",
-  "criticality": "HIGH",
-  "status": "OPERATIONAL",
-  "createdAt": "2026-09-02T14:30:00Z"
-}
-```
-
-**Errores:** `400`, `401`, `403`, `404`, `409`, `422`, `500`.
-
-### `GET /equipment/{equipmentId}`
-
-Consulta el equipo con su ultimo mantenimiento y resumen de historial. **Roles:** `ADMIN`, `DISPATCHER`, `VIEWER`; un tecnico solo puede consultarlo si esta relacionado con una OT asignada.
-
-**Response `200`**
-
-```json
-{
-  "id": "0192f3a1-0000-4000-8000-000000000020",
-  "installationId": "0192f3a1-0000-4000-8000-000000000012",
-  "client": { "id": "0192f3a1-0000-4000-8000-000000000010", "name": "Acme Industrial" },
-  "site": { "id": "0192f3a1-0000-4000-8000-000000000011", "name": "Planta Norte", "address": "Av. Central 123" },
-  "name": "Compresor principal",
-  "assetTag": "CMP-001",
-  "serialNumber": "SN-88421",
-  "model": "AC-500",
-  "manufacturer": "IndustrialTech",
-  "equipmentType": "COMPRESSOR",
-  "criticality": "HIGH",
-  "status": "OPERATIONAL",
-  "lastMaintenanceAt": "2026-08-20T16:00:00Z",
-  "openWorkOrderCount": 1
-}
-```
-
-**Errores:** `401`, `403`, `404`, `500`.
-
-## 3. Catalogos de servicios y checklists
-
-### `GET /service-types`
-
-Lista tipos de servicio. **Roles:** todos los autenticados. Query opcional: `active`, `page`, `size`.
-
-**Response `200`**
-
-```json
-{
-  "content": [
-    {
-      "id": "0192f3a1-0000-4000-8000-000000000030",
-      "code": "PREVENTIVE_COMPRESSOR",
-      "name": "Mantenimiento preventivo de compresor",
-      "description": "Inspeccion y mantenimiento programado",
-      "estimatedDurationMinutes": 180,
-      "requiresChecklist": true,
-      "active": true
-    }
-  ],
-  "page": 0,
-  "size": 20,
-  "totalElements": 1,
-  "totalPages": 1
-}
-```
-
-**Errores:** `400`, `401`, `403`, `500`.
 
 ### `POST /service-types`
 
-Crea un tipo de servicio. **Roles:** `ADMIN`.
+Crea un tipo de servicio. **Roles:** `ADMINISTRATION`. Header `Idempotency-Key` requerido.
 
 **Request**
 
 ```json
 {
-  "code": "PREVENTIVE_COMPRESSOR",
   "name": "Mantenimiento preventivo de compresor",
-  "description": "Inspeccion y mantenimiento programado",
-  "estimatedDurationMinutes": 180,
-  "requiresChecklist": true
+  "description": "Inspeccion y mantenimiento programado"
 }
 ```
 
@@ -567,43 +390,19 @@ Crea un tipo de servicio. **Roles:** `ADMIN`.
 ```json
 {
   "id": "0192f3a1-0000-4000-8000-000000000030",
-  "code": "PREVENTIVE_COMPRESSOR",
   "name": "Mantenimiento preventivo de compresor",
   "description": "Inspeccion y mantenimiento programado",
-  "estimatedDurationMinutes": 180,
-  "requiresChecklist": true,
-  "active": true,
-  "createdAt": "2026-09-02T14:30:00Z"
-}
-```
-
-**Errores:** `400`, `401`, `403`, `409`, `422`, `500`.
-
-### `GET /checklists?serviceTypeId={serviceTypeId}`
-
-Obtiene el checklist vigente de un tipo de servicio. **Roles:** todos los autenticados.
-
-**Response `200`**
-
-```json
-{
-  "id": "0192f3a1-0000-4000-8000-000000000031",
-  "serviceTypeId": "0192f3a1-0000-4000-8000-000000000030",
-  "version": 2,
-  "title": "Revision de compresor",
-  "items": [
-    { "id": "0192f3a1-0000-4000-8000-000000000032", "order": 1, "label": "Verificar nivel de aceite", "required": true, "responseType": "BOOLEAN" },
-    { "id": "0192f3a1-0000-4000-8000-000000000033", "order": 2, "label": "Registrar presion de salida", "required": true, "responseType": "NUMBER", "unit": "bar" }
-  ],
   "active": true
 }
 ```
 
-**Errores:** `401`, `403`, `404`, `500`.
+### `GET /service-types`
 
-### `POST /checklists`
+Lista tipos de servicio. **Roles:** cualquier usuario autenticado.
 
-Crea una version de checklist. **Roles:** `ADMIN`.
+### `POST /service-requests/{requestId}/work-orders`
+
+Convierte una solicitud en una OT. La solicitud pasa a `CONVERTED`. **Roles:** `ADMINISTRATION`. Header `Idempotency-Key` requerido.
 
 **Request**
 
@@ -611,505 +410,426 @@ Crea una version de checklist. **Roles:** `ADMIN`.
 {
   "serviceTypeId": "0192f3a1-0000-4000-8000-000000000030",
   "title": "Revision de compresor",
-  "items": [
-    { "order": 1, "label": "Verificar nivel de aceite", "required": true, "responseType": "BOOLEAN", "unit": null }
-  ]
-}
-```
-
-**Response `201`**
-
-```json
-{
-  "id": "0192f3a1-0000-4000-8000-000000000031",
-  "serviceTypeId": "0192f3a1-0000-4000-8000-000000000030",
-  "version": 3,
-  "title": "Revision de compresor",
-  "items": [
-    { "id": "0192f3a1-0000-4000-8000-000000000034", "order": 1, "label": "Verificar nivel de aceite", "required": true, "responseType": "BOOLEAN", "unit": null }
-  ],
-  "active": true
-}
-```
-
-**Errores:** `400`, `401`, `403`, `404`, `409`, `422`, `500`.
-
-## 4. Tecnicos, disponibilidad y agenda
-
-### `GET /technicians`
-
-Lista tecnicos activos y su disponibilidad resumida. **Roles:** `ADMIN`, `DISPATCHER`, `VIEWER`; `TECHNICIAN` puede consultar su propio registro.
-
-**Request:** sin cuerpo. Query opcional: `availableFrom`, `availableTo`, `serviceTypeId`, `page`, `size`.
-
-**Response `200`**
-
-```json
-{
-  "content": [
-    {
-      "id": "0192f3a1-0000-4000-8000-000000000040",
-      "name": "Luis Gomez",
-      "email": "luis@fieldflow.com",
-      "phone": "+54 351 5555-0111",
-      "specialties": ["COMPRESSOR", "ELECTRICAL"],
-      "status": "ACTIVE",
-      "available": true
-    }
-  ],
-  "page": 0,
-  "size": 20,
-  "totalElements": 1,
-  "totalPages": 1
-}
-```
-
-**Errores:** `400`, `401`, `403`, `500`.
-
-### `PUT /technicians/{technicianId}/availability`
-
-Reemplaza la disponibilidad de un tecnico para un periodo. **Roles:** `ADMIN`, `DISPATCHER`; un `TECHNICIAN` puede modificar solo la propia.
-
-**Request**
-
-```json
-{
-  "from": "2026-09-07T00:00:00Z",
-  "to": "2026-09-13T23:59:59Z",
-  "slots": [
-    { "startsAt": "2026-09-08T09:00:00Z", "endsAt": "2026-09-08T17:00:00Z", "status": "AVAILABLE" },
-    { "startsAt": "2026-09-10T09:00:00Z", "endsAt": "2026-09-10T17:00:00Z", "status": "UNAVAILABLE", "reason": "Licencia" }
-  ]
-}
-```
-
-**Response `200`**
-
-```json
-{
-  "technicianId": "0192f3a1-0000-4000-8000-000000000040",
-  "from": "2026-09-07T00:00:00Z",
-  "to": "2026-09-13T23:59:59Z",
-  "slots": [
-    { "startsAt": "2026-09-08T09:00:00Z", "endsAt": "2026-09-08T17:00:00Z", "status": "AVAILABLE", "reason": null },
-    { "startsAt": "2026-09-10T09:00:00Z", "endsAt": "2026-09-10T17:00:00Z", "status": "UNAVAILABLE", "reason": "Licencia" }
-  ]
-}
-```
-
-**Errores:** `400`, `401`, `403`, `404`, `409`, `422`, `500`.
-
-### `GET /calendar`
-
-Consulta la agenda de trabajos asignados. **Roles:** todos los autenticados; un tecnico solo ve su agenda.
-
-**Request:** sin cuerpo. Query requerida: `from`, `to`; opcional: `technicianId`, `status`.
-
-**Response `200`**
-
-```json
-{
-  "from": "2026-09-07T00:00:00Z",
-  "to": "2026-09-13T23:59:59Z",
-  "events": [
-    {
-      "workOrderId": "0192f3a1-0000-4000-8000-000000000050",
-      "title": "OT-000050 - Mantenimiento preventivo",
-      "startsAt": "2026-09-08T09:00:00Z",
-      "endsAt": "2026-09-08T12:00:00Z",
-      "technician": { "id": "0192f3a1-0000-4000-8000-000000000040", "name": "Luis Gomez" },
-      "status": "ASSIGNED",
-      "site": { "id": "0192f3a1-0000-4000-8000-000000000011", "name": "Planta Norte" }
-    }
-  ]
-}
-```
-
-**Errores:** `400`, `401`, `403`, `500`.
-
-## 5. Ordenes de trabajo
-
-### `GET /work-orders`
-
-Lista y filtra OT. **Roles:** todos los autenticados; tecnicos solo ven sus asignaciones.
-
-**Request:** sin cuerpo. Query opcional: `status`, `priority`, `clientId`, `siteId`, `equipmentId`, `technicianId`, `from`, `to`, `page`, `size`, `sort`.
-
-**Response `200`**
-
-```json
-{
-  "content": [
-    {
-      "id": "0192f3a1-0000-4000-8000-000000000050",
-      "number": "OT-000050",
-      "title": "Mantenimiento preventivo",
-      "status": "ASSIGNED",
-      "priority": "HIGH",
-      "plannedStartAt": "2026-09-08T09:00:00Z",
-      "plannedEndAt": "2026-09-08T12:00:00Z",
-      "client": { "id": "0192f3a1-0000-4000-8000-000000000010", "name": "Acme Industrial" },
-      "site": { "id": "0192f3a1-0000-4000-8000-000000000011", "name": "Planta Norte" },
-      "equipment": { "id": "0192f3a1-0000-4000-8000-000000000020", "name": "Compresor principal" },
-      "technician": { "id": "0192f3a1-0000-4000-8000-000000000040", "name": "Luis Gomez" }
-    }
-  ],
-  "page": 0,
-  "size": 20,
-  "totalElements": 1,
-  "totalPages": 1
-}
-```
-
-**Errores:** `400`, `401`, `403`, `500`.
-
-### `POST /work-orders`
-
-Crea una OT pendiente. **Roles:** `ADMIN`, `DISPATCHER`. Header `Idempotency-Key` requerido.
-
-**Request**
-
-```json
-{
-  "title": "Mantenimiento preventivo",
-  "description": "Realizar inspeccion general y medir presion",
-  "clientId": "0192f3a1-0000-4000-8000-000000000010",
-  "siteId": "0192f3a1-0000-4000-8000-000000000011",
-  "equipmentId": "0192f3a1-0000-4000-8000-000000000020",
-  "installationId": "0192f3a1-0000-4000-8000-000000000012",
-  "serviceTypeId": "0192f3a1-0000-4000-8000-000000000030",
-  "priority": "HIGH",
-  "estimatedDurationMinutes": 180,
-  "requestedAt": "2026-09-02T14:30:00Z",
-  "dueAt": "2026-09-15T23:59:59Z",
-  "instructions": "Coordinar parada con el responsable de planta"
-}
-```
-
-**Response `201`**
-
-```json
-{
-  "id": "0192f3a1-0000-4000-8000-000000000050",
-  "number": "OT-000050",
-  "title": "Mantenimiento preventivo",
-  "description": "Realizar inspeccion general y medir presion",
-  "status": "PENDING",
-  "priority": "HIGH",
-  "estimatedDurationMinutes": 180,
-  "requestedAt": "2026-09-02T14:30:00Z",
-  "dueAt": "2026-09-15T23:59:59Z",
-  "client": { "id": "0192f3a1-0000-4000-8000-000000000010", "name": "Acme Industrial" },
-  "site": { "id": "0192f3a1-0000-4000-8000-000000000011", "name": "Planta Norte" },
-  "equipment": { "id": "0192f3a1-0000-4000-8000-000000000020", "name": "Compresor principal" },
-  "serviceType": { "id": "0192f3a1-0000-4000-8000-000000000030", "name": "Mantenimiento preventivo de compresor" },
-  "technician": null,
-  "createdAt": "2026-09-02T14:30:00Z",
-  "updatedAt": "2026-09-02T14:30:00Z"
-}
-```
-
-**Errores:** `400`, `401`, `403`, `404`, `409`, `422`, `500`.
-
-### `GET /work-orders/{workOrderId}`
-
-Devuelve la OT completa, asignacion, intervencion, evidencia, conformidad e historial relacionado. **Roles:** todos los autenticados con alcance sobre la OT.
-
-**Request:** sin cuerpo.
-
-**Response `200`**
-
-```json
-{
-  "id": "0192f3a1-0000-4000-8000-000000000050",
-  "number": "OT-000050",
-  "title": "Mantenimiento preventivo",
-  "description": "Realizar inspeccion general y medir presion",
-  "status": "ASSIGNED",
-  "priority": "HIGH",
-  "client": { "id": "0192f3a1-0000-4000-8000-000000000010", "name": "Acme Industrial", "contact": { "name": "Maria Silva", "phone": "+54 11 5555-0101" } },
-  "site": { "id": "0192f3a1-0000-4000-8000-000000000011", "name": "Planta Norte", "address": "Av. Central 123", "accessNotes": "Ingreso por porteria norte" },
-  "equipment": { "id": "0192f3a1-0000-4000-8000-000000000020", "name": "Compresor principal", "assetTag": "CMP-001", "serialNumber": "SN-88421" },
-  "serviceType": { "id": "0192f3a1-0000-4000-8000-000000000030", "name": "Mantenimiento preventivo de compresor" },
-  "technician": { "id": "0192f3a1-0000-4000-8000-000000000040", "name": "Luis Gomez", "phone": "+54 351 5555-0111" },
   "instructions": "Coordinar parada con el responsable de planta",
-  "requestedAt": "2026-09-02T14:30:00Z",
-  "dueAt": "2026-09-15T23:59:59Z",
-  "plannedStartAt": "2026-09-08T09:00:00Z",
-  "plannedEndAt": "2026-09-08T12:00:00Z",
-  "intervention": {
-    "id": "0192f3a1-0000-4000-8000-000000000060",
-    "startedAt": "2026-09-08T09:12:00Z",
-    "endedAt": null,
-    "status": "IN_PROGRESS",
-    "technicalNotes": null,
-    "observations": null,
-    "measurements": [],
-    "failures": [],
-    "repairs": [],
-    "componentsIntervened": []
-  },
-  "checklist": null,
-  "evidence": [],
-  "conformity": null,
-  "maintenanceHistory": [],
-  "assignmentHistory": [
-    {
-      "id": "0192f3a1-0000-4000-8000-000000000051",
-      "technician": { "id": "0192f3a1-0000-4000-8000-000000000040", "name": "Luis Gomez" },
-      "plannedStartAt": "2026-09-08T09:00:00Z",
-      "plannedEndAt": "2026-09-08T12:00:00Z",
-      "status": "ASSIGNED"
-    }
-  ],
-  "createdAt": "2026-09-02T14:30:00Z",
-  "updatedAt": "2026-09-02T14:30:00Z"
-}
-```
-
-**Errores:** `401`, `403`, `404`, `500`.
-
-### `PATCH /work-orders/{workOrderId}`
-
-Actualiza datos editables de una OT pendiente o asignada. **Roles:** `ADMIN`, `DISPATCHER`.
-
-**Request**
-
-```json
-{
-  "priority": "URGENT",
-  "description": "Realizar inspeccion general y medir presion. Llevar repuesto R-22",
+  "priority": "HIGH",
+  "estimatedDurationMinutes": 180,
   "dueAt": "2026-09-10T23:59:59Z"
 }
 ```
 
-**Response `200`**
+**Response `201`**
 
 ```json
 {
   "id": "0192f3a1-0000-4000-8000-000000000050",
   "number": "OT-000050",
-  "title": "Mantenimiento preventivo",
-  "description": "Realizar inspeccion general y medir presion. Llevar repuesto R-22",
-  "status": "PENDING",
-  "priority": "URGENT",
+  "serviceRequestId": "0192f3a1-0000-4000-8000-000000000005",
+  "clientId": "0192f3a1-0000-4000-8000-000000000010",
+  "siteId": "0192f3a1-0000-4000-8000-000000000011",
+  "installationId": "0192f3a1-0000-4000-8000-000000000012",
+  "equipmentId": "0192f3a1-0000-4000-8000-000000000020",
+  "siteNameSnapshot": "Planta Norte",
+  "siteAddressSnapshot": "Av. Central 123",
+  "installationNameSnapshot": "Sala de compresores",
+  "equipmentIdentifierSnapshot": "CMP-001",
+  "serviceTypeId": "0192f3a1-0000-4000-8000-000000000030",
+  "title": "Revision de compresor",
+  "instructions": "Coordinar parada con el responsable de planta",
+  "priority": "HIGH",
+  "estimatedDurationMinutes": 180,
   "dueAt": "2026-09-10T23:59:59Z",
-  "updatedAt": "2026-09-02T14:35:00Z"
+  "status": "PENDING",
+  "createdAt": "2026-09-02T14:30:00Z",
+  "updatedAt": "2026-09-02T14:30:00Z"
 }
 ```
 
-**Errores:** `400`, `401`, `403`, `404`, `409`, `422`, `500`.
+### `POST /work-orders`
 
-### `POST /work-orders/{workOrderId}/assignments`
-
-Asigna tecnico y horario a una OT. **Roles:** `ADMIN`, `DISPATCHER`. Header `Idempotency-Key` requerido.
+Crea directamente una OT. Para mantenimiento preventivo, se debe informar `preventiveMaintenancePlanId` en lugar de `serviceRequestId`. **Roles:** `ADMINISTRATION`. Header `Idempotency-Key` requerido.
 
 **Request**
 
 ```json
 {
-  "technicianId": "0192f3a1-0000-4000-8000-000000000040",
-  "plannedStartAt": "2026-09-08T09:00:00Z",
-  "plannedEndAt": "2026-09-08T12:00:00Z",
-  "notes": "Confirmado con el cliente"
+  "serviceRequestId": null,
+  "preventiveMaintenancePlanId": "0192f3a1-0000-4000-0000-000000000070",
+  "clientId": "0192f3a1-0000-4000-0000-000000000010",
+  "siteId": "0192f3a1-0000-4000-0000-000000000011",
+  "installationId": "0192f3a1-0000-4000-0000-000000000012",
+  "equipmentId": "0192f3a1-0000-4000-0000-000000000020",
+  "siteNameSnapshot": "Planta Norte",
+  "siteAddressSnapshot": "Av. Central 123",
+  "installationNameSnapshot": "Sala de compresores",
+  "equipmentIdentifierSnapshot": "CMP-001",
+  "serviceTypeId": "0192f3a1-0000-4000-0000-000000000030",
+  "title": "Mantenimiento preventivo",
+  "instructions": "Realizar inspeccion general",
+  "priority": "MEDIUM",
+  "estimatedDurationMinutes": 180,
+  "dueAt": "2026-11-20T09:00:00Z"
 }
 ```
 
-**Response `201`**
+### `GET /work-orders`
+
+Lista y filtra OT por `status`, `priority`, `clientId`, `siteId`, `equipmentId` y tecnico asignado. **Roles:** cualquier usuario autenticado; el tecnico solo ve sus asignaciones.
+
+### `GET /work-orders/{workOrderId}`
+
+Devuelve la OT, sus asignaciones, intervenciones, evidencia, conformidad e historial de estados. **Roles:** cualquier usuario autenticado con alcance sobre la OT.
+
+**Response `200`**
 
 ```json
 {
-  "id": "0192f3a1-0000-4000-8000-000000000051",
-  "workOrderId": "0192f3a1-0000-4000-8000-000000000050",
-  "technician": { "id": "0192f3a1-0000-4000-8000-000000000040", "name": "Luis Gomez" },
-  "plannedStartAt": "2026-09-08T09:00:00Z",
-  "plannedEndAt": "2026-09-08T12:00:00Z",
-  "status": "ACTIVE",
-  "notes": "Confirmado con el cliente",
-  "createdAt": "2026-09-02T14:30:00Z"
+  "id": "0192f3a1-0000-4000-0000-000000000050",
+  "number": "OT-000050",
+  "serviceRequestId": null,
+  "preventiveMaintenancePlanId": "0192f3a1-0000-4000-0000-000000000070",
+  "clientId": "0192f3a1-0000-4000-0000-000000000010",
+  "siteId": "0192f3a1-0000-4000-0000-000000000011",
+  "installationId": "0192f3a1-0000-4000-0000-000000000012",
+  "equipmentId": "0192f3a1-0000-4000-0000-000000000020",
+  "siteNameSnapshot": "Planta Norte",
+  "siteAddressSnapshot": "Av. Central 123",
+  "installationNameSnapshot": "Sala de compresores",
+  "equipmentIdentifierSnapshot": "CMP-001",
+  "serviceTypeId": "0192f3a1-0000-4000-0000-000000000030",
+  "title": "Mantenimiento preventivo",
+  "instructions": "Realizar inspeccion general",
+  "priority": "MEDIUM",
+  "estimatedDurationMinutes": 180,
+  "dueAt": "2026-11-20T09:00:00Z",
+  "status": "PENDING",
+  "assignments": [],
+  "interventions": [],
+  "statusHistory": [],
+  "createdAt": "2026-09-02T14:30:00Z",
+  "updatedAt": "2026-09-02T14:30:00Z"
 }
 ```
 
-**Errores:** `400`, `401`, `403`, `404`, `409`, `422`, `500`.
+### `PATCH /work-orders/{workOrderId}`
+
+Actualiza datos editables de la OT. **Roles:** `ADMINISTRATION`.
 
 ### `PATCH /work-orders/{workOrderId}/status`
 
-Cambia el estado de la OT respetando las transiciones permitidas. **Roles:** `ADMIN`, `DISPATCHER`; `TECHNICIAN` puede usar solo `EN_ROUTE` en sus OT. `IN_PROGRESS` se establece al iniciar la intervención, `PENDING_CUSTOMER_CONFIRMATION` al completarla y `COMPLETED` solo mediante conformidad aceptada.
-
-Estados: `PENDING`, `ASSIGNED`, `EN_ROUTE`, `IN_PROGRESS`, `PENDING_CUSTOMER_CONFIRMATION`, `COMPLETED` y `RESCHEDULED`. Son los estados definidos en la fuente del proyecto; `CANCELLED` no se incorpora a v1.
+Cambia el estado de la OT respetando las transiciones permitidas. **Roles:** `ADMINISTRATION`; `TECHNICIAN` puede usar `EN_ROUTE` para una OT asignada.
 
 **Request**
 
 ```json
 {
   "status": "EN_ROUTE",
-  "reason": null,
-  "rescheduledStart": null,
-  "rescheduledEnd": null
+  "reason": null
 }
 ```
 
-Cuando `status` es `RESCHEDULED`, `reason`, `rescheduledStart` y `rescheduledEnd` son obligatorios; para los demas estados deben ser `null`. La respuesta devuelve los valores efectivos y conserva la asignacion anterior en `assignmentHistory`.
+### `GET /work-orders/{workOrderId}/status-history`
 
-**Response `200`**
+Devuelve los registros de `work_order_status_history` en orden cronologico. **Roles:** cualquier usuario con alcance sobre la OT.
 
-```json
-{
-  "workOrderId": "0192f3a1-0000-4000-8000-000000000050",
-  "previousStatus": "ASSIGNED",
-  "status": "EN_ROUTE",
-  "rescheduledStart": null,
-  "rescheduledEnd": null,
-  "changedAt": "2026-09-08T08:35:00Z",
-  "changedBy": { "id": "0192f3a1-0000-4000-8000-000000000040", "name": "Luis Gomez" }
-}
-```
+**Errores comunes del modulo:** `400`, `401`, `403`, `404`, `409`, `422`, `500`.
 
-**Errores:** `400`, `401`, `403`, `404`, `409`, `422`, `500`.
+---
 
-## 6. Intervencion y evidencia en campo
+## 4. Planificacion y agenda
 
-### `POST /work-orders/{workOrderId}/intervention`
+### `GET /technicians`
 
-Inicia o registra la intervencion de la OT. **Roles:** `TECHNICIAN` asignado, `ADMIN`, `DISPATCHER`. Header `Idempotency-Key` requerido.
+Lista usuarios activos que tienen el rol `TECHNICIAN`. No crea una entidad `technician` separada. **Roles:** `ADMINISTRATION`; un tecnico puede consultar su propio usuario.
+
+### `GET /technicians/{technicianId}/availability`
+
+Consulta intervalos de disponibilidad. **Roles:** `ADMINISTRATION`; un tecnico puede consultar su propia disponibilidad.
+
+### `PUT /technicians/{technicianId}/availability`
+
+Reemplaza intervalos de disponibilidad para un periodo. **Roles:** `ADMINISTRATION`; un tecnico solo puede modificar la propia.
 
 **Request**
 
 ```json
 {
-  "startedAt": "2026-09-08T09:12:00Z",
-  "initialNotes": "Equipo detenido al llegar; se inicia inspeccion"
-}
-```
-
-**Response `201`**
-
-```json
-{
-  "id": "0192f3a1-0000-4000-8000-000000000060",
-  "workOrderId": "0192f3a1-0000-4000-8000-000000000050",
-  "startedAt": "2026-09-08T09:12:00Z",
-  "endedAt": null,
-  "status": "IN_PROGRESS",
-  "initialNotes": "Equipo detenido al llegar; se inicia inspeccion",
-  "technicalNotes": null,
-  "measurements": [],
-  "checklist": null
-}
-```
-
-**Errores:** `400`, `401`, `403`, `404`, `409`, `422`, `500`.
-
-### `PATCH /work-orders/{workOrderId}/intervention`
-
-Completa el registro tecnico de la intervencion. La OT queda pendiente de conformidad y no se considera finalizada. **Roles:** tecnico asignado, `ADMIN`, `DISPATCHER`.
-
-**Request**
-
-```json
-{
-  "endedAt": "2026-09-08T11:45:00Z",
-  "technicalNotes": "Se ajusto correa y se reemplazo filtro. Equipo operativo.",
-  "observations": "Vibracion dentro del rango luego del ajuste",
-  "measurements": [
-    { "name": "Presion de salida", "value": 8.4, "unit": "bar" }
-  ],
-  "failures": [
-    { "description": "Correa floja", "severity": "MEDIUM", "detectedAt": "2026-09-08T09:30:00Z", "resolved": true }
-  ],
-  "repairs": [
-    { "description": "Ajuste de correa", "status": "COMPLETED", "completedAt": "2026-09-08T10:30:00Z", "notes": null },
-    { "description": "Reemplazo de filtro", "status": "COMPLETED", "completedAt": "2026-09-08T10:45:00Z", "notes": null }
-  ],
-  "componentsIntervened": [
-    { "equipmentComponentId": "0192f3a1-0000-4000-8000-000000000071", "action": "REPAIRED", "description": "Ajuste de correa" },
-    { "equipmentComponentId": "0192f3a1-0000-4000-8000-000000000072", "action": "REPLACED", "description": "Reemplazo de filtro" }
-  ],
-  "equipmentStatus": "OPERATIONAL",
-  "result": "COMPLETED"
-}
-```
-
-**Response `200`**
-
-```json
-{
-  "id": "0192f3a1-0000-4000-8000-000000000060",
-  "workOrderId": "0192f3a1-0000-4000-8000-000000000050",
-  "startedAt": "2026-09-08T09:12:00Z",
-  "endedAt": "2026-09-08T11:45:00Z",
-  "status": "PENDING_CUSTOMER_CONFIRMATION",
-  "technicalNotes": "Se ajusto correa y se reemplazo filtro. Equipo operativo.",
-  "observations": "Vibracion dentro del rango luego del ajuste",
-  "measurements": [
-    { "name": "Presion de salida", "value": 8.4, "unit": "bar" }
-  ],
-  "failures": [
-    { "description": "Correa floja", "severity": "MEDIUM", "detectedAt": "2026-09-08T09:30:00Z", "resolved": true }
-  ],
-  "repairs": [
-    { "description": "Ajuste de correa", "status": "COMPLETED", "completedAt": "2026-09-08T10:30:00Z", "notes": null },
-    { "description": "Reemplazo de filtro", "status": "COMPLETED", "completedAt": "2026-09-08T10:45:00Z", "notes": null }
-  ],
-  "componentsIntervened": [
-    { "equipmentComponentId": "0192f3a1-0000-4000-8000-000000000071", "action": "REPAIRED", "description": "Ajuste de correa" },
-    { "equipmentComponentId": "0192f3a1-0000-4000-8000-000000000072", "action": "REPLACED", "description": "Reemplazo de filtro" }
-  ],
-  "equipmentStatus": "OPERATIONAL",
-  "result": "COMPLETED"
-}
-```
-
-**Errores:** `400`, `401`, `403`, `404`, `409`, `422`, `500`.
-
-### `PUT /work-orders/{workOrderId}/checklist`
-
-Guarda las respuestas del checklist asociado al servicio. Permite guardado parcial. **Roles:** tecnico asignado, `ADMIN`, `DISPATCHER`.
-
-**Request**
-
-```json
-{
-  "checklistId": "0192f3a1-0000-4000-8000-000000000031",
-  "answers": [
-    { "itemId": "0192f3a1-0000-4000-8000-000000000032", "value": true, "note": null },
-    { "itemId": "0192f3a1-0000-4000-8000-000000000033", "value": 8.4, "note": "Dentro de rango" }
-  ],
-  "completed": true
-}
-```
-
-**Response `200`**
-
-```json
-{
-  "checklistId": "0192f3a1-0000-4000-8000-000000000031",
-  "workOrderId": "0192f3a1-0000-4000-8000-000000000050",
-  "answeredCount": 2,
-  "totalItems": 2,
-  "completed": true,
-  "answers": [
-    { "itemId": "0192f3a1-0000-4000-8000-000000000032", "value": true, "note": null },
-    { "itemId": "0192f3a1-0000-4000-8000-000000000033", "value": 8.4, "note": "Dentro de rango" }
+  "slots": [
+    {
+      "startsAt": "2026-09-08T09:00:00Z",
+      "endsAt": "2026-09-08T17:00:00Z",
+      "status": "AVAILABLE",
+      "notes": null
+    }
   ]
 }
 ```
 
-**Errores:** `400`, `401`, `403`, `404`, `409`, `422`, `500`.
+### `POST /work-orders/{workOrderId}/assignments`
 
-### `POST /work-orders/{workOrderId}/evidence`
-
-Carga una foto o archivo de evidencia. **Roles:** tecnico asignado, `ADMIN`, `DISPATCHER`. Header `Idempotency-Key` requerido. `Content-Type: multipart/form-data`.
+Crea una asignacion activa para un tecnico disponible. **Roles:** `ADMINISTRATION`. Header `Idempotency-Key` requerido.
 
 **Request**
+
+```json
+{
+  "technicianId": "0192f3a1-0000-4000-0000-000000000040",
+  "assignedByUserId": "0192f3a1-0000-4000-0000-000000000001",
+  "plannedStartAt": "2026-09-08T09:00:00Z",
+  "plannedEndAt": "2026-09-08T12:00:00Z",
+  "status": "ACTIVE",
+  "reschedulingReason": null
+}
+```
+
+**Response `201`**
+
+```json
+{
+  "id": "0192f3a1-0000-4000-0000-000000000051",
+  "workOrderId": "0192f3a1-0000-4000-0000-000000000050",
+  "technicianId": "0192f3a1-0000-4000-0000-000000000040",
+  "assignedByUserId": "0192f3a1-0000-4000-0000-000000000001",
+  "plannedStartAt": "2026-09-08T09:00:00Z",
+  "plannedEndAt": "2026-09-08T12:00:00Z",
+  "status": "ACTIVE",
+  "reschedulingReason": null,
+  "createdAt": "2026-09-02T14:30:00Z"
+}
+```
+
+### `POST /assignments/{assignmentId}/schedule-events`
+
+Crea un bloque de agenda para una asignacion. **Roles:** `ADMINISTRATION`. Header `Idempotency-Key` requerido.
+
+**Request**
+
+```json
+{
+  "startsAt": "2026-09-08T09:00:00Z",
+  "endsAt": "2026-09-08T12:00:00Z",
+  "status": "SCHEDULED"
+}
+```
+
+### `GET /calendar`
+
+Consulta `scheduleEvent` en un intervalo `from` y `to`. **Roles:** cualquier usuario autenticado; el tecnico solo ve sus eventos.
+
+**Errores comunes del modulo:** `400`, `401`, `403`, `404`, `409`, `422`, `500`.
+
+---
+
+## 5. Ejecucion en campo
+
+### `POST /work-orders/{workOrderId}/interventions`
+
+Registra una visita e intervencion. Debe vincularse a una asignacion. **Roles:** `TECHNICIAN` asignado o `ADMINISTRATION`. Header `Idempotency-Key` requerido.
+
+**Request**
+
+```json
+{
+  "assignmentId": "0192f3a1-0000-4000-0000-000000000051",
+  "technicianId": "0192f3a1-0000-4000-0000-000000000040",
+  "actualStartedAt": "2026-09-08T09:12:00Z",
+  "result": null,
+  "observations": null
+}
+```
+
+**Response `201`**
+
+```json
+{
+  "id": "0192f3a1-0000-4000-0000-000000000060",
+  "workOrderId": "0192f3a1-0000-4000-0000-000000000050",
+  "assignmentId": "0192f3a1-0000-4000-0000-000000000051",
+  "technicianId": "0192f3a1-0000-4000-0000-000000000040",
+  "actualStartedAt": "2026-09-08T09:12:00Z",
+  "actualEndedAt": null,
+  "result": null,
+  "observations": null,
+  "createdAt": "2026-09-08T09:12:00Z",
+  "updatedAt": "2026-09-08T09:12:00Z"
+}
+```
+
+### `PATCH /interventions/{interventionId}`
+
+Actualiza el resultado, observaciones y finalizacion de una intervencion. **Roles:** tecnico propietario de la asignacion o `ADMINISTRATION`.
+
+**Request**
+
+```json
+{
+  "actualEndedAt": "2026-09-08T11:45:00Z",
+  "result": "COMPLETED",
+  "observations": "Equipo operativo luego del ajuste"
+}
+```
+
+### `POST /interventions/{interventionId}/failures`
+
+Registra una falla. **Roles:** tecnico de la intervencion o `ADMINISTRATION`.
+
+**Request**
+
+```json
+{
+  "description": "Correa floja",
+  "severity": "MEDIUM",
+  "detectedAt": "2026-09-08T09:30:00Z",
+  "resolved": true
+}
+```
+
+### `POST /interventions/{interventionId}/repairs`
+
+Registra una reparacion. **Roles:** tecnico de la intervencion o `ADMINISTRATION`.
+
+**Request**
+
+```json
+{
+  "description": "Ajuste de correa",
+  "status": "COMPLETED",
+  "completedAt": "2026-09-08T10:30:00Z",
+  "notes": null
+}
+```
+
+### `POST /equipment/{equipmentId}/components`
+
+Registra un componente del equipo. **Roles:** `ADMINISTRATION`. Header `Idempotency-Key` requerido.
+
+**Request**
+
+```json
+{
+  "name": "Correa principal",
+  "partNumber": "BELT-22",
+  "serialNumber": null,
+  "currentStatus": "OPERATIONAL",
+  "active": true
+}
+```
+
+### `POST /interventions/{interventionId}/components`
+
+Registra un componente intervenido. El componente debe pertenecer al equipo de la OT. **Roles:** tecnico de la intervencion o `ADMINISTRATION`.
+
+**Request**
+
+```json
+{
+  "equipmentComponentId": "0192f3a1-0000-4000-0000-000000000071",
+  "action": "REPAIRED",
+  "description": "Ajuste de correa"
+}
+```
+
+**Errores comunes del modulo:** `400`, `401`, `403`, `404`, `409`, `422`, `500`.
+
+---
+
+## 6. Checklists, notas y evidencia
+
+### `GET /checklists?serviceTypeId={serviceTypeId}`
+
+Devuelve la plantilla activa de un tipo de servicio. **Roles:** cualquier usuario autenticado.
+
+**Response `200`**
+
+```json
+{
+  "id": "0192f3a1-0000-4000-0000-000000000031",
+  "serviceTypeId": "0192f3a1-0000-4000-0000-000000000030",
+  "name": "Revision de compresor",
+  "version": 2,
+  "active": true,
+  "items": [
+    {
+      "id": "0192f3a1-0000-4000-0000-000000000032",
+      "checklistId": "0192f3a1-0000-4000-0000-000000000031",
+      "position": 1,
+      "label": "Verificar nivel de aceite",
+      "responseType": "BOOLEAN",
+      "required": true
+    }
+  ]
+}
+```
+
+### `POST /checklists`
+
+Crea una version de checklist. **Roles:** `ADMINISTRATION`. Header `Idempotency-Key` requerido.
+
+**Request**
+
+```json
+{
+  "serviceTypeId": "0192f3a1-0000-4000-0000-000000000030",
+  "name": "Revision de compresor",
+  "version": 3,
+  "active": true,
+  "items": [
+    {
+      "position": 1,
+      "label": "Verificar nivel de aceite",
+      "responseType": "BOOLEAN",
+      "required": true
+    }
+  ]
+}
+```
+
+### `PUT /interventions/{interventionId}/checklist-responses`
+
+Guarda respuestas de checklist. Permite guardado parcial. **Roles:** tecnico de la intervencion o `ADMINISTRATION`.
+
+**Request**
+
+```json
+{
+  "responses": [
+    {
+      "checklistItemId": "0192f3a1-0000-4000-0000-000000000032",
+      "value": true,
+      "observation": null,
+      "answeredAt": "2026-09-08T10:00:00Z"
+    }
+  ]
+}
+```
+
+### `POST /interventions/{interventionId}/technical-notes`
+
+Registra una nota tecnica. **Roles:** tecnico de la intervencion o `ADMINISTRATION`.
+
+**Request**
+
+```json
+{
+  "authorUserId": "0192f3a1-0000-4000-0000-000000000040",
+  "content": "Se ajusto correa y se reemplazo filtro"
+}
+```
+
+### `POST /interventions/{interventionId}/evidence`
+
+Carga evidencia y la vincula a la intervencion. **Roles:** tecnico de la intervencion o `ADMINISTRATION`. Header `Idempotency-Key` requerido.
 
 Campo `file`: binario. Campo `metadata`:
 
 ```json
 {
   "type": "PHOTO",
-  "caption": "Filtro reemplazado",
-  "takenAt": "2026-09-08T10:40:00Z"
+  "fileName": "filtro-reemplazado.jpg",
+  "storageLocation": "fieldflow/interventions/0192.../filtro-reemplazado.jpg",
+  "mimeType": "image/jpeg",
+  "sizeBytes": 248912,
+  "description": "Filtro reemplazado",
+  "capturedAt": "2026-09-08T10:40:00Z"
 }
 ```
 
@@ -1117,72 +837,45 @@ Campo `file`: binario. Campo `metadata`:
 
 ```json
 {
-  "id": "0192f3a1-0000-4000-8000-000000000061",
-  "workOrderId": "0192f3a1-0000-4000-8000-000000000050",
+  "id": "0192f3a1-0000-4000-0000-000000000061",
+  "interventionId": "0192f3a1-0000-4000-0000-000000000060",
   "type": "PHOTO",
   "fileName": "filtro-reemplazado.jpg",
-  "contentType": "image/jpeg",
+  "storageLocation": "fieldflow/interventions/0192.../filtro-reemplazado.jpg",
+  "mimeType": "image/jpeg",
   "sizeBytes": 248912,
-  "caption": "Filtro reemplazado",
-  "takenAt": "2026-09-08T10:40:00Z",
-  "url": "/api/v1/evidence/0192f3a1-0000-4000-8000-000000000061/download",
+  "description": "Filtro reemplazado",
+  "capturedAt": "2026-09-08T10:40:00Z",
   "createdAt": "2026-09-08T10:41:00Z"
 }
 ```
 
-**Errores:** `400`, `401`, `403`, `404`, `409`, `413`, `415`, `422`, `500`, `503`.
+### `GET /interventions/{interventionId}/evidence`
 
-### `GET /work-orders/{workOrderId}/evidence`
-
-Lista la evidencia de una OT. **Roles:** todos los usuarios con alcance sobre la OT.
-
-**Response `200`**
-
-```json
-{
-  "workOrderId": "0192f3a1-0000-4000-8000-000000000050",
-  "items": [
-    {
-      "id": "0192f3a1-0000-4000-8000-000000000061",
-      "type": "PHOTO",
-      "fileName": "filtro-reemplazado.jpg",
-      "contentType": "image/jpeg",
-      "sizeBytes": 248912,
-      "caption": "Filtro reemplazado",
-      "url": "/api/v1/evidence/0192f3a1-0000-4000-8000-000000000061/download",
-      "createdAt": "2026-09-08T10:41:00Z"
-    }
-  ]
-}
-```
-
-**Errores:** `401`, `403`, `404`, `500`.
+Lista la evidencia de una intervencion. **Roles:** cualquier usuario con alcance sobre la OT.
 
 ### `GET /evidence/{evidenceId}/download`
 
-Descarga la evidencia. **Roles:** todos los usuarios con alcance sobre la OT. La respuesta es binaria con `Content-Disposition: attachment`.
+Descarga el binario asociado a la evidencia. **Roles:** cualquier usuario con alcance sobre la OT.
 
-**Request:** sin cuerpo.
-
-**Respuesta `200`:** archivo binario.
-
-**Errores:** `401`, `403`, `404`, `500`, `503`.
+---
 
 ## 7. Conformidad e historial
 
-### `POST /work-orders/{workOrderId}/conformity`
+### `POST /interventions/{interventionId}/conformity`
 
-Registra la firma o conformidad del cliente. Solo `accepted: true` lleva la OT a `COMPLETED`; con `accepted: false` permanece en `PENDING_CUSTOMER_CONFIRMATION`. **Roles:** `TECHNICIAN` asignado, `ADMIN`, `DISPATCHER`. Header `Idempotency-Key` requerido.
+Registra la aceptacion o firma del cliente. Solo puede existir una conformidad por intervencion. **Roles:** tecnico de la intervencion o `ADMINISTRATION`. Header `Idempotency-Key` requerido.
 
 **Request**
 
 ```json
 {
-  "accepted": true,
-  "customerName": "Carlos Ruiz",
+  "signerName": "Carlos Ruiz",
   "customerRole": "Responsable de planta",
-  "signatureData": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUg...",
-  "comments": "Trabajo realizado conforme"
+  "signerIdentifier": null,
+  "signature": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUg...",
+  "acceptedAt": "2026-09-08T12:00:00Z",
+  "observations": "Trabajo realizado conforme"
 }
 ```
 
@@ -1190,57 +883,35 @@ Registra la firma o conformidad del cliente. Solo `accepted: true` lleva la OT a
 
 ```json
 {
-  "id": "0192f3a1-0000-4000-8000-000000000062",
-  "workOrderId": "0192f3a1-0000-4000-8000-000000000050",
-  "accepted": true,
-  "customerName": "Carlos Ruiz",
+  "id": "0192f3a1-0000-4000-0000-000000000062",
+  "interventionId": "0192f3a1-0000-4000-0000-000000000060",
+  "signerName": "Carlos Ruiz",
   "customerRole": "Responsable de planta",
-  "comments": "Trabajo realizado conforme",
-  "signedAt": "2026-09-08T12:00:00Z",
-  "workOrderStatus": "COMPLETED",
-  "equipmentStatus": "OPERATIONAL"
+  "signerIdentifier": null,
+  "signature": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUg...",
+  "acceptedAt": "2026-09-08T12:00:00Z",
+  "observations": "Trabajo realizado conforme"
 }
 ```
 
-Si `accepted` es `false`, el mismo response devuelve `workOrderStatus: "PENDING_CUSTOMER_CONFIRMATION"`; `comments` debe explicar la disconformidad.
-
-**Errores:** `400`, `401`, `403`, `404`, `409`, `422`, `500`.
+Una conformidad con `acceptedAt` no nulo permite que la OT pase a `COMPLETED`. Una conformidad sin aceptacion debe conservar la OT en `PENDING_CUSTOMER_CONFIRMATION`.
 
 ### `GET /equipment/{equipmentId}/maintenance-history`
 
-Consulta el historial completo de mantenimientos, fallas y reparaciones del equipo. **Roles:** `ADMIN`, `DISPATCHER`, `VIEWER`; un tecnico solo puede consultarlo si el equipo esta relacionado con una OT asignada.
-
-**Request:** sin cuerpo. Query opcional: `from`, `to`, `type`, `page`, `size`, `sort`.
+Consulta el historial derivado de intervenciones completadas, OT, fallas, reparaciones, componentes, notas, evidencia, checklist y conformidad. No crea una tabla fuente `maintenanceHistory`. **Roles:** `ADMINISTRATION`; un tecnico requiere alcance sobre una OT asignada.
 
 **Response `200`**
 
 ```json
 {
-  "equipmentId": "0192f3a1-0000-4000-8000-000000000020",
-  "content": [
+  "equipmentId": "0192f3a1-0000-4000-0000-000000000020",
+  "items": [
     {
-      "workOrderId": "0192f3a1-0000-4000-8000-000000000050",
-      "number": "OT-000050",
-      "serviceType": "Mantenimiento preventivo de compresor",
-      "type": "PREVENTIVE",
+      "workOrderId": "0192f3a1-0000-4000-0000-000000000050",
+      "interventionId": "0192f3a1-0000-4000-0000-000000000060",
       "status": "COMPLETED",
-      "performedAt": "2026-09-08T11:45:00Z",
-      "technician": { "id": "0192f3a1-0000-4000-8000-000000000040", "name": "Luis Gomez" },
-      "summary": "Se ajusto correa y se reemplazo filtro. Equipo operativo.",
-      "failures": [
-        { "description": "Correa floja", "severity": "MEDIUM", "detectedAt": "2026-09-08T09:30:00Z", "resolved": true }
-      ],
-      "repairs": [
-        { "description": "Ajuste de correa", "status": "COMPLETED", "completedAt": "2026-09-08T10:30:00Z", "notes": null },
-        { "description": "Reemplazo de filtro", "status": "COMPLETED", "completedAt": "2026-09-08T10:45:00Z", "notes": null }
-      ],
-      "componentsIntervened": [
-        { "equipmentComponentId": "0192f3a1-0000-4000-8000-000000000071", "action": "REPAIRED", "description": "Ajuste de correa" },
-        { "equipmentComponentId": "0192f3a1-0000-4000-8000-000000000072", "action": "REPLACED", "description": "Reemplazo de filtro" }
-      ],
-      "equipmentStatus": "OPERATIONAL",
-      "evidenceCount": 2,
-      "conformityAccepted": true
+      "actualEndedAt": "2026-09-08T11:45:00Z",
+      "technicianId": "0192f3a1-0000-4000-0000-000000000040"
     }
   ],
   "page": 0,
@@ -1250,57 +921,32 @@ Consulta el historial completo de mantenimientos, fallas y reparaciones del equi
 }
 ```
 
-**Errores:** `400`, `401`, `403`, `404`, `500`.
+---
 
-## 8. Mantenimiento preventivo y recurrencias
-
-### `GET /preventive-maintenance-plans`
-
-Lista planes preventivos. **Roles:** `ADMIN`, `DISPATCHER`, `VIEWER`.
-
-**Request:** sin cuerpo. Query opcional: `equipmentId`, `active`, `dueBefore`, `page`, `size`.
-
-**Response `200`**
-
-```json
-{
-  "content": [
-    {
-      "id": "0192f3a1-0000-4000-8000-000000000070",
-      "equipmentId": "0192f3a1-0000-4000-8000-000000000020",
-      "serviceTypeId": "0192f3a1-0000-4000-8000-000000000030",
-      "frequency": "EVERY_3_MONTHS",
-      "nextDueAt": "2026-11-20T09:00:00Z",
-      "active": true,
-      "autoCreateWorkOrder": true
-    }
-  ],
-  "page": 0,
-  "size": 20,
-  "totalElements": 1,
-  "totalPages": 1
-}
-```
-
-**Errores:** `400`, `401`, `403`, `500`.
+## 8. Mantenimiento preventivo
 
 ### `POST /preventive-maintenance-plans`
 
-Crea un plan preventivo recurrente. **Roles:** `ADMIN`, `DISPATCHER`. Header `Idempotency-Key` requerido.
+Crea un plan preventivo y su recurrencia. **Roles:** `ADMINISTRATION`. Header `Idempotency-Key` requerido.
 
 **Request**
 
 ```json
 {
-  "equipmentId": "0192f3a1-0000-4000-8000-000000000020",
-  "serviceTypeId": "0192f3a1-0000-4000-8000-000000000030",
-  "frequency": "EVERY_3_MONTHS",
-  "startsAt": "2026-08-20T09:00:00Z",
-  "nextDueAt": "2026-11-20T09:00:00Z",
-  "priority": "MEDIUM",
-  "preferredTechnicianId": null,
-  "autoCreateWorkOrder": true,
-  "active": true
+  "equipmentId": "0192f3a1-0000-4000-0000-000000000020",
+  "serviceTypeId": "0192f3a1-0000-4000-0000-000000000030",
+  "name": "Mantenimiento preventivo del compresor",
+  "description": "Inspeccion y mantenimiento programado",
+  "startsOn": "2026-08-20",
+  "nextExecutionAt": "2026-11-20T09:00:00Z",
+  "active": true,
+  "recurrence": {
+    "frequency": "MONTHLY",
+    "interval": 3,
+    "dayOfMonth": 20,
+    "dayOfWeek": null,
+    "endsOn": null
+  }
 }
 ```
 
@@ -1308,98 +954,80 @@ Crea un plan preventivo recurrente. **Roles:** `ADMIN`, `DISPATCHER`. Header `Id
 
 ```json
 {
-  "id": "0192f3a1-0000-4000-8000-000000000070",
-  "equipmentId": "0192f3a1-0000-4000-8000-000000000020",
-  "serviceTypeId": "0192f3a1-0000-4000-8000-000000000030",
-  "frequency": "EVERY_3_MONTHS",
-  "startsAt": "2026-08-20T09:00:00Z",
-  "nextDueAt": "2026-11-20T09:00:00Z",
-  "priority": "MEDIUM",
-  "preferredTechnicianId": null,
-  "autoCreateWorkOrder": true,
+  "id": "0192f3a1-0000-4000-0000-000000000070",
+  "equipmentId": "0192f3a1-0000-4000-0000-000000000020",
+  "serviceTypeId": "0192f3a1-0000-4000-0000-000000000030",
+  "name": "Mantenimiento preventivo del compresor",
+  "description": "Inspeccion y mantenimiento programado",
+  "startsOn": "2026-08-20",
+  "nextExecutionAt": "2026-11-20T09:00:00Z",
   "active": true,
-  "createdAt": "2026-09-02T14:30:00Z"
+  "recurrence": {
+    "id": "0192f3a1-0000-4000-0000-000000000071",
+    "frequency": "MONTHLY",
+    "interval": 3,
+    "dayOfMonth": 20,
+    "dayOfWeek": null,
+    "endsOn": null
+  },
+  "createdAt": "2026-09-02T14:30:00Z",
+  "updatedAt": "2026-09-02T14:30:00Z"
 }
 ```
 
-**Errores:** `400`, `401`, `403`, `404`, `409`, `422`, `500`.
+### `GET /preventive-maintenance-plans`
+
+Lista planes preventivos. **Roles:** `ADMINISTRATION`; un tecnico solo ve planes relacionados con sus OT asignadas.
+
+### `GET /preventive-maintenance-plans/{planId}`
+
+Devuelve un plan y su recurrencia. **Roles:** `ADMINISTRATION`.
 
 ### `PATCH /preventive-maintenance-plans/{planId}`
 
-Actualiza, pausa o reactiva un plan preventivo. **Roles:** `ADMIN`, `DISPATCHER`.
+Actualiza `name`, `description`, `nextExecutionAt`, `active` o la recurrencia. **Roles:** `ADMINISTRATION`.
 
 **Request**
 
 ```json
 {
-  "nextDueAt": "2026-12-01T09:00:00Z",
-  "active": false,
-  "autoCreateWorkOrder": true
+  "nextExecutionAt": "2026-12-01T09:00:00Z",
+  "active": false
 }
 ```
 
-**Response `200`**
+Cada ejecucion preventiva genera una OT con `preventiveMaintenancePlanId` y sigue el flujo normal de asignacion, agenda, intervencion, evidencia, conformidad e historial.
 
-```json
-{
-  "id": "0192f3a1-0000-4000-8000-000000000070",
-  "equipmentId": "0192f3a1-0000-4000-8000-000000000020",
-  "serviceTypeId": "0192f3a1-0000-4000-8000-000000000030",
-  "frequency": "EVERY_3_MONTHS",
-  "nextDueAt": "2026-12-01T09:00:00Z",
-  "active": false,
-  "autoCreateWorkOrder": true,
-  "updatedAt": "2026-09-02T14:35:00Z"
-}
-```
+---
 
-**Errores:** `400`, `401`, `403`, `404`, `409`, `422`, `500`.
+## 9. Reglas de negocio MVP
 
-## 9. Operacion
+- Los roles persistidos son solo `ADMINISTRATION` y `TECHNICIAN`; la relacion de usuario y rol es muchos a muchos.
+- Un `serviceRequest` puede originar cero o una OT. Su estado es `RECEIVED`, `CONVERTED` o `CANCELLED`.
+- Una OT debe pertenecer a un cliente, una sede y un tipo de servicio; instalacion y equipo pueden ser nulos.
+- Una OT de solicitud usa `serviceRequestId`; una OT preventiva usa `preventiveMaintenancePlanId`.
+- Los estados de OT son `PENDING`, `ASSIGNED`, `EN_ROUTE`, `IN_PROGRESS`, `PENDING_CUSTOMER_CONFIRMATION`, `COMPLETED` y `RESCHEDULED`. `CANCELLED` no forma parte de v1.
+- Como maximo existe una asignacion `ACTIVE` por OT. Las asignaciones anteriores conservan `REPLACED`, `CANCELLED` o `COMPLETED`.
+- Una asignacion valida requiere un usuario con rol `TECHNICIAN` y una franja compatible con su disponibilidad.
+- Una OT puede tener varias intervenciones; cada intervencion pertenece a una asignacion.
+- Checklist, notas tecnicas, fallas, reparaciones, componentes, evidencia y conformidad se vinculan a una intervencion.
+- La conformidad es unica por intervencion. La OT solo puede completarse con intervencion finalizada y conformidad aceptada.
+- El historial de mantenimiento es una consulta o vista derivada, no una tabla fuente duplicada.
+- Los registros con historial no se eliminan fisicamente; se desactivan o cambian de estado.
+- Las relaciones deben validarse: equipo dentro de la sede de la OT, componente dentro del equipo de la OT y tecnico con rol `TECHNICIAN`.
 
-### `GET /public/ping`
+## 10. Estado de implementacion MVP
 
-Comprueba que el proceso responde. No consulta la base de datos. **Roles:** publico.
+| Area | Endpoints principales | Estado |
+|---|---|---|
+| Autenticacion | `/auth/login`, `/auth/logout`, `/auth/me` | Pendiente |
+| Usuarios y roles | `/users` | Pendiente |
+| Clientes y activos | `/clients`, `/sites`, `/installations`, `/equipment` | Pendiente |
+| Solicitudes y OT | `/service-requests`, `/service-types`, `/work-orders` | Pendiente |
+| Planificacion | `/technicians`, `/availability`, `/assignments`, `/calendar` | Pendiente |
+| Ejecucion | `/interventions`, `/failures`, `/repairs`, `/components` | Pendiente |
+| Checklist y evidencia | `/checklists`, `/checklist-responses`, `/technical-notes`, `/evidence` | Pendiente |
+| Conformidad e historial | `/conformity`, `/maintenance-history` | Pendiente |
+| Preventivo | `/preventive-maintenance-plans` | Pendiente |
 
-**Response `200`**
-
-```json
-{
-  "status": "UP",
-  "timestamp": "2026-09-02T14:30:00Z"
-}
-```
-
-**Errores:** `500`.
-
-### `GET /health`
-
-Healthcheck para monitoreo. **Roles:** publico.
-
-**Response `200`**
-
-```json
-{
-  "status": "UP",
-  "checks": {
-    "database": "UP",
-    "storage": "UP"
-  },
-  "timestamp": "2026-09-02T14:30:00Z"
-}
-```
-
-**Errores:** `503`, `500`.
-
-## Estados y reglas de negocio
-
-- Una OT se crea en `PENDING` y solo puede pasar a `ASSIGNED` cuando existe un tecnico disponible y una franja horaria valida.
-- `EN_ROUTE` e `IN_PROGRESS` requieren un tecnico asignado.
-- `PENDING_CUSTOMER_CONFIRMATION` requiere intervencion registrada; `COMPLETED` requiere intervencion finalizada y conformidad aceptada. Una conformidad no aceptada mantiene la OT en `PENDING_CUSTOMER_CONFIRMATION` y conserva los comentarios.
-- El endpoint de cambio de estado no permite saltar las operaciones de intervención y conformidad que producen `IN_PROGRESS`, `PENDING_CUSTOMER_CONFIRMATION` y `COMPLETED`.
-- Una OT puede pasar a `RESCHEDULED` indicando `reason`, `rescheduledStart` y `rescheduledEnd`; la asignacion anterior se conserva en el historial y la nueva agenda debe crear una asignacion nueva.
-- Una OT `COMPLETED` no puede editarse, excepto para agregar evidencia o corregir datos mediante una accion autorizada de auditoria definida por el backend.
-- Un checklist con items obligatorios no puede marcarse como `completed` mientras falte una respuesta.
-- El historial de mantenimiento se construye a partir de OT completadas asociadas al equipo; las OT pendientes no se consideran mantenimiento realizado.
-- Un plan preventivo activo puede generar una OT cuando alcanza `nextDueAt`; la generacion debe ser idempotente.
-- Todas las mutaciones deben registrar actor, fecha, estado anterior y estado nuevo en una bitacora de auditoria, aunque esa bitacora no se expone como endpoint en esta version.
+`API.md` debe mantenerse alineado con `modules-and-entities.md` y con la implementacion OpenAPI generada por el backend.
