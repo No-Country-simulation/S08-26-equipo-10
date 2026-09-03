@@ -911,7 +911,73 @@ Consulta el historial derivado de intervenciones completadas, OT, fallas, repara
       "interventionId": "0192f3a1-0000-4000-0000-000000000060",
       "status": "COMPLETED",
       "actualEndedAt": "2026-09-08T11:45:00Z",
-      "technicianId": "0192f3a1-0000-4000-0000-000000000040"
+      "technicianId": "0192f3a1-0000-4000-0000-000000000040",
+      "failures": [
+        {
+          "id": "0192f3a1-0000-4000-0000-000000000080",
+          "description": "Correa floja",
+          "severity": "MEDIUM",
+          "detectedAt": "2026-09-08T09:30:00Z",
+          "resolved": true
+        }
+      ],
+      "repairs": [
+        {
+          "id": "0192f3a1-0000-4000-0000-000000000081",
+          "description": "Ajuste de correa",
+          "status": "COMPLETED",
+          "completedAt": "2026-09-08T10:30:00Z",
+          "notes": null
+        }
+      ],
+      "componentsIntervened": [
+        {
+          "id": "0192f3a1-0000-4000-0000-000000000082",
+          "equipmentComponentId": "0192f3a1-0000-4000-0000-000000000071",
+          "action": "REPAIRED",
+          "description": "Ajuste de correa",
+          "createdAt": "2026-09-08T10:30:00Z"
+        }
+      ],
+      "technicalNotes": [
+        {
+          "id": "0192f3a1-0000-4000-0000-000000000083",
+          "authorUserId": "0192f3a1-0000-4000-0000-000000000040",
+          "content": "Se ajusto correa y se reemplazo filtro",
+          "createdAt": "2026-09-08T11:45:00Z"
+        }
+      ],
+      "evidence": [
+        {
+          "id": "0192f3a1-0000-4000-0000-000000000084",
+          "type": "PHOTO",
+          "fileName": "filtro-reemplazado.jpg",
+          "storageLocation": "fieldflow/interventions/0192.../filtro-reemplazado.jpg",
+          "mimeType": "image/jpeg",
+          "sizeBytes": 248912,
+          "description": "Filtro reemplazado",
+          "capturedAt": "2026-09-08T10:40:00Z",
+          "createdAt": "2026-09-08T10:41:00Z"
+        }
+      ],
+      "checklistResponses": [
+        {
+          "id": "0192f3a1-0000-4000-0000-000000000085",
+          "checklistItemId": "0192f3a1-0000-4000-0000-000000000032",
+          "value": true,
+          "observation": null,
+          "answeredAt": "2026-09-08T10:00:00Z"
+        }
+      ],
+      "conformity": {
+        "id": "0192f3a1-0000-4000-0000-000000000086",
+        "signerName": "Carlos Ruiz",
+        "customerRole": "Responsable de planta",
+        "signerIdentifier": null,
+        "signature": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUg...",
+        "acceptedAt": "2026-09-08T12:00:00Z",
+        "observations": "Trabajo realizado conforme"
+      }
     }
   ],
   "page": 0,
