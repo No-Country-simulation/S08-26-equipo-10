@@ -58,11 +58,12 @@ spring:
     multipart:
       max-file-size: 5MB
       max-request-size: 6MB
+  web:
+    error:
+      include-message: never
 
 server:
   port: ${PORT:8080}
-  error:
-    include-message: never      # no filtrar detalles internos al cliente
 
 app:
   openapi:
