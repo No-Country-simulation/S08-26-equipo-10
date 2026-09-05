@@ -1,0 +1,47 @@
+# Uso típico en local: solo la base de datos.
+#   docker compose up -d postgres
+# Stack completo:
+#   docker compose up --build
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: fieldflow-postgres
+    environment:
+      POSTGRES_DB: fieldflow
+      POSTGRES_USER: fieldflow
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-fieldflow_local}
+    ports:
+      # Puerto del HOST configurable: si ya tienes un Postgres local en 5432,
+      # define DB_PORT en backend/.env (por ejemplo 5433). Dentro de la red de
+      # Docker el puerto siempre es 5432.
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U fieldflow" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    # Contexto en la raíz del repo: el build necesita backend/ y database/
+    # (las migraciones se empaquetan desde database/migrations).
+    build:
+      context: ..
+      dockerfile: backend/Dockerfile
+    container_name: fieldflow-api
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/fieldflow
+      DB_USER: fieldflow
+      DB_PASSWORD: ${DB_PASSWORD:-fieldflow_local}
+      CORS_ALLOWED_ORIGINS: http://localhost:3000
+      JWT_SECRET: ${JWT_SECRET:-cambiar-en-local-minimo-32-caracteres}
+    ports:
+      - "8080:8080"
+
+volumes:
+  pgdata:
