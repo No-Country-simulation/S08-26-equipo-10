@@ -26,7 +26,7 @@ El criterio de éxito que guía este modelo es que, a partir de una Orden de Tra
 - la conformidad del cliente;
 - el historial de mantenimiento del equipo.
 
-Las decisiones puramente técnicas de persistencia, auditoría, seguridad, almacenamiento de archivos, índices, tipos SQL, UUID, soft-delete o timestamps globales no forman parte de este documento salvo que sean necesarias para expresar una relación funcional.
+Las decisiones puramente técnicas de persistencia, auditoría, seguridad, almacenamiento de archivos, índices, tipos SQL, soft-delete o timestamps globales no forman parte de este documento salvo que sean necesarias para expresar una relación funcional. Como convención técnica transversal del MVP, todos los identificadores primarios (`id`) y las referencias entre entidades (`*_id`) utilizan UUID.
 
 ---
 
@@ -53,7 +53,7 @@ Organización que solicita o recibe servicios técnicos.
 
 Campos funcionales mínimos:
 
-- `id` — identificador técnico.
+- `id` — identificador técnico UUID.
 - `name` — nombre del cliente.
 
 Relaciones:
@@ -69,7 +69,7 @@ Sede o ubicación principal perteneciente a un cliente.
 
 Campos funcionales mínimos:
 
-- `id` — identificador técnico.
+- `id` — identificador técnico UUID.
 - `client_id` — referencia al `client`.
 - `name` — nombre de la sede.
 - `address` — ubicación donde se presta el servicio.
@@ -88,7 +88,7 @@ Sububicación opcional dentro de una sede.
 
 Campos funcionales mínimos:
 
-- `id` — identificador técnico.
+- `id` — identificador técnico UUID.
 - `site_id` — referencia a la `site`.
 - `name` — identificación de la instalación.
 
@@ -108,7 +108,7 @@ Equipo que requiere mantenimiento, reparación o una intervención específica.
 
 Campos funcionales mínimos:
 
-- `id` — identificador técnico.
+- `id` — identificador técnico UUID.
 - `site_id` — referencia obligatoria a la sede donde se encuentra el equipo.
 - `installation_id` — referencia opcional a una instalación.
 - `identifier` — identificador reconocible del equipo.
@@ -132,7 +132,7 @@ Clasificación del trabajo requerido.
 
 Campos funcionales mínimos:
 
-- `id` — identificador técnico.
+- `id` — identificador técnico UUID.
 - `name` — nombre del tipo de servicio.
 
 Relaciones:
@@ -148,7 +148,7 @@ Unidad central de planificación, seguimiento y ejecución del trabajo.
 
 Campos funcionales mínimos:
 
-- `id` — identificador técnico.
+- `id` — identificador técnico UUID.
 - `equipment_id` — equipo involucrado.
 - `service_type_id` — tipo de servicio requerido.
 - `instructions` — instrucciones necesarias para ejecutar el trabajo.
@@ -188,7 +188,7 @@ Técnico que puede ser planificado y asignado a una Orden de Trabajo.
 
 Campos funcionales mínimos:
 
-- `id` — identificador técnico.
+- `id` — identificador técnico UUID.
 - `name` — nombre del técnico.
 
 No se modelan usuarios, roles ni permisos en este documento porque `project-description.md` no define un sistema de autenticación o autorización como parte del alcance funcional del MVP.
@@ -201,7 +201,7 @@ Intervalo en el que un técnico se encuentra disponible para recibir trabajo.
 
 Campos funcionales mínimos:
 
-- `id` — identificador técnico.
+- `id` — identificador técnico UUID.
 - `technician_id` — técnico disponible.
 - `starts_at` — inicio de disponibilidad.
 - `ends_at` — fin de disponibilidad.
@@ -218,7 +218,7 @@ Asignación y planificación de una Orden de Trabajo a un técnico.
 
 Campos funcionales mínimos:
 
-- `id` — identificador técnico.
+- `id` — identificador técnico UUID.
 - `work_order_id` — Orden de Trabajo asignada.
 - `technician_id` — técnico responsable.
 - `planned_start_at` — fecha y hora planificada de inicio.
@@ -251,7 +251,7 @@ Registro de lo ocurrido realmente durante una visita o ejecución de una Orden d
 
 Campos funcionales mínimos:
 
-- `id` — identificador técnico.
+- `id` — identificador técnico UUID.
 - `work_order_id` — Orden de Trabajo ejecutada.
 - `technician_id` — técnico que realizó la intervención.
 - `started_at` — momento real de inicio.
@@ -276,7 +276,7 @@ Falla detectada o registrada durante una intervención.
 
 Campos funcionales mínimos:
 
-- `id` — identificador técnico.
+- `id` — identificador técnico UUID.
 - `intervention_id` — intervención donde se registró.
 - `description` — descripción de la falla.
 
@@ -292,7 +292,7 @@ Reparación realizada durante una intervención.
 
 Campos funcionales mínimos:
 
-- `id` — identificador técnico.
+- `id` — identificador técnico UUID.
 - `intervention_id` — intervención donde se realizó.
 - `description` — descripción de la reparación.
 
@@ -308,7 +308,7 @@ Registro simple de un componente que fue intervenido durante el trabajo.
 
 Campos funcionales mínimos:
 
-- `id` — identificador técnico.
+- `id` — identificador técnico UUID.
 - `intervention_id` — intervención donde fue afectado.
 - `component_name` — componente intervenido.
 - `action` — acción realizada sobre el componente.
@@ -328,7 +328,7 @@ Conjunto de verificaciones utilizadas para una Orden de Trabajo.
 
 Campos funcionales mínimos:
 
-- `id` — identificador técnico.
+- `id` — identificador técnico UUID.
 - `work_order_id` — Orden de Trabajo a la que corresponde.
 - `name` — identificación del checklist.
 
@@ -347,7 +347,7 @@ Verificación individual de un checklist.
 
 Campos funcionales mínimos:
 
-- `id` — identificador técnico.
+- `id` — identificador técnico UUID.
 - `checklist_id` — checklist al que pertenece.
 - `label` — texto de la verificación.
 
@@ -364,7 +364,7 @@ Respuesta registrada para un ítem del checklist durante una intervención.
 
 Campos funcionales mínimos:
 
-- `id` — identificador técnico.
+- `id` — identificador técnico UUID.
 - `intervention_id` — intervención donde se respondió.
 - `checklist_item_id` — ítem respondido.
 - `value` — respuesta registrada.
@@ -383,7 +383,7 @@ Nota técnica registrada durante una intervención.
 
 Campos funcionales mínimos:
 
-- `id` — identificador técnico.
+- `id` — identificador técnico UUID.
 - `intervention_id` — intervención asociada.
 - `content` — contenido de la nota.
 
@@ -403,7 +403,7 @@ El alcance funcional contempla principalmente fotografías y mediciones.
 
 Campos funcionales mínimos:
 
-- `id` — identificador técnico.
+- `id` — identificador técnico UUID.
 - `intervention_id` — intervención respaldada.
 - `type` — tipo de evidencia.
 - `reference` — referencia lógica al contenido de la evidencia.
@@ -423,7 +423,7 @@ Firma o conformidad del cliente respecto de una intervención.
 
 Campos funcionales mínimos:
 
-- `id` — identificador técnico.
+- `id` — identificador técnico UUID.
 - `intervention_id` — intervención aceptada.
 - `signature` — firma o registro equivalente de conformidad.
 
@@ -443,7 +443,7 @@ Plan de mantenimiento preventivo asociado a un equipo.
 
 Campos funcionales mínimos:
 
-- `id` — identificador técnico.
+- `id` — identificador técnico UUID.
 - `equipment_id` — equipo que debe recibir mantenimiento.
 - `service_type_id` — tipo de servicio previsto.
 - `next_execution_at` — próxima fecha prevista de mantenimiento.
@@ -464,7 +464,7 @@ Regla simple de repetición de un mantenimiento preventivo.
 
 Campos funcionales mínimos:
 
-- `id` — identificador técnico.
+- `id` — identificador técnico UUID.
 - `preventive_maintenance_plan_id` — plan asociado.
 - `frequency` — unidad de repetición.
 - `interval` — cantidad de unidades entre ejecuciones.
