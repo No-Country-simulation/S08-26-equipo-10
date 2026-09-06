@@ -6,7 +6,7 @@ spring:
     name: fieldflow-api
 
   datasource:
-    # El proveedor es Supabase (PostgreSQL gestionado). Ver ADR-0004.
+    # El proveedor es Supabase (PostgreSQL gestionado).
     # Los valores reales viven en backend/.env, que no entra al repositorio.
     # El default apunta al Postgres de docker-compose para que el proyecto
     # siga arrancando en local sin .env.
