@@ -1,13 +1,13 @@
-package com.fieldflow.api;
+package com.fieldflow;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class ApiApplication {
+public class FieldFlowApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(ApiApplication.class, args);
+		SpringApplication.run(FieldFlowApplication.class, args);
 	}
 
 }

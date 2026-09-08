@@ -1,4 +1,4 @@
-package com.fieldflow.api.shared;
+package com.fieldflow.shared;
 
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;

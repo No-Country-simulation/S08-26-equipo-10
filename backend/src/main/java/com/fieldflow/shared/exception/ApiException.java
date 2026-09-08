@@ -1,4 +1,4 @@
-package com.fieldflow.api.shared.exception;
+package com.fieldflow.shared.exception;
 
 import org.springframework.http.HttpStatus;
 

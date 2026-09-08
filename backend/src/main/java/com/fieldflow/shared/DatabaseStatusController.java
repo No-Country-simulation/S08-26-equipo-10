@@ -1,4 +1,4 @@
-package com.fieldflow.api.shared;
+package com.fieldflow.shared;
 
 import com.zaxxer.hikari.HikariDataSource;
 import com.zaxxer.hikari.HikariPoolMXBean;

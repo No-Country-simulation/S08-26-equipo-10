@@ -1,8 +1,8 @@
-package com.fieldflow.api.config;
+package com.fieldflow.config;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fieldflow.api.shared.annotations.ApiJsonExample;
-import com.fieldflow.api.shared.annotations.ApiJsonExamples;
+import com.fieldflow.shared.annotations.ApiJsonExample;
+import com.fieldflow.shared.annotations.ApiJsonExamples;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.examples.Example;
