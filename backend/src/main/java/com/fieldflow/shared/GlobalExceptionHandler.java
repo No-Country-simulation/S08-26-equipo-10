@@ -1,7 +1,7 @@
-package com.fieldflow.api.shared;
+package com.fieldflow.shared;
 
-import com.fieldflow.api.shared.exception.ApiErrorType;
-import com.fieldflow.api.shared.exception.ApiException;
+import com.fieldflow.shared.exception.ApiErrorType;
+import com.fieldflow.shared.exception.ApiException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

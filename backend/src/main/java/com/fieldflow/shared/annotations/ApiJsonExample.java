@@ -1,4 +1,4 @@
-package com.fieldflow.api.shared.annotations;
+package com.fieldflow.shared.annotations;
 
 import java.lang.annotation.*;
 

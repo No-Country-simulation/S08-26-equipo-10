@@ -1,4 +1,4 @@
-package com.fieldflow.api.shared.exception;
+package com.fieldflow.shared.exception;
 
 /**
  * Tipos de errores que pueden ocurrir en la API.

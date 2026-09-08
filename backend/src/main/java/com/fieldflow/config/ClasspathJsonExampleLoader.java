@@ -1,4 +1,4 @@
-package com.fieldflow.api.config;
+package com.fieldflow.config;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
