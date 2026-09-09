@@ -1,5 +1,5 @@
-function Preventivos() {
-    return null
+function MantenimientosPage() {
+    return <h1>Mantenimientos</h1>
 }
 
-export default Preventivos
+export default MantenimientosPage
