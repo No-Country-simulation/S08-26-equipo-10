@@ -1,4 +1,4 @@
-package com.fieldflow.assets.persistense;
+package com.fieldflow.assets.persistence;
 
 import com.fieldflow.assets.domain.Equipment;
 import org.springframework.data.jpa.repository.JpaRepository;
