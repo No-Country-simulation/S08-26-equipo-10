@@ -2,7 +2,7 @@ package com.fieldflow.assets.application;
 
 import com.fieldflow.assets.api.dto.EquipmentResponse;
 import com.fieldflow.assets.application.mapper.EquipmentMapper;
-import com.fieldflow.assets.persistense.EquipmentRepository;
+import com.fieldflow.assets.persistence.EquipmentRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
