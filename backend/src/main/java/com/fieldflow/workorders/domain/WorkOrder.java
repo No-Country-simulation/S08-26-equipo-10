@@ -30,8 +30,9 @@ public class WorkOrder {
 	@Column(name = "instructions", nullable = false)
 	private String instructions;
 
+	@Enumerated(EnumType.STRING)
 	@Column(name = "priority", nullable = false, length = 50)
-	private String priority;
+	private WorkOrderPriority priority;
 
 	@Column(name = "estimated_duration", nullable = false)
 	private Integer estimatedDuration;
@@ -56,7 +57,7 @@ public class WorkOrder {
 			Equipment equipment,
 			ServiceType serviceType,
 			String instructions,
-			String priority,
+			WorkOrderPriority priority,
 			Integer estimatedDuration,
 			WorkOrderStatus status
 	) {
@@ -84,7 +85,7 @@ public class WorkOrder {
 		return instructions;
 	}
 
-	public String getPriority() {
+	public WorkOrderPriority getPriority() {
 		return priority;
 	}
 
