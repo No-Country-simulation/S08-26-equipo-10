@@ -2,6 +2,8 @@ package com.fieldflow.assets.domain;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -10,7 +12,7 @@ public class Site {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.UUID)
-	@Column(name = "id", nullable = false)
+	@Column(name = "id", nullable = false, updatable = false)
 	private UUID id;
 
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -23,7 +25,19 @@ public class Site {
 	@Column(name = "address", nullable = false)
 	private String address;
 
-	public Site() {
+	@OneToMany(mappedBy = "site", fetch = FetchType.LAZY)
+	private List<Installation> installations = new ArrayList<>();
+
+	@OneToMany(mappedBy = "site", fetch = FetchType.LAZY)
+	private List<Equipment> equipments = new ArrayList<>();
+
+	protected Site() {
+	}
+
+	public Site(Client client, String name, String address) {
+		this.client = client;
+		this.name = name;
+		this.address = address;
 	}
 
 	public UUID getId() {
@@ -42,19 +56,11 @@ public class Site {
 		return address;
 	}
 
-	public void setId(UUID id) {
-		this.id = id;
+	public List<Installation> getInstallations() {
+		return installations;
 	}
 
-	public void setClient(Client client) {
-		this.client = client;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public void setAddress(String address) {
-		this.address = address;
+	public List<Equipment> getEquipments() {
+		return equipments;
 	}
 }

@@ -1,7 +1,11 @@
 package com.fieldflow.assets.domain;
 
+import com.fieldflow.maintenance.domain.PreventiveMaintenancePlan;
+import com.fieldflow.workorders.domain.WorkOrder;
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -10,7 +14,7 @@ public class Equipment {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.UUID)
-	@Column(name = "id", nullable = false)
+	@Column(name = "id", nullable = false, updatable = false)
 	private UUID id;
 
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -30,7 +34,27 @@ public class Equipment {
 	@Column(name = "current_status", nullable = false, length = 50)
 	private String currentStatus;
 
-	public Equipment() {
+	@OneToMany(mappedBy = "equipment", fetch = FetchType.LAZY)
+	private List<WorkOrder> workOrders = new ArrayList<>();
+
+	@OneToMany(mappedBy = "equipment", fetch = FetchType.LAZY)
+	private List<PreventiveMaintenancePlan> preventiveMaintenancePlans = new ArrayList<>();
+
+	protected Equipment() {
+	}
+
+	public Equipment(
+			Site site,
+			Installation installation,
+			String identifier,
+			String name,
+			String currentStatus
+	) {
+		this.site = site;
+		this.installation = installation;
+		this.identifier = identifier;
+		this.name = name;
+		this.currentStatus = currentStatus;
 	}
 
 	public UUID getId() {
@@ -57,27 +81,11 @@ public class Equipment {
 		return currentStatus;
 	}
 
-	public void setId(UUID id) {
-		this.id = id;
+	public List<WorkOrder> getWorkOrders() {
+		return workOrders;
 	}
 
-	public void setSite(Site site) {
-		this.site = site;
-	}
-
-	public void setInstallation(Installation installation) {
-		this.installation = installation;
-	}
-
-	public void setIdentifier(String identifier) {
-		this.identifier = identifier;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public void setCurrentStatus(String currentStatus) {
-		this.currentStatus = currentStatus;
+	public List<PreventiveMaintenancePlan> getPreventiveMaintenancePlans() {
+		return preventiveMaintenancePlans;
 	}
 }

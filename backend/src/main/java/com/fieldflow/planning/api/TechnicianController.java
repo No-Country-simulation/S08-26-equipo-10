@@ -36,7 +36,7 @@ public class TechnicianController {
 			path = "/static/swagger/examples/planning/list-technicians-200.json",
 			summary = "Lista de técnicos"
 	)
-	@GetMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
+	@GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<List<TechnicianResponse>> getAllTechnicians() {
 		List<TechnicianResponse> technicians = technicianService.getAllTechnicians();
 		return ResponseEntity.ok(technicians);

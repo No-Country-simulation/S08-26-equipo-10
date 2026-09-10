@@ -1,0 +1,32 @@
+[
+  {
+    "id": "08000000-0000-4000-8000-000000000001",
+    "equipment": {
+      "id": "04000000-0000-4000-8000-000000000001",
+      "identifier": "EQ-001",
+      "name": "Compresor principal"
+    },
+    "serviceType": {
+      "id": "05000000-0000-4000-8000-000000000001",
+      "name": "Mantenimiento preventivo"
+    },
+    "priority": "HIGH",
+    "estimatedDurationMinutes": 90,
+    "status": "COMPLETED"
+  },
+  {
+    "id": "08000000-0000-4000-8000-000000000002",
+    "equipment": {
+      "id": "04000000-0000-4000-8000-000000000002",
+      "identifier": "EQ-002",
+      "name": "Bomba de agua"
+    },
+    "serviceType": {
+      "id": "05000000-0000-4000-8000-000000000002",
+      "name": "Reparación de emergencia"
+    },
+    "priority": "MEDIUM",
+    "estimatedDurationMinutes": 120,
+    "status": "IN_PROGRESS"
+  }
+]
