@@ -28,7 +28,7 @@ function NotFound() {
                     <button
                         type="button"
                         onClick={() => window.history.back()}
-                        className="inline-flex items-center gap-2 rounded-md border border-slate-700 bg-slate-900 px-4 py-2 text-sm font-medium text-slate-300 transition hover:bg-slate-800 hover:text-white"
+                        className="inline-flex items-center gap-2 rounded-md border border-slate-700 bg-slate-900 px-4 py-2 text-sm font-medium text-slate-300 transition hover:bg-slate-800 hover:text-white cursor-pointer"
                     >
                         <ArrowLeft className="h-4 w-4" />
                         Volver

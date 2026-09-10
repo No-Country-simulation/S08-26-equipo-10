@@ -1,3 +1,4 @@
+import { formatCurrentDateTime } from '@/utils/formatters'
 import { Bell, ChevronRight } from 'lucide-react'
 import { useLocation } from 'react-router'
 
@@ -18,6 +19,8 @@ function Navbar() {
     const currentPage = currentPath[currentPath.length - 1]
 
     const pageName = pageNames[currentPage] ?? 'FieldFlow'
+
+    const currentDate = new Date().getDate()
 
     return (
         <header className="flex h-14 items-center justify-between border-b border-slate-800 bg-slate-950 px-4">
@@ -52,7 +55,7 @@ function Navbar() {
                     <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
 
                     <span>
-                        Sáb 04 ene 2025 · 10:24
+                        {formatCurrentDateTime()}
                     </span>
                 </div>
             </div>
