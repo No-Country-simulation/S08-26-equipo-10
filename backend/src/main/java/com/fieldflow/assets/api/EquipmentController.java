@@ -40,7 +40,7 @@ public class EquipmentController {
 					Si no hay equipos, devuelve un arreglo vacío.
 					"""
 	)
-	@GetMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
+	@GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<List<EquipmentResponse>> getAllEquipments(@RequestParam(required = false) UUID siteId,
 	                                                                @RequestParam(required = false) UUID clientId) {
 		List<EquipmentResponse> equipments = equipmentService.getAllEquipments(siteId, clientId);
