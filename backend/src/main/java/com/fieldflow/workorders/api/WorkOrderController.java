@@ -39,7 +39,7 @@ public class WorkOrderController {
 			path = "/static/swagger/examples/workorders/list-work-orders-200.json",
 			summary = "Lista de órdenes de trabajo"
 	)
-	@GetMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
+	@GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<List<WorkOrderResponse>> getAllWorkOrders(
 			@RequestParam(required = false) WorkOrderStatus status,
 			@RequestParam(required = false) UUID equipmentId) {
