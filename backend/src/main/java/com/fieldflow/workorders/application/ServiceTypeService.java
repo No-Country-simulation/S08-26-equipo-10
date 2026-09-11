@@ -1,9 +1,8 @@
 package com.fieldflow.workorders.application;
 
-import com.fieldflow.workorders.domain.ServiceType;
 import java.util.List;
+import com.fieldflow.workorders.api.dto.ServiceTypeResponse;
 
 public interface ServiceTypeService {
-    List<ServiceType> getAllServiceTypes();
-    
-} 
+    List<ServiceTypeResponse> getAllServiceTypes();
+}
