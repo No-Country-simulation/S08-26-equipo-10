@@ -5,6 +5,7 @@ import com.fieldflow.workorders.application.mapper.WorkOrderMapper;
 import com.fieldflow.workorders.domain.WorkOrderStatus;
 import com.fieldflow.workorders.persistence.WorkOrderRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -21,6 +22,7 @@ public class WorkOrderServiceImpl implements WorkOrderService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public List<WorkOrderResponse> getAllWorkOrders(WorkOrderStatus status, UUID equipmentId) {
 		return workOrderRepository.findAllWithContext(status, equipmentId).stream()
 				.map(workOrderMapper::toResponse)

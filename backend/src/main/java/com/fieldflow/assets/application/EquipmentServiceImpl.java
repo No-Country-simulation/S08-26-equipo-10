@@ -4,6 +4,7 @@ import com.fieldflow.assets.api.dto.EquipmentResponse;
 import com.fieldflow.assets.application.mapper.EquipmentMapper;
 import com.fieldflow.assets.persistence.EquipmentRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -20,6 +21,7 @@ public class EquipmentServiceImpl implements EquipmentService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public List<EquipmentResponse> getAllEquipments(UUID siteId, UUID clientId) {
 		return equipmentRepository.findAllWithContext(siteId, clientId)
 				.stream()
