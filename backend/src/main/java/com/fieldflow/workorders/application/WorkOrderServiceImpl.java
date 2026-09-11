@@ -1,6 +1,6 @@
 package com.fieldflow.workorders.application;
 
-import com.fieldflow.workorders.api.dto.WorkOrderResponse;
+import com.fieldflow.workorders.api.dto.WorkOrderSummaryResponse;
 import com.fieldflow.workorders.application.mapper.WorkOrderMapper;
 import com.fieldflow.workorders.domain.WorkOrderStatus;
 import com.fieldflow.workorders.persistence.WorkOrderRepository;
@@ -23,7 +23,7 @@ public class WorkOrderServiceImpl implements WorkOrderService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<WorkOrderResponse> getAllWorkOrders(WorkOrderStatus status, UUID equipmentId) {
+	public List<WorkOrderSummaryResponse> getAllWorkOrders(WorkOrderStatus status, UUID equipmentId) {
 		return workOrderRepository.findAllWithContext(status, equipmentId).stream()
 				.map(workOrderMapper::toResponse)
 				.toList();

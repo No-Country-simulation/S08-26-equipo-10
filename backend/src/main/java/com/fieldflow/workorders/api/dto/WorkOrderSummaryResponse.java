@@ -5,7 +5,7 @@ import com.fieldflow.workorders.domain.WorkOrderStatus;
 
 import java.util.UUID;
 
-public record WorkOrderResponse(
+public record WorkOrderSummaryResponse(
 		UUID id,
 		EquipmentSummaryResponse equipment,
 		ServiceTypeResponse serviceType,

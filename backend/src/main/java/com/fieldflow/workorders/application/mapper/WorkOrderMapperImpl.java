@@ -1,6 +1,6 @@
 package com.fieldflow.workorders.application.mapper;
 
-import com.fieldflow.workorders.api.dto.WorkOrderResponse;
+import com.fieldflow.workorders.api.dto.WorkOrderSummaryResponse;
 import com.fieldflow.workorders.domain.WorkOrder;
 import org.springframework.stereotype.Component;
 
@@ -8,8 +8,8 @@ import org.springframework.stereotype.Component;
 public class WorkOrderMapperImpl implements WorkOrderMapper {
 
 	@Override
-	public WorkOrderResponse toResponse(WorkOrder entity) {
-		return new WorkOrderResponse(
+	public WorkOrderSummaryResponse toResponse(WorkOrder entity) {
+		return new WorkOrderSummaryResponse(
 				entity.getId(),
 				toEquipmentSummaryResponse(entity),
 				toServiceTypeResponse(entity),
@@ -19,18 +19,18 @@ public class WorkOrderMapperImpl implements WorkOrderMapper {
 		);
 	}
 
-	private WorkOrderResponse.EquipmentSummaryResponse toEquipmentSummaryResponse(WorkOrder entity) {
+	private WorkOrderSummaryResponse.EquipmentSummaryResponse toEquipmentSummaryResponse(WorkOrder entity) {
 		var equipment = entity.getEquipment();
-		return new WorkOrderResponse.EquipmentSummaryResponse(
+		return new WorkOrderSummaryResponse.EquipmentSummaryResponse(
 				equipment.getId(),
 				equipment.getIdentifier(),
 				equipment.getName()
 		);
 	}
 
-	private WorkOrderResponse.ServiceTypeResponse toServiceTypeResponse(WorkOrder entity) {
+	private WorkOrderSummaryResponse.ServiceTypeResponse toServiceTypeResponse(WorkOrder entity) {
 		var serviceType = entity.getServiceType();
-		return new WorkOrderResponse.ServiceTypeResponse(
+		return new WorkOrderSummaryResponse.ServiceTypeResponse(
 				serviceType.getId(),
 				serviceType.getName()
 		);

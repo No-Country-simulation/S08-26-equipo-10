@@ -1,7 +1,7 @@
 package com.fieldflow.workorders.api;
 
 import com.fieldflow.shared.annotations.ApiJsonExample;
-import com.fieldflow.workorders.api.dto.WorkOrderResponse;
+import com.fieldflow.workorders.api.dto.WorkOrderSummaryResponse;
 import com.fieldflow.workorders.application.WorkOrderService;
 import com.fieldflow.workorders.domain.WorkOrderStatus;
 import io.swagger.v3.oas.annotations.Operation;
@@ -40,10 +40,10 @@ public class WorkOrderController {
 			summary = "Lista de órdenes de trabajo"
 	)
 	@GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<List<WorkOrderResponse>> getAllWorkOrders(
+	public ResponseEntity<List<WorkOrderSummaryResponse>> getAllWorkOrders(
 			@RequestParam(required = false) WorkOrderStatus status,
 			@RequestParam(required = false) UUID equipmentId) {
-		List<WorkOrderResponse> response = workOrderService.getAllWorkOrders(status, equipmentId);
+		List<WorkOrderSummaryResponse> response = workOrderService.getAllWorkOrders(status, equipmentId);
 		return ResponseEntity.ok(response);
 	}
 }
