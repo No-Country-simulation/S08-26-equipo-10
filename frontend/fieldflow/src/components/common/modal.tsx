@@ -29,7 +29,7 @@ export function Modal({
                         className="text-slate-400 hover:text-white"
                         aria-label="Cerrar"
                     >
-                        <X className="h-5 w-5" />
+                        <X className="h-5 w-5 cursor-pointer" />
                     </button>
                 </div>
 
