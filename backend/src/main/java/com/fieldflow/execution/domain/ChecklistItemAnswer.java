@@ -12,7 +12,7 @@ import java.util.UUID;
 				columnNames = {"intervention_id", "checklist_item_id"}
 		)
 )
-public class ChecklistResponse {
+public class ChecklistItemAnswer {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.UUID)
@@ -33,10 +33,10 @@ public class ChecklistResponse {
 	@Column(name = "observation")
 	private String observation;
 
-	protected ChecklistResponse() {
+	protected ChecklistItemAnswer() {
 	}
 
-	public ChecklistResponse(
+	public ChecklistItemAnswer(
 			Intervention intervention,
 			ChecklistItem checklistItem,
 			String value,

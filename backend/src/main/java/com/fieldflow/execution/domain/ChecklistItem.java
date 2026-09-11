@@ -23,7 +23,7 @@ public class ChecklistItem {
 	private String label;
 
 	@OneToMany(mappedBy = "checklistItem", fetch = FetchType.LAZY)
-	private List<ChecklistResponse> responses = new ArrayList<>();
+	private List<ChecklistItemAnswer> responses = new ArrayList<>();
 
 	protected ChecklistItem() {
 	}
@@ -45,7 +45,7 @@ public class ChecklistItem {
 		return label;
 	}
 
-	public List<ChecklistResponse> getResponses() {
+	public List<ChecklistItemAnswer> getResponses() {
 		return responses;
 	}
 }

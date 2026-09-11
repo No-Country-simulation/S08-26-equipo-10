@@ -53,7 +53,7 @@ public class Intervention {
 	private List<InterventionComponent> components = new ArrayList<>();
 
 	@OneToMany(mappedBy = "intervention", fetch = FetchType.LAZY)
-	private List<ChecklistResponse> checklistResponses = new ArrayList<>();
+	private List<ChecklistItemAnswer> checklistAnswers = new ArrayList<>();
 
 	@OneToMany(mappedBy = "intervention", fetch = FetchType.LAZY)
 	private List<TechnicalNote> technicalNotes = new ArrayList<>();
@@ -123,8 +123,8 @@ public class Intervention {
 		return components;
 	}
 
-	public List<ChecklistResponse> getChecklistResponses() {
-		return checklistResponses;
+	public List<ChecklistItemAnswer> getChecklistAnswers() {
+		return checklistAnswers;
 	}
 
 	public List<TechnicalNote> getTechnicalNotes() {
