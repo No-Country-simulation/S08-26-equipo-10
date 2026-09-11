@@ -688,7 +688,7 @@ Respuesta `200`:
       "failures": [],
       "repairs": [],
       "components": [],
-      "checklistResponses": [],
+      "checklistAnswers": [],
       "technicalNotes": [],
       "evidence": [],
       "conformity": null
