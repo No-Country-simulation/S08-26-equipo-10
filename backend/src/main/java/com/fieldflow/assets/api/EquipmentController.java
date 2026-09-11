@@ -1,6 +1,6 @@
 package com.fieldflow.assets.api;
 
-import com.fieldflow.assets.api.dto.EquipmentResponse;
+import com.fieldflow.assets.api.dto.EquipmentDetailResponse;
 import com.fieldflow.assets.application.EquipmentService;
 import com.fieldflow.shared.annotations.ApiJsonExample;
 import io.swagger.v3.oas.annotations.Operation;
@@ -41,9 +41,9 @@ public class EquipmentController {
 					"""
 	)
 	@GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<List<EquipmentResponse>> getAllEquipments(@RequestParam(required = false) UUID siteId,
-	                                                                @RequestParam(required = false) UUID clientId) {
-		List<EquipmentResponse> equipments = equipmentService.getAllEquipments(siteId, clientId);
+	public ResponseEntity<List<EquipmentDetailResponse>> getAllEquipments(@RequestParam(required = false) UUID siteId,
+	                                                                      @RequestParam(required = false) UUID clientId) {
+		List<EquipmentDetailResponse> equipments = equipmentService.getAllEquipments(siteId, clientId);
 		return ResponseEntity.ok(equipments);
 	}
 }

@@ -1,6 +1,6 @@
 package com.fieldflow.assets.application.mapper;
 
-import com.fieldflow.assets.api.dto.EquipmentResponse;
+import com.fieldflow.assets.api.dto.EquipmentDetailResponse;
 import com.fieldflow.assets.domain.Client;
 import com.fieldflow.assets.domain.Equipment;
 import com.fieldflow.assets.domain.Installation;
@@ -11,8 +11,8 @@ import org.springframework.stereotype.Component;
 public class EquipmentMapperImpl implements EquipmentMapper {
 
 	@Override
-	public EquipmentResponse toResponse(Equipment entity) {
-		return new EquipmentResponse(
+	public EquipmentDetailResponse toResponse(Equipment entity) {
+		return new EquipmentDetailResponse(
 				entity.getId(),
 				entity.getIdentifier(),
 				entity.getName(),
@@ -23,23 +23,23 @@ public class EquipmentMapperImpl implements EquipmentMapper {
 		);
 	}
 
-	private EquipmentResponse.ClientSummaryResponse toClientSummaryResponse(Client entity) {
-		return new EquipmentResponse.ClientSummaryResponse(
+	private EquipmentDetailResponse.ClientSummaryResponse toClientSummaryResponse(Client entity) {
+		return new EquipmentDetailResponse.ClientSummaryResponse(
 				entity.getId(),
 				entity.getName()
 		);
 	}
 
-	private EquipmentResponse.SiteSummaryResponse toSiteSummaryResponse(Site entity) {
-		return new EquipmentResponse.SiteSummaryResponse(
+	private EquipmentDetailResponse.SiteSummaryResponse toSiteSummaryResponse(Site entity) {
+		return new EquipmentDetailResponse.SiteSummaryResponse(
 				entity.getId(),
 				entity.getName(),
 				entity.getAddress()
 		);
 	}
 
-	private EquipmentResponse.InstallationSummaryResponse toInstallationSummaryResponse(Installation entity) {
-		return entity == null ? null : new EquipmentResponse.InstallationSummaryResponse(
+	private EquipmentDetailResponse.InstallationSummaryResponse toInstallationSummaryResponse(Installation entity) {
+		return entity == null ? null : new EquipmentDetailResponse.InstallationSummaryResponse(
 				entity.getId(),
 				entity.getName()
 		);
