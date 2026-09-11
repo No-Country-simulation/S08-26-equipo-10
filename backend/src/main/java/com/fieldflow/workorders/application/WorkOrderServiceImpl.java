@@ -25,7 +25,7 @@ public class WorkOrderServiceImpl implements WorkOrderService {
 	@Transactional(readOnly = true)
 	public List<WorkOrderSummaryResponse> getAllWorkOrders(WorkOrderStatus status, UUID equipmentId) {
 		return workOrderRepository.findAllWithContext(status, equipmentId).stream()
-				.map(workOrderMapper::toResponse)
+				.map(workOrderMapper::toSummaryResponse)
 				.toList();
 	}
 }

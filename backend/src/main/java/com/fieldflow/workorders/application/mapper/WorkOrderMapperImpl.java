@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 public class WorkOrderMapperImpl implements WorkOrderMapper {
 
 	@Override
-	public WorkOrderSummaryResponse toResponse(WorkOrder entity) {
+	public WorkOrderSummaryResponse toSummaryResponse(WorkOrder entity) {
 		return new WorkOrderSummaryResponse(
 				entity.getId(),
 				toEquipmentSummaryResponse(entity),

@@ -5,5 +5,5 @@ import com.fieldflow.workorders.domain.WorkOrder;
 
 public interface WorkOrderMapper {
 
-	WorkOrderSummaryResponse toResponse(WorkOrder entity);
+	WorkOrderSummaryResponse toSummaryResponse(WorkOrder entity);
 }
