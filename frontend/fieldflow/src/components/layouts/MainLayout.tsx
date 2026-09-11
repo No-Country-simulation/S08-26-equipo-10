@@ -4,15 +4,19 @@ import SideBar from './SideBar'
 
 function MainLayout() {
     return (
-        <div className="flex min-h-screen bg-slate-950">
+        <div className="flex h-screen overflow-hidden bg-slate-950">
+            {/* Sidebar fijo */}
             <SideBar />
+
             <div className="flex min-w-0 flex-1 flex-col">
+                {/* Navbar fijo */}
                 <NavBar />
-                <main className="flex-1">
+
+                {/* Única zona con scroll */}
+                <main className="min-h-0 flex-1 overflow-y-auto">
                     <Outlet />
                 </main>
             </div>
-
         </div>
     )
 }
