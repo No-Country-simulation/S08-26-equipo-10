@@ -1,6 +1,6 @@
 package com.fieldflow.planning.application.mapper;
 
-import com.fieldflow.planning.api.dto.TechnicianResponse;
+import com.fieldflow.planning.api.dto.TechnicianSummaryResponse;
 import com.fieldflow.planning.domain.Technician;
 import org.springframework.stereotype.Component;
 
@@ -8,8 +8,8 @@ import org.springframework.stereotype.Component;
 public class TechnicianMapperImpl implements TechnicianMapper {
 
 	@Override
-	public TechnicianResponse toResponse(Technician entity) {
-		return new TechnicianResponse(
+	public TechnicianSummaryResponse toResponse(Technician entity) {
+		return new TechnicianSummaryResponse(
 				entity.getId(),
 				entity.getName()
 		);

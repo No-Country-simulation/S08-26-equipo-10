@@ -1,10 +1,10 @@
 package com.fieldflow.planning.application;
 
-import com.fieldflow.planning.api.dto.TechnicianResponse;
+import com.fieldflow.planning.api.dto.TechnicianSummaryResponse;
 
 import java.util.List;
 
 public interface TechnicianService {
 
-	List<TechnicianResponse> getAllTechnicians();
+	List<TechnicianSummaryResponse> getAllTechnicians();
 }

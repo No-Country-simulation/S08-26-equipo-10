@@ -1,6 +1,6 @@
 package com.fieldflow.planning.application;
 
-import com.fieldflow.planning.api.dto.TechnicianResponse;
+import com.fieldflow.planning.api.dto.TechnicianSummaryResponse;
 import com.fieldflow.planning.application.mapper.TechnicianMapper;
 import com.fieldflow.planning.persistence.TechnicianRepository;
 import org.springframework.stereotype.Service;
@@ -21,7 +21,7 @@ public class TechnicianServiceImpl implements TechnicianService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<TechnicianResponse> getAllTechnicians() {
+	public List<TechnicianSummaryResponse> getAllTechnicians() {
 		return technicianRepository.findAll().stream()
 				.map(technicianMapper::toResponse)
 				.toList();

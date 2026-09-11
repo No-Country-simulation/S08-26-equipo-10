@@ -1,6 +1,6 @@
 package com.fieldflow.planning.api;
 
-import com.fieldflow.planning.api.dto.TechnicianResponse;
+import com.fieldflow.planning.api.dto.TechnicianSummaryResponse;
 import com.fieldflow.planning.application.TechnicianService;
 import com.fieldflow.shared.annotations.ApiJsonExample;
 import io.swagger.v3.oas.annotations.Operation;
@@ -37,8 +37,8 @@ public class TechnicianController {
 			summary = "Lista de técnicos"
 	)
 	@GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<List<TechnicianResponse>> getAllTechnicians() {
-		List<TechnicianResponse> technicians = technicianService.getAllTechnicians();
+	public ResponseEntity<List<TechnicianSummaryResponse>> getAllTechnicians() {
+		List<TechnicianSummaryResponse> technicians = technicianService.getAllTechnicians();
 		return ResponseEntity.ok(technicians);
 	}
 }
