@@ -1,5 +1,7 @@
 package com.fieldflow.execution.api.dto;
 
+import com.fieldflow.conformity.api.dto.ConformitySummaryResponse;
+import com.fieldflow.conformity.api.dto.EvidenceSummaryResponse;
 import com.fieldflow.planning.api.dto.TechnicianSummaryResponse;
 
 import java.time.OffsetDateTime;
@@ -14,13 +16,12 @@ public record InterventionDetailResponse(
 		String status,
 		String result,
 		String observations,
-		// TODO: crear records dedicados para cada uno de estos elementos en lugar de usar List<?>
-		List<?> failures,
-		List<?> repairs,
-		List<?> components,
-		List<?> checklistResponses,
-		List<?> technicalNotes,
-		List<?> evidence,
-		Object conformity
+		List<FailureSummaryResponse> failures,
+		List<RepairSummaryResponse> repairs,
+		List<ComponentSummaryResponse> components,
+		List<ChecklistAnswerSummaryResponse> checklistAnswers,
+		List<TechnicalNoteSummaryResponse> technicalNotes,
+		List<EvidenceSummaryResponse> evidence,
+		ConformitySummaryResponse conformity
 ) {
 }
