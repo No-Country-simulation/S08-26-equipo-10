@@ -8,6 +8,7 @@ import ClientesPage from "../pages/clientes/ClientesPage"
 import MantenimientosPage from "../pages/mantenimiento/Preventivos"
 import NotFound from "../pages/notFound/NotFound"
 import EquiposPage from "@/pages/equipos/Equipos"
+import ComponentsCatalog from "@/pages/componentsCatalog/ComponentsCatalog"
 
 function AppRoutes() {
     return (<Routes>
@@ -31,6 +32,7 @@ function AppRoutes() {
                 <Route path="clientes" element={<ClientesPage />} />
                 <Route path="mantenimientos" element={<MantenimientosPage />} />
                 <Route path="equipos" element={<EquiposPage />} />
+                <Route path="componentes" element={<ComponentsCatalog />} />
             </Route>
 
             <Route path="*" element={<NotFound />} />
