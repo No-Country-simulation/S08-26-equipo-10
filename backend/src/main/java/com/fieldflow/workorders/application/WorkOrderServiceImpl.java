@@ -1,5 +1,6 @@
 package com.fieldflow.workorders.application;
 
+import com.fieldflow.workorders.api.dto.WorkOrderDetailResponse;
 import com.fieldflow.workorders.api.dto.WorkOrderSummaryResponse;
 import com.fieldflow.workorders.application.mapper.WorkOrderMapper;
 import com.fieldflow.workorders.domain.WorkOrderStatus;
@@ -27,5 +28,11 @@ public class WorkOrderServiceImpl implements WorkOrderService {
 		return workOrderRepository.findAllWithContext(status, equipmentId).stream()
 				.map(workOrderMapper::toSummaryResponse)
 				.toList();
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public WorkOrderDetailResponse getWorkOrderDetail(UUID id) {
+		return null;
 	}
 }

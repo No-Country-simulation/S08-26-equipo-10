@@ -1,6 +1,7 @@
 package com.fieldflow.workorders.api;
 
 import com.fieldflow.shared.annotations.ApiJsonExample;
+import com.fieldflow.workorders.api.dto.WorkOrderDetailResponse;
 import com.fieldflow.workorders.api.dto.WorkOrderSummaryResponse;
 import com.fieldflow.workorders.application.WorkOrderService;
 import com.fieldflow.workorders.domain.WorkOrderStatus;
@@ -8,10 +9,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
@@ -44,6 +42,23 @@ public class WorkOrderController {
 			@RequestParam(required = false) WorkOrderStatus status,
 			@RequestParam(required = false) UUID equipmentId) {
 		List<WorkOrderSummaryResponse> response = workOrderService.getAllWorkOrders(status, equipmentId);
+		return ResponseEntity.ok(response);
+	}
+
+	@Operation(
+			summary = "Obtener detalles de una orden de trabajo",
+			description = """
+					Obtiene los detalles de una orden de trabajo específica buscando por su ID.
+					"""
+	)
+	@ApiJsonExample(
+			description = "Ejemplo de respuesta para obtener detalles de una orden de trabajo",
+			path = "/static/swagger/examples/workorders/get-work-order-detail-200.json",
+			summary = "Detalles de la orden de trabajo"
+	)
+	@GetMapping(path = "/{workOrderId}", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<WorkOrderDetailResponse> getWorkOrderDetail(@PathVariable UUID workOrderId) {
+		WorkOrderDetailResponse response = workOrderService.getWorkOrderDetail(workOrderId);
 		return ResponseEntity.ok(response);
 	}
 }
