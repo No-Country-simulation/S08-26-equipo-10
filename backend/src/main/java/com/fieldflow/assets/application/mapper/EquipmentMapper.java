@@ -5,5 +5,5 @@ import com.fieldflow.assets.domain.Equipment;
 
 public interface EquipmentMapper {
 
-	EquipmentDetailResponse toResponse(Equipment entity);
+	EquipmentDetailResponse toDetailResponse(Equipment entity);
 }

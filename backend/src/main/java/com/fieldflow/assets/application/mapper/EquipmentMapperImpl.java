@@ -11,27 +11,36 @@ import org.springframework.stereotype.Component;
 public class EquipmentMapperImpl implements EquipmentMapper {
 
 	@Override
-	public EquipmentDetailResponse toResponse(Equipment entity) {
+	public EquipmentDetailResponse toDetailResponse(Equipment entity) {
+		if (entity == null) {
+			return null;
+		}
 		return new EquipmentDetailResponse(
 				entity.getId(),
 				entity.getIdentifier(),
 				entity.getName(),
 				entity.getCurrentStatus(),
+
+				// ----------------- client -----------------
 				toClientSummaryResponse(entity.getSite().getClient()),
+
+				// ----------------- site -----------------
 				toSiteSummaryResponse(entity.getSite()),
+
+				// ----------------- installation -----------------
 				toInstallationSummaryResponse(entity.getInstallation())
 		);
 	}
 
 	private EquipmentDetailResponse.ClientSummaryResponse toClientSummaryResponse(Client entity) {
-		return new EquipmentDetailResponse.ClientSummaryResponse(
+		return entity == null ? null : new EquipmentDetailResponse.ClientSummaryResponse(
 				entity.getId(),
 				entity.getName()
 		);
 	}
 
 	private EquipmentDetailResponse.SiteSummaryResponse toSiteSummaryResponse(Site entity) {
-		return new EquipmentDetailResponse.SiteSummaryResponse(
+		return entity == null ? null : new EquipmentDetailResponse.SiteSummaryResponse(
 				entity.getId(),
 				entity.getName(),
 				entity.getAddress()

@@ -25,7 +25,7 @@ public class EquipmentServiceImpl implements EquipmentService {
 	public List<EquipmentDetailResponse> getAllEquipments(UUID siteId, UUID clientId) {
 		return equipmentRepository.findAllWithContext(siteId, clientId)
 				.stream()
-				.map(equipmentMapper::toResponse)
+				.map(equipmentMapper::toDetailResponse)
 				.toList();
 	}
 }
