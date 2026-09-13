@@ -58,7 +58,7 @@ public class WorkOrderController {
 	)
 	@GetMapping(path = "/{workOrderId}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<WorkOrderDetailResponse> getWorkOrderDetail(@PathVariable UUID workOrderId) {
-		WorkOrderDetailResponse response = workOrderService.getWorkOrderDetail(workOrderId);
+		WorkOrderDetailResponse response = workOrderService.getWorkOrderDetailById(workOrderId);
 		return ResponseEntity.ok(response);
 	}
 }

@@ -11,5 +11,5 @@ public interface WorkOrderService {
 
 	List<WorkOrderSummaryResponse> getAllWorkOrders(WorkOrderStatus status, UUID equipmentId);
 
-	WorkOrderDetailResponse getWorkOrderDetail(UUID id);
+	WorkOrderDetailResponse getWorkOrderDetailById(UUID id);
 }

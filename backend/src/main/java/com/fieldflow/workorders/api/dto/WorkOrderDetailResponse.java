@@ -16,7 +16,7 @@ public record WorkOrderDetailResponse(
 		WorkOrderPriority priority,
 		int estimatedDurationMinutes,
 		WorkOrderStatus status,
-		WorkOrderSummaryResponse.ServiceTypeResponse serviceType, // TODO: cambiar a record dedicado y no sub-record
+		ServiceTypeResponse serviceType,
 		EquipmentDetailResponse equipment,
 		AssignmentSummaryResponse assignment,
 		ChecklistDetailResponse checklist,

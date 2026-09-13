@@ -1,29 +1,40 @@
 package com.fieldflow.workorders.application.mapper;
 
-import com.fieldflow.assets.api.dto.EquipmentDetailResponse;
 import com.fieldflow.assets.application.mapper.EquipmentMapper;
-import com.fieldflow.planning.api.dto.AssignmentSummaryResponse;
-import com.fieldflow.planning.api.dto.TechnicianSummaryResponse;
+import com.fieldflow.execution.api.dto.ChecklistDetailResponse;
+import com.fieldflow.execution.api.dto.InterventionDetailResponse;
+import com.fieldflow.planning.application.mapper.AssignmentMapper;
 import com.fieldflow.workorders.api.dto.WorkOrderDetailResponse;
 import com.fieldflow.workorders.api.dto.WorkOrderSummaryResponse;
 import com.fieldflow.workorders.domain.WorkOrder;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 public class WorkOrderMapperImpl implements WorkOrderMapper {
 
 	private final EquipmentMapper equipmentMapper;
+	private final AssignmentMapper assignmentMapper;
+	private final ServiceTypeMapper serviceTypeMapper;
 
-	public WorkOrderMapperImpl(EquipmentMapper equipmentMapper) {
+	public WorkOrderMapperImpl(EquipmentMapper equipmentMapper,
+	                           AssignmentMapper assignmentMapper,
+	                           ServiceTypeMapper serviceTypeMapper) {
 		this.equipmentMapper = equipmentMapper;
+		this.assignmentMapper = assignmentMapper;
+		this.serviceTypeMapper = serviceTypeMapper;
 	}
 
 	@Override
 	public WorkOrderSummaryResponse toSummaryResponse(WorkOrder entity) {
+		if (entity == null) {
+			return null;
+		}
 		return new WorkOrderSummaryResponse(
 				entity.getId(),
 				toEquipmentSummaryResponse(entity),
-				toServiceTypeResponse(entity),
+				serviceTypeMapper.toResponse(entity.getServiceType()),
 				entity.getPriority(),
 				entity.getEstimatedDuration(),
 				entity.getStatus()
@@ -31,45 +42,45 @@ public class WorkOrderMapperImpl implements WorkOrderMapper {
 	}
 
 	@Override
-	public WorkOrderDetailResponse toDetailResponse(WorkOrder entity) {
+	public WorkOrderDetailResponse toDetailResponse(WorkOrder entity,
+	                                                ChecklistDetailResponse checklist,
+	                                                List<InterventionDetailResponse> interventions) {
+		if (entity == null) {
+			return null;
+		}
 		return new WorkOrderDetailResponse(
 				entity.getId(),
 				entity.getInstructions(),
 				entity.getPriority(),
 				entity.getEstimatedDuration(),
 				entity.getStatus(),
-				new WorkOrderSummaryResponse.ServiceTypeResponse(
-						entity.getServiceType().getId(),
-						entity.getServiceType().getName()
-				),
-				equipmentMapper.toResponse(entity.getEquipment()),
-				new AssignmentSummaryResponse(
-						entity.getAssignment().getId(),
-						new TechnicianSummaryResponse(
-								entity.getAssignment().getTechnician().getId(),
-								entity.getAssignment().getTechnician().getName()
-						),
-						entity.getAssignment().getPlannedStartAt(),
-						entity.getAssignment().getPlannedEndAt()
-				),
 
+				// ----------------- service-type -----------------
+				serviceTypeMapper.toResponse(entity.getServiceType()),
+
+				// ----------------- equipment -----------------
+				equipmentMapper.toDetailResponse(entity.getEquipment()),
+
+				// ----------------- assignment -----------------
+				assignmentMapper.toSummaryResponse(entity.getAssignment()),
+
+				// ----------------- checklist -----------------
+				checklist,
+
+				// ----------------- interventions -----------------
+				interventions
 		);
 	}
 
 	private WorkOrderSummaryResponse.EquipmentSummaryResponse toEquipmentSummaryResponse(WorkOrder entity) {
+		if (entity.getEquipment() == null) {
+			return null;
+		}
 		var equipment = entity.getEquipment();
 		return new WorkOrderSummaryResponse.EquipmentSummaryResponse(
 				equipment.getId(),
 				equipment.getIdentifier(),
 				equipment.getName()
-		);
-	}
-
-	private WorkOrderSummaryResponse.ServiceTypeResponse toServiceTypeResponse(WorkOrder entity) {
-		var serviceType = entity.getServiceType();
-		return new WorkOrderSummaryResponse.ServiceTypeResponse(
-				serviceType.getId(),
-				serviceType.getName()
 		);
 	}
 }
