@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -22,4 +23,22 @@ public interface WorkOrderRepository extends JpaRepository<WorkOrder, UUID> {
 			      AND (:equipmentId IS NULL OR e.id = :equipmentId)
 			""")
 	List<WorkOrder> findAllWithContext(@Param("status") WorkOrderStatus status, @Param("equipmentId") UUID equipmentId);
+
+	@Query("""
+			SELECT wo
+			FROM WorkOrder wo
+			
+			JOIN FETCH wo.serviceType st
+			
+			JOIN FETCH wo.equipment e
+			JOIN FETCH e.site s
+			JOIN FETCH s.client c
+			LEFT JOIN FETCH e.installation ins
+			
+			LEFT JOIN FETCH wo.assignment a
+			LEFT JOIN FETCH a.technician tech
+			
+			WHERE wo.id = :workOrderId
+			""")
+	Optional<WorkOrder> findDetailBaseById(@Param("workOrderId") UUID id);
 }
