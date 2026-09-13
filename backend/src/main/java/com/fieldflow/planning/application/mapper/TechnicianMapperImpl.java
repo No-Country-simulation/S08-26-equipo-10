@@ -8,7 +8,10 @@ import org.springframework.stereotype.Component;
 public class TechnicianMapperImpl implements TechnicianMapper {
 
 	@Override
-	public TechnicianSummaryResponse toResponse(Technician entity) {
+	public TechnicianSummaryResponse toSummaryResponse(Technician entity) {
+		if (entity == null) {
+			return null;
+		}
 		return new TechnicianSummaryResponse(
 				entity.getId(),
 				entity.getName()

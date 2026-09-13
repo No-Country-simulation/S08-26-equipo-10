@@ -23,7 +23,7 @@ public class TechnicianServiceImpl implements TechnicianService {
 	@Transactional(readOnly = true)
 	public List<TechnicianSummaryResponse> getAllTechnicians() {
 		return technicianRepository.findAll().stream()
-				.map(technicianMapper::toResponse)
+				.map(technicianMapper::toSummaryResponse)
 				.toList();
 	}
 }

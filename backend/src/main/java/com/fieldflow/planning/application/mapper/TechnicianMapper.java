@@ -5,5 +5,5 @@ import com.fieldflow.planning.domain.Technician;
 
 public interface TechnicianMapper {
 
-	TechnicianSummaryResponse toResponse(Technician entity);
+	TechnicianSummaryResponse toSummaryResponse(Technician entity);
 }
