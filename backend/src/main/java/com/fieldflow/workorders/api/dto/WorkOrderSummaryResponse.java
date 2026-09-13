@@ -20,10 +20,4 @@ public record WorkOrderSummaryResponse(
 			String name
 	) {
 	}
-
-	public record ServiceTypeResponse(
-			UUID id,
-			String name
-	) {
-	}
 }
