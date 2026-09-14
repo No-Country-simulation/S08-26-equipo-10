@@ -35,6 +35,8 @@ services:
       postgres:
         condition: service_healthy
     environment:
+      # Docker Compose se utiliza únicamente para desarrollo.
+      SPRING_PROFILES_ACTIVE: dev
       DB_URL: jdbc:postgresql://postgres:5432/fieldflow
       DB_USER: fieldflow
       DB_PASSWORD: ${DB_PASSWORD:-fieldflow_local}

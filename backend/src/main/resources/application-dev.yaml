@@ -1,0 +1,35 @@
+# Configuración específica del perfil DEV.
+# Activar con: SPRING_PROFILES_ACTIVE=dev
+#
+# application.yaml se carga primero y este archivo sobrescribe
+# únicamente las propiedades específicas de desarrollo.
+
+spring:
+  jpa:
+    properties:
+      hibernate:
+        # Facilita la lectura del SQL generado por Hibernate.
+        format_sql: true
+
+        # Incluye comentarios que permiten relacionar el SQL generado
+        # con la consulta JPQL/HQL que lo originó.
+        use_sql_comments: true
+
+app:
+  db-status:
+    # Útil para diagnóstico local.
+    show-details: true
+
+logging:
+  level:
+    root: INFO
+
+    # Logs detallados del código de FieldFlow.
+    com.fieldflow: DEBUG
+
+    # SQL generado por Hibernate.
+    org.hibernate.SQL: DEBUG
+
+    # Valores asociados a los parámetros (?, ?, ...).
+    # Mantener solo en desarrollo porque puede exponer datos en logs.
+    org.hibernate.orm.jdbc.bind: TRACE
