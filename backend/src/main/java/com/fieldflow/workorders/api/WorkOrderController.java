@@ -49,6 +49,9 @@ public class WorkOrderController {
 			summary = "Obtener detalles de una orden de trabajo",
 			description = """
 					Obtiene los detalles de una orden de trabajo específica buscando por su ID.
+					`assignment` puede ser null, `checklist` puede ser null, `installation` puede ser null,
+					`interventions` puede estar vacío y `conformity` puede ser null.
+					Una orden de trabajo (OT) puede tener múltiples intervenciones.
 					"""
 	)
 	@ApiJsonExample(
