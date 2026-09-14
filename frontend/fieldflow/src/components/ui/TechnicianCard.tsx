@@ -1,124 +1,136 @@
-import { MapPin } from "lucide-react";
-import { TechnicianStatusBadge } from "./TechnicianStatusBadge";
+import { MapPin, Phone, Mail } from "lucide-react";
 
+export type TecnicoStatus =
+    | "Disponible"
+    | "En campo"
+    | "Descanso"
+    | "No disponible";
 
-interface TechnicianCardProps {
-    initials: string;
-    name: string;
-    code: string;
-    specialty: string;
-    phone: string;
+export interface Tecnico {
+    id: string;
+    nombre: string;
+    codigo: string;
+    especialidad: string;
+    telefono: string;
     email: string;
-    status: "En campo" | "Disponible" | "Ocupado";
-    location: string;
-
-    orderStatus?: "En ejecución" | "En camino" | "Asignada";
-    orderId?: string;
-    clientName?: string;
-
-    certifications?: string[];
-
-    activeOrders: number;
-    completedOrders: number;
-
-    onViewOrder?: () => void;
-    onViewAgenda?: () => void;
+    zona: string;
+    estado: TecnicoStatus;
+    certificaciones: string[];
+    otsActivas: number;
+    otsFinalizadas: number;
+    ordenActual?: {
+        codigo: string;
+        cliente: string;
+    };
 }
 
-export function TechnicianCard({
-    initials,
-    name,
-    code,
-    specialty,
-    phone,
-    email,
-    status,
-    location,
-    orderStatus,
-    orderId,
-    clientName,
-    certifications = [],
-    activeOrders,
-    completedOrders,
-    onViewOrder,
-    onViewAgenda,
-}: TechnicianCardProps) {
+interface TecnicoCardProps {
+    tecnico: Tecnico;
+    onVerAgenda?: (tecnico: Tecnico) => void;
+}
+
+const statusStyles: Record<TecnicoStatus, string> = {
+    Disponible:
+        "border-emerald-500/40 bg-emerald-500/10 text-emerald-400",
+    "En campo":
+        "border-blue-500/40 bg-blue-500/10 text-blue-400",
+    Descanso:
+        "border-yellow-500/40 bg-yellow-500/10 text-yellow-400",
+    "No disponible":
+        "border-red-500/40 bg-red-500/10 text-red-400",
+};
+
+function getInitials(nombre: string) {
+    return nombre
+        .split(" ")
+        .slice(0, 2)
+        .map((word) => word[0])
+        .join("")
+        .toUpperCase();
+}
+
+function TecnicoCard({
+    tecnico,
+    onVerAgenda,
+}: TecnicoCardProps) {
     return (
-        <article className="overflow-hidden rounded-lg border border-slate-700 bg-slate-900">
-            {/* Información del técnico */}
-            <div className="p-4">
-                <div className="flex items-start justify-between gap-4">
-                    <div className="flex min-w-0 items-start gap-4">
-                        {/* Avatar */}
-                        <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-blue-900 text-xl font-semibold text-blue-400">
-                            {initials}
-                        </div>
-
-                        {/* Datos */}
-                        <div className="min-w-0">
-                            <div className="flex flex-wrap items-center gap-2">
-                                <h3 className="text-lg font-semibold text-white">
-                                    {name}
-                                </h3>
-
-                                <span className="font-mono text-sm text-slate-500">
-                                    {code}
-                                </span>
-                            </div>
-
-                            <p className="mt-1 text-slate-400">
-                                {specialty}
-                            </p>
-
-                            <div className="mt-3 flex flex-wrap items-center gap-3">
-                                <TechnicianStatusBadge status={status} />
-
-                                <span className="flex items-center gap-2 text-sm text-slate-500">
-                                    <MapPin className="h-4 w-4 text-pink-400" />
-                                    {location}
-                                </span>
-                            </div>
-                        </div>
+        <article className="overflow-hidden rounded-xl border border-slate-700 bg-[#131a22]">
+            {/* Header */}
+            <div className="flex items-start justify-between gap-4 p-6">
+                <div className="flex min-w-0 gap-5">
+                    {/* Avatar */}
+                    <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-blue-900/70 text-lg font-semibold text-blue-400">
+                        {getInitials(tecnico.nombre)}
                     </div>
 
-                    {/* Contacto */}
-                    <div className="hidden text-right md:block">
-                        <p className="text-sm text-slate-300">
-                            {phone}
+                    {/* Información */}
+                    <div className="min-w-0">
+                        <div className="flex flex-wrap items-center gap-2">
+                            <h3 className="text-lg font-semibold text-white">
+                                {tecnico.nombre}
+                            </h3>
+
+                            <span className="font-mono text-sm text-slate-500">
+                                {tecnico.codigo}
+                            </span>
+                        </div>
+
+                        <p className="mt-1 text-base text-blue-400">
+                            {tecnico.especialidad}
                         </p>
 
-                        <p className="mt-1 text-sm text-slate-500">
-                            {email}
-                        </p>
+                        <div className="mt-3 flex flex-wrap items-center gap-3">
+                            <span
+                                className={`rounded border px-2.5 py-1 font-mono text-xs ${statusStyles[tecnico.estado]}`}
+                            >
+                                {tecnico.estado}
+                            </span>
+
+                            <span className="flex items-center gap-1 text-sm text-slate-500">
+                                <MapPin size={14} />
+                                {tecnico.zona}
+                            </span>
+                        </div>
                     </div>
+                </div>
+
+                {/* Contacto */}
+                <div className="hidden text-right md:block">
+                    <p className="flex items-center justify-end gap-2 text-sm text-slate-400">
+                        <Phone size={14} />
+                        {tecnico.telefono}
+                    </p>
+
+                    <p className="mt-1 flex items-center justify-end gap-2 text-sm text-slate-500">
+                        <Mail size={14} />
+                        {tecnico.email}
+                    </p>
                 </div>
             </div>
 
-            {/* OT activa */}
-            {orderId && clientName && (
-                <div className="border-y border-slate-700 bg-slate-800/60 px-4 py-4">
-                    <div className="flex items-center justify-between gap-4">
-                        <div className="min-w-0">
-                            <div className="flex items-center gap-3">
-                                <span className="h-2 w-2 rounded-full bg-purple-400" />
+            {/* Orden actual */}
+            {tecnico.ordenActual && (
+                <div className="border-y border-slate-700 bg-[#182231] px-6 py-4">
+                    <div className="mb-1 text-sm text-slate-400">
+                        En ejecución
+                    </div>
 
-                                <span className="text-sm text-slate-400">
-                                    {orderStatus}
-                                </span>
-                            </div>
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                        <div className="flex items-center gap-3">
+                            <span className="h-2 w-2 rounded-full bg-violet-400" />
 
-                            <p className="mt-1 font-mono text-base font-semibold text-white">
-                                {orderId}
-                                <span className="mx-2 text-slate-500">•</span>
-                                {clientName}
-                            </p>
+                            <span className="font-mono font-semibold text-white">
+                                {tecnico.ordenActual.codigo}
+                            </span>
+
+                            <span className="text-white">•</span>
+
+                            <span className="font-mono font-semibold text-white">
+                                {tecnico.ordenActual.cliente}
+                            </span>
                         </div>
 
-                        <button
-                            type="button"
-                            onClick={onViewOrder}
-                            className="shrink-0 text-sm font-medium text-cyan-400 transition-colors hover:text-cyan-300"
-                        >
+                        <button className="text-sm text-cyan-400 transition hover:text-cyan-300">
                             Ver OT →
                         </button>
                     </div>
@@ -126,47 +138,44 @@ export function TechnicianCard({
             )}
 
             {/* Certificaciones */}
-            {certifications.length > 0 && (
-                <div className="border-b border-slate-700 px-4 py-4">
-                    <p className="mb-3 text-sm text-blue-400">
-                        Certificaciones
-                    </p>
+            <div className="px-6 py-4">
+                <p className="mb-2 text-sm text-slate-400">
+                    Certificaciones
+                </p>
 
-                    <div className="flex flex-wrap gap-2">
-                        {certifications.map((certification) => (
+                <div className="flex flex-wrap gap-2">
+                    {tecnico.certificaciones.length > 0 ? (
+                        tecnico.certificaciones.map((certificacion) => (
                             <span
-                                key={certification}
-                                className="rounded-md border border-slate-700 bg-slate-800 px-3 py-1 text-sm text-slate-400"
+                                key={certificacion}
+                                className="rounded bg-slate-800 px-2.5 py-1 text-sm text-slate-400"
                             >
-                                {certification}
+                                {certificacion}
                             </span>
-                        ))}
-                    </div>
+                        ))
+                    ) : (
+                        <span className="text-sm text-slate-600">
+                            Sin certificaciones
+                        </span>
+                    )}
                 </div>
-            )}
+            </div>
 
-            {/* Resumen */}
-            <div className="flex items-center justify-between px-4 py-4">
-                <div className="flex gap-6 text-sm">
-                    <span className="text-slate-400">
-                        <strong className="font-normal text-slate-300">
-                            {activeOrders}
-                        </strong>{" "}
-                        OTs activas
+            {/* Footer */}
+            <div className="flex items-center justify-between border-t border-slate-700 px-6 py-4">
+                <div className="flex gap-5 text-sm">
+                    <span className="text-blue-400">
+                        {tecnico.otsActivas} OTs activas
                     </span>
 
-                    <span className="text-slate-400">
-                        <strong className="font-normal text-slate-300">
-                            {completedOrders}
-                        </strong>{" "}
-                        finalizadas
+                    <span className="text-blue-400">
+                        {tecnico.otsFinalizadas} finalizadas
                     </span>
                 </div>
 
                 <button
-                    type="button"
-                    onClick={onViewAgenda}
-                    className="text-sm font-medium text-cyan-400 transition-colors hover:text-cyan-300"
+                    onClick={() => onVerAgenda?.(tecnico)}
+                    className="text-sm text-cyan-400 transition hover:text-cyan-300"
                 >
                     Ver agenda
                 </button>
@@ -174,3 +183,5 @@ export function TechnicianCard({
         </article>
     );
 }
+
+export default TecnicoCard;
