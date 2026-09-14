@@ -1,38 +1,86 @@
 package com.fieldflow.workorders.application.mapper;
 
-import com.fieldflow.workorders.api.dto.WorkOrderResponse;
+import com.fieldflow.assets.application.mapper.EquipmentMapper;
+import com.fieldflow.execution.api.dto.ChecklistDetailResponse;
+import com.fieldflow.execution.api.dto.InterventionDetailResponse;
+import com.fieldflow.planning.application.mapper.AssignmentMapper;
+import com.fieldflow.workorders.api.dto.WorkOrderDetailResponse;
+import com.fieldflow.workorders.api.dto.WorkOrderSummaryResponse;
 import com.fieldflow.workorders.domain.WorkOrder;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Component
 public class WorkOrderMapperImpl implements WorkOrderMapper {
 
+	private final EquipmentMapper equipmentMapper;
+	private final AssignmentMapper assignmentMapper;
+	private final ServiceTypeMapper serviceTypeMapper;
+
+	public WorkOrderMapperImpl(EquipmentMapper equipmentMapper,
+	                           AssignmentMapper assignmentMapper,
+	                           ServiceTypeMapper serviceTypeMapper) {
+		this.equipmentMapper = equipmentMapper;
+		this.assignmentMapper = assignmentMapper;
+		this.serviceTypeMapper = serviceTypeMapper;
+	}
+
 	@Override
-	public WorkOrderResponse toResponse(WorkOrder entity) {
-		return new WorkOrderResponse(
+	public WorkOrderSummaryResponse toSummaryResponse(WorkOrder entity) {
+		if (entity == null) {
+			return null;
+		}
+		return new WorkOrderSummaryResponse(
 				entity.getId(),
 				toEquipmentSummaryResponse(entity),
-				toServiceTypeResponse(entity),
+				serviceTypeMapper.toResponse(entity.getServiceType()),
 				entity.getPriority(),
 				entity.getEstimatedDuration(),
 				entity.getStatus()
 		);
 	}
 
-	private WorkOrderResponse.EquipmentSummaryResponse toEquipmentSummaryResponse(WorkOrder entity) {
-		var equipment = entity.getEquipment();
-		return new WorkOrderResponse.EquipmentSummaryResponse(
-				equipment.getId(),
-				equipment.getIdentifier(),
-				equipment.getName()
+	@Override
+	public WorkOrderDetailResponse toDetailResponse(WorkOrder entity,
+	                                                ChecklistDetailResponse checklist,
+	                                                List<InterventionDetailResponse> interventions) {
+		if (entity == null) {
+			return null;
+		}
+		return new WorkOrderDetailResponse(
+				entity.getId(),
+				entity.getInstructions(),
+				entity.getPriority(),
+				entity.getEstimatedDuration(),
+				entity.getStatus(),
+
+				// ----------------- service-type -----------------
+				serviceTypeMapper.toResponse(entity.getServiceType()),
+
+				// ----------------- equipment -----------------
+				equipmentMapper.toDetailResponse(entity.getEquipment()),
+
+				// ----------------- assignment -----------------
+				assignmentMapper.toSummaryResponse(entity.getAssignment()),
+
+				// ----------------- checklist -----------------
+				checklist,
+
+				// ----------------- interventions -----------------
+				interventions
 		);
 	}
 
-	private WorkOrderResponse.ServiceTypeResponse toServiceTypeResponse(WorkOrder entity) {
-		var serviceType = entity.getServiceType();
-		return new WorkOrderResponse.ServiceTypeResponse(
-				serviceType.getId(),
-				serviceType.getName()
+	private WorkOrderSummaryResponse.EquipmentSummaryResponse toEquipmentSummaryResponse(WorkOrder entity) {
+		if (entity.getEquipment() == null) {
+			return null;
+		}
+		var equipment = entity.getEquipment();
+		return new WorkOrderSummaryResponse.EquipmentSummaryResponse(
+				equipment.getId(),
+				equipment.getIdentifier(),
+				equipment.getName()
 		);
 	}
 }

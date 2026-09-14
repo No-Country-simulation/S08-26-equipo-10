@@ -2,7 +2,7 @@ package com.fieldflow.assets.api.dto;
 
 import java.util.UUID;
 
-public record EquipmentResponse(
+public record EquipmentDetailResponse(
 		UUID id,
 		String identifier,
 		String name,

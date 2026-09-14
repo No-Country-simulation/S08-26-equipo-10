@@ -1,6 +1,6 @@
 package com.fieldflow.assets.application;
 
-import com.fieldflow.assets.api.dto.EquipmentResponse;
+import com.fieldflow.assets.api.dto.EquipmentDetailResponse;
 import com.fieldflow.assets.application.mapper.EquipmentMapper;
 import com.fieldflow.assets.persistence.EquipmentRepository;
 import org.springframework.stereotype.Service;
@@ -22,10 +22,10 @@ public class EquipmentServiceImpl implements EquipmentService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<EquipmentResponse> getAllEquipments(UUID siteId, UUID clientId) {
+	public List<EquipmentDetailResponse> getAllEquipments(UUID siteId, UUID clientId) {
 		return equipmentRepository.findAllWithContext(siteId, clientId)
 				.stream()
-				.map(equipmentMapper::toResponse)
+				.map(equipmentMapper::toDetailResponse)
 				.toList();
 	}
 }
