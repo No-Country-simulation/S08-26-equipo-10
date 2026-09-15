@@ -1,5 +1,6 @@
 package com.fieldflow.workorders.application.mapper;
 
+import com.fieldflow.assets.api.dto.EquipmentSummaryResponse;
 import com.fieldflow.assets.application.mapper.EquipmentMapper;
 import com.fieldflow.execution.api.dto.ChecklistDetailResponse;
 import com.fieldflow.execution.api.dto.InterventionDetailResponse;
@@ -35,6 +36,7 @@ public class WorkOrderMapperImpl implements WorkOrderMapper {
 				entity.getId(),
 				toEquipmentSummaryResponse(entity),
 				serviceTypeMapper.toResponse(entity.getServiceType()),
+				entity.getInstructions(),
 				entity.getPriority(),
 				entity.getEstimatedDuration(),
 				entity.getStatus()
@@ -72,12 +74,12 @@ public class WorkOrderMapperImpl implements WorkOrderMapper {
 		);
 	}
 
-	private WorkOrderSummaryResponse.EquipmentSummaryResponse toEquipmentSummaryResponse(WorkOrder entity) {
+	private EquipmentSummaryResponse toEquipmentSummaryResponse(WorkOrder entity) {
 		if (entity.getEquipment() == null) {
 			return null;
 		}
 		var equipment = entity.getEquipment();
-		return new WorkOrderSummaryResponse.EquipmentSummaryResponse(
+		return new EquipmentSummaryResponse(
 				equipment.getId(),
 				equipment.getIdentifier(),
 				equipment.getName()

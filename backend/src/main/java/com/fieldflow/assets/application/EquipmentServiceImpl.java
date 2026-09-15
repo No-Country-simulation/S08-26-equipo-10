@@ -2,7 +2,9 @@ package com.fieldflow.assets.application;
 
 import com.fieldflow.assets.api.dto.EquipmentDetailResponse;
 import com.fieldflow.assets.application.mapper.EquipmentMapper;
+import com.fieldflow.assets.domain.Equipment;
 import com.fieldflow.assets.persistence.EquipmentRepository;
+import com.fieldflow.shared.exception.ApiException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,5 +29,12 @@ public class EquipmentServiceImpl implements EquipmentService {
 				.stream()
 				.map(equipmentMapper::toDetailResponse)
 				.toList();
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public Equipment getEntityById(UUID id) {
+		return equipmentRepository.findById(id)
+				.orElseThrow(() -> ApiException.notFound("No existe un equipo asociado al ID " + id));
 	}
 }

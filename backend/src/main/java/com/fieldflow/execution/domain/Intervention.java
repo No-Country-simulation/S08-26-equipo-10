@@ -34,8 +34,9 @@ public class Intervention {
 	@Column(name = "ended_at")
 	private OffsetDateTime endedAt;
 
+	@Enumerated(EnumType.STRING)
 	@Column(name = "status", nullable = false, length = 50)
-	private String status;
+	private InterventionStatus status;
 
 	@Column(name = "result")
 	private String result;
@@ -71,7 +72,7 @@ public class Intervention {
 			WorkOrder workOrder,
 			Technician technician,
 			OffsetDateTime startedAt,
-			String status
+			InterventionStatus status
 	) {
 		this.workOrder = workOrder;
 		this.technician = technician;
@@ -99,7 +100,7 @@ public class Intervention {
 		return endedAt;
 	}
 
-	public String getStatus() {
+	public InterventionStatus getStatus() {
 		return status;
 	}
 

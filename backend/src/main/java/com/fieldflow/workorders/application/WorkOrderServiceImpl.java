@@ -1,8 +1,10 @@
 package com.fieldflow.workorders.application;
 
+import com.fieldflow.assets.application.EquipmentService;
 import com.fieldflow.execution.application.ChecklistService;
 import com.fieldflow.execution.application.InterventionService;
 import com.fieldflow.shared.exception.ApiException;
+import com.fieldflow.workorders.api.dto.CreateWorkOrderRequest;
 import com.fieldflow.workorders.api.dto.WorkOrderDetailResponse;
 import com.fieldflow.workorders.api.dto.WorkOrderSummaryResponse;
 import com.fieldflow.workorders.application.mapper.WorkOrderMapper;
@@ -23,15 +25,21 @@ public class WorkOrderServiceImpl implements WorkOrderService {
 
 	private final ChecklistService checklistService;
 	private final InterventionService interventionService;
+	private final EquipmentService equipmentService;
+	private final ServiceTypeService serviceTypeService;
 
 	public WorkOrderServiceImpl(WorkOrderRepository repository,
 	                            WorkOrderMapper mapper,
 	                            ChecklistService checklistService,
-	                            InterventionService interventionService) {
+	                            InterventionService interventionService,
+	                            EquipmentService equipmentService,
+	                            ServiceTypeService serviceTypeService) {
 		this.repository = repository;
 		this.mapper = mapper;
 		this.checklistService = checklistService;
 		this.interventionService = interventionService;
+		this.equipmentService = equipmentService;
+		this.serviceTypeService = serviceTypeService;
 	}
 
 	@Override
@@ -54,5 +62,24 @@ public class WorkOrderServiceImpl implements WorkOrderService {
 		var interventions = interventionService.getInterventionsByWorkOrderId(id);
 
 		return mapper.toDetailResponse(workOrder, checklist, interventions);
+	}
+
+	@Override
+	@Transactional
+	public WorkOrderSummaryResponse createWorkOrder(CreateWorkOrderRequest request) {
+		var equipment = equipmentService.getEntityById(request.equipmentId());
+		var serviceType = serviceTypeService.getEntityById(request.serviceTypeId());
+
+		WorkOrder workOrder = new WorkOrder(
+				equipment,
+				serviceType,
+				request.instructions(),
+				request.priority(),
+				request.estimatedDurationMinutes(),
+				WorkOrderStatus.PENDING
+		);
+		workOrder = repository.save(workOrder);
+
+		return mapper.toSummaryResponse(workOrder);
 	}
 }
