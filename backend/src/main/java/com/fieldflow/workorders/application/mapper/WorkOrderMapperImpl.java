@@ -36,6 +36,7 @@ public class WorkOrderMapperImpl implements WorkOrderMapper {
 				entity.getId(),
 				toEquipmentSummaryResponse(entity),
 				serviceTypeMapper.toResponse(entity.getServiceType()),
+				entity.getInstructions(),
 				entity.getPriority(),
 				entity.getEstimatedDuration(),
 				entity.getStatus()

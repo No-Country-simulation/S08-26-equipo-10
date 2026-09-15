@@ -10,6 +10,7 @@ public record WorkOrderSummaryResponse(
 		UUID id,
 		EquipmentSummaryResponse equipment,
 		ServiceTypeResponse serviceType,
+		String instructions,
 		WorkOrderPriority priority,
 		int estimatedDurationMinutes,
 		WorkOrderStatus status
