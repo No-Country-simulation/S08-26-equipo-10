@@ -2,6 +2,7 @@ package com.fieldflow.execution.api.dto;
 
 import com.fieldflow.conformity.api.dto.ConformitySummaryResponse;
 import com.fieldflow.conformity.api.dto.EvidenceSummaryResponse;
+import com.fieldflow.execution.domain.InterventionStatus;
 import com.fieldflow.planning.api.dto.TechnicianSummaryResponse;
 
 import java.time.OffsetDateTime;
@@ -13,7 +14,7 @@ public record InterventionDetailResponse(
 		TechnicianSummaryResponse technician,
 		OffsetDateTime startedAt,
 		OffsetDateTime endedAt,
-		String status,
+		InterventionStatus status,
 		String result,
 		String observations,
 		List<FailureSummaryResponse> failures,
