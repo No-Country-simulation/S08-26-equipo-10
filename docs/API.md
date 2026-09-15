@@ -86,7 +86,7 @@ La API permite:
 5. Asignar o reprogramar una Orden de Trabajo.
 6. Consultar la agenda de un técnico a partir de `assignment`.
 7. Registrar los estados operativos que no se producen automáticamente por otra acción.
-8. Asociar un checklist a una Orden de Trabajo.
+8. Asociar una checklist a una Orden de Trabajo.
 9. Iniciar una intervención.
 10. Registrar en una única operación el reporte de campo: resultado, observaciones, fallas, reparaciones, componentes, checklist, notas y evidencia.
 11. Registrar conformidad del cliente.
@@ -119,7 +119,7 @@ Estas capacidades pueden ser válidas en una evolución futura, pero no forman p
 
 ### 2.3 Datos maestros durante el MVP
 
-Para evitar consumir tiempo de desarrollo en pantallas y CRUDs que no son necesarios para demostrar el criterio de éxito, los siguientes datos se consideran precargados mediante seed/migración o administración directa controlada:
+Para evitar consumir tiempo de desarrollo en pantallas y CRUD que no son necesarios para demostrar el criterio de éxito, los siguientes datos se consideran precargados mediante seed/migración o administración directa controlada:
 
 - `client`
 - `site`
@@ -138,24 +138,24 @@ Esta es una decisión de implementación del MVP, no una limitación futura del 
 
 ### 3.1 Convenciones HTTP y JSON
 
-| Aspecto | Regla del MVP |
-|---|---|
-| Base path | `/api/v1` |
-| Formato principal | JSON |
-| Content-Type requests/responses JSON | `application/json; charset=utf-8` |
-| Content-Type de errores | `application/problem+json` |
-| Nombres JSON | `camelCase` |
-| Identificadores | UUID representado como string |
-| Fechas y horas | ISO-8601 con offset, por ejemplo `2026-09-15T09:30:00-03:00` |
-| Persistencia temporal | Los timestamps se almacenan como `TIMESTAMPTZ` |
-| Valores opcionales | Se representan como `null` cuando forman parte estable de la respuesta |
-| Colecciones vacías | Se devuelven como `[]`, no como `null` ni `404` |
-| Booleanos | `true` / `false` JSON |
-| Duraciones | Minutos enteros positivos cuando el contrato use duración |
-| Paginación | No se incorpora en el MVP |
-| Autenticación | No forma parte de este contrato MVP |
-| Idempotency-Key | No se incorpora en el MVP |
-| Rate limiting | No se incorpora en el MVP |
+| Aspecto                              | Regla del MVP                                                          |
+|--------------------------------------|------------------------------------------------------------------------|
+| Base path                            | `/api/v1`                                                              |
+| Formato principal                    | JSON                                                                   |
+| Content-Type requests/responses JSON | `application/json; charset=utf-8`                                      |
+| Content-Type de errores              | `application/problem+json`                                             |
+| Nombres JSON                         | `camelCase`                                                            |
+| Identificadores                      | UUID representado como string                                          |
+| Fechas y horas                       | ISO-8601 con offset, por ejemplo `2026-09-15T09:30:00-03:00`           |
+| Persistencia temporal                | Los timestamps se almacenan como `TIMESTAMPTZ`                         |
+| Valores opcionales                   | Se representan como `null` cuando forman parte estable de la respuesta |
+| Colecciones vacías                   | Se devuelven como `[]`, no como `null` ni `404`                        |
+| Booleanos                            | `true` / `false` JSON                                                  |
+| Duraciones                           | Minutos enteros positivos cuando el contrato use duración              |
+| Paginación                           | No se incorpora en el MVP                                              |
+| Autenticación                        | No forma parte de este contrato MVP                                    |
+| Idempotency-Key                      | No se incorpora en el MVP                                              |
+| Rate limiting                        | No se incorpora en el MVP                                              |
 
 ### 3.2 Identificadores UUID
 
@@ -196,7 +196,7 @@ startedAt <= endedAt
 
 ### 3.4 Duración estimada
 
-La base de datos define `estimated_duration` como entero pero no fija una unidad. Para eliminar ambigüedad en el contrato HTTP, el MVP adopta **minutos** y expone el campo como:
+La base de datos define `estimated_duration` como entero, pero no fija una unidad. Para eliminar ambigüedad en el contrato HTTP, el MVP adopta **minutos** y expone el campo como:
 
 ```json
 {
@@ -228,7 +228,7 @@ Ejemplos:
 
 ### 3.6 Query parameters
 
-Los query parameters definidos como UUID siguen las mismas reglas de validación que los path parameters.
+Los `query parameters` definidos como UUID siguen las mismas reglas de validación que los `path parameters`.
 
 Los timestamps enviados por query string deben usar ISO-8601 con offset.
 
@@ -238,7 +238,7 @@ No se aceptan filtros adicionales no documentados en cada endpoint.
 
 ## 3.7 Formato uniforme de errores
 
-Todas las respuestas de error HTTP deben utilizar una estructura compatible con **RFC 9457 (Problem Details for HTTP APIs)**.
+Todas las respuestas de error HTTP deben utilizar una estructura compatible con **RFC 9457 (Problem Details for HTTP API)**.
 
 El contrato agrega dos extensiones útiles para FieldFlow:
 
@@ -269,16 +269,16 @@ Formato base:
 
 ### 3.8 Significado de los campos de error
 
-| Campo | Obligatorio | Uso |
-|---|---:|---|
-| `type` | Sí | URI/URN estable que clasifica el tipo general de problema |
-| `title` | Sí | Descripción breve y estable del problema |
-| `status` | Sí | Código HTTP de la respuesta |
-| `detail` | Sí | Explicación legible del caso concreto |
-| `instance` | Sí | Ruta de la request que produjo el error |
-| `code` | Sí | Código funcional estable de FieldFlow |
-| `traceId` | No | Correlación con logs/observabilidad |
-| `errors` | No | Errores de validación asociados a campos concretos |
+| Campo      | Obligatorio | Uso                                                       |
+|------------|------------:|-----------------------------------------------------------|
+| `type`     |          Sí | URI/URN estable que clasifica el tipo general de problema |
+| `title`    |          Sí | Descripción breve y estable del problema                  |
+| `status`   |          Sí | Código HTTP de la respuesta                               |
+| `detail`   |          Sí | Explicación legible del caso concreto                     |
+| `instance` |          Sí | Ruta de la request que produjo el error                   |
+| `code`     |          Sí | Código funcional estable de FieldFlow                     |
+| `traceId`  |          No | Correlación con logs/observabilidad                       |
+| `errors`   |          No | Errores de validación asociados a campos concretos        |
 
 El frontend debe tomar decisiones utilizando `status` y/o `code`, **no comparando el texto de `detail`**.
 
@@ -344,15 +344,15 @@ El frontend debe tomar decisiones utilizando `status` y/o `code`, **no comparand
 
 ### 3.10 Códigos HTTP utilizados
 
-| Código | Uso en FieldFlow |
-|---:|---|
-| `200 OK` | Consulta o actualización correcta |
-| `201 Created` | Recurso creado correctamente |
-| `400 Bad Request` | JSON inválido, formato incorrecto, UUID inválido o validación básica de campos |
-| `404 Not Found` | El recurso referenciado no existe |
-| `409 Conflict` | Conflicto con el estado actual de los datos, unicidad o agenda |
+|                      Código | Uso en FieldFlow                                                                            |
+|----------------------------:|---------------------------------------------------------------------------------------------|
+|                    `200 OK` | Consulta o actualización correcta                                                           |
+|               `201 Created` | Recurso creado correctamente                                                                |
+|           `400 Bad Request` | JSON inválido, formato incorrecto, UUID inválido o validación básica de campos              |
+|             `404 Not Found` | El recurso referenciado no existe                                                           |
+|              `409 Conflict` | Conflicto con el estado actual de los datos, unicidad o agenda                              |
 | `422 Unprocessable Content` | La request es válida estructuralmente pero viola una regla funcional o transición permitida |
-| `500 Internal Server Error` | Error inesperado del servidor |
+| `500 Internal Server Error` | Error inesperado del servidor                                                               |
 
 No se incorporan `202`, `204`, `401`, `403` ni `429` porque los endpoints del MVP actual no requieren procesamiento asíncrono, respuestas sin cuerpo, autenticación/autorización ni rate limiting.
 
@@ -360,19 +360,19 @@ No se incorporan `202`, `204`, `401`, `403` ni `429` porque los endpoints del MV
 
 Los siguientes códigos cubren las reglas explícitas del contrato. No es necesario crear un código distinto para cada validación trivial.
 
-| HTTP | `code` | Situación |
-|---:|---|---|
-| `400` | `VALIDATION_ERROR` | Request mal formada, UUID inválido, campo requerido ausente, valor o intervalo básico inválido |
-| `404` | `RESOURCE_NOT_FOUND` | El recurso solicitado o referenciado no existe |
-| `409` | `TECHNICIAN_NOT_AVAILABLE` | El intervalo solicitado no está contenido en la disponibilidad del técnico |
-| `409` | `SCHEDULE_OVERLAP` | La asignación se solapa con otra asignación del mismo técnico |
-| `409` | `CHECKLIST_ALREADY_EXISTS` | La OT ya posee su checklist único |
-| `409` | `CONFORMITY_ALREADY_EXISTS` | La intervención ya posee conformidad |
-| `409` | `DUPLICATE_CHECKLIST_RESPONSE` | Se intenta registrar más de una respuesta para el mismo ítem en una intervención |
-| `422` | `INVALID_STATUS_TRANSITION` | Se intenta realizar una transición de OT no habilitada por el endpoint |
-| `422` | `TECHNICIAN_NOT_ASSIGNED` | Se intenta iniciar una intervención con un técnico distinto al asignado en el flujo normal del MVP |
-| `422` | `CHECKLIST_ITEM_NOT_IN_WORK_ORDER` | Un `checklistItemId` no pertenece al checklist de la OT de la intervención |
-| `500` | `INTERNAL_ERROR` | Error inesperado no atribuible a la request |
+|  HTTP | `code`                             | Situación                                                                                          |
+|------:|------------------------------------|----------------------------------------------------------------------------------------------------|
+| `400` | `VALIDATION_ERROR`                 | Request mal formada, UUID inválido, campo requerido ausente, valor o intervalo básico inválido     |
+| `404` | `RESOURCE_NOT_FOUND`               | El recurso solicitado o referenciado no existe                                                     |
+| `409` | `TECHNICIAN_NOT_AVAILABLE`         | El intervalo solicitado no está contenido en la disponibilidad del técnico                         |
+| `409` | `SCHEDULE_OVERLAP`                 | La asignación se solapa con otra asignación del mismo técnico                                      |
+| `409` | `CHECKLIST_ALREADY_EXISTS`         | La OT ya posee su checklist único                                                                  |
+| `409` | `CONFORMITY_ALREADY_EXISTS`        | La intervención ya posee conformidad                                                               |
+| `409` | `DUPLICATE_CHECKLIST_RESPONSE`     | Se intenta registrar más de una respuesta para el mismo ítem en una intervención                   |
+| `422` | `INVALID_STATUS_TRANSITION`        | Se intenta realizar una transición de OT no habilitada por el endpoint                             |
+| `422` | `TECHNICIAN_NOT_ASSIGNED`          | Se intenta iniciar una intervención con un técnico distinto al asignado en el flujo normal del MVP |
+| `422` | `CHECKLIST_ITEM_NOT_IN_WORK_ORDER` | Un `checklistItemId` no pertenece al checklist de la OT de la intervención                         |
+| `500` | `INTERNAL_ERROR`                   | Error inesperado no atribuible a la request                                                        |
 
 Para errores `500`, la respuesta no debe exponer stack traces, SQL, credenciales ni detalles internos de infraestructura.
 
@@ -392,15 +392,15 @@ Estados soportados por el esquema:
 
 Para reducir estados inválidos desde el cliente, varias transiciones son responsabilidad del backend:
 
-| Acción | Estado resultante |
-|---|---|
-| Crear OT | `PENDING` |
-| Crear/actualizar asignación | `ASSIGNED` |
-| Técnico informa que está en camino | `EN_ROUTE` |
-| Iniciar intervención | `IN_PROGRESS` |
-| Enviar reporte de intervención | `PENDING_CUSTOMER_CONFIRMATION` |
-| Registrar conformidad | `COMPLETED` |
-| Reprogramar | `RESCHEDULED`, hasta confirmar la nueva asignación |
+| Acción                             | Estado resultante                                  |
+|------------------------------------|----------------------------------------------------|
+| Crear OT                           | `PENDING`                                          |
+| Crear/actualizar asignación        | `ASSIGNED`                                         |
+| Técnico informa que está en camino | `EN_ROUTE`                                         |
+| Iniciar intervención               | `IN_PROGRESS`                                      |
+| Enviar reporte de intervención     | `PENDING_CUSTOMER_CONFIRMATION`                    |
+| Registrar conformidad              | `COMPLETED`                                        |
+| Reprogramar                        | `RESCHEDULED`, hasta confirmar la nueva asignación |
 
 El endpoint genérico de estado queda restringido a `EN_ROUTE` y `RESCHEDULED`. Los demás estados se alcanzan mediante las acciones de negocio correspondientes.
 
@@ -416,7 +416,7 @@ Salvo que un endpoint indique lo contrario, pueden aplicarse los errores comunes
 
 ### GET `/equipment`
 
-Devuelve los equipos disponibles para seleccionar al crear una OT, incluyendo contexto de cliente y ubicación.
+Devuelve los equipos disponibles para seleccionar al crear una Orden de Trabajo (OT), incluyendo contexto de cliente y ubicación.
 
 Query params opcionales:
 
@@ -572,9 +572,16 @@ Respuesta `201`:
 
 ```json
 {
-  "id": "8c9fb9c4-93c7-4d13-a347-33262872b95a",
-  "equipmentId": "1fc79768-93cd-4f66-a225-08b30153b5de",
-  "serviceTypeId": "4cc315c5-0b93-4e19-a02d-3902ab688d02",
+  "id": "08000000-0000-4000-8000-000000000001",
+  "equipment": {
+    "id": "04000000-0000-4000-8000-000000000001",
+    "identifier": "EQ-001",
+    "name": "Compresor principal"
+  },
+  "serviceType": {
+    "id": "05000000-0000-4000-8000-000000000001",
+    "name": "Mantenimiento preventivo"
+  },
   "instructions": "Revisar vibración y temperatura del equipo.",
   "priority": "HIGH",
   "estimatedDurationMinutes": 90,
@@ -586,7 +593,7 @@ Respuesta `201`:
 
 ### GET `/work-orders`
 
-Lista Órdenes de Trabajo para seguimiento operativo.
+Lista las Órdenes de Trabajo para seguimiento operativo.
 
 Query params opcionales:
 
@@ -623,7 +630,7 @@ No se incorpora paginación en el MVP.
 
 **Endpoint principal de trazabilidad del MVP.**
 
-Debe permitir reconstruir desde una OT toda la información necesaria para responder al criterio de éxito del proyecto.
+Debe permitir reconstruir desde una Orden de Trabajo (OT) toda la información necesaria para responder al criterio de éxito del proyecto.
 
 Respuesta `200`:
 
@@ -703,7 +710,7 @@ Notas:
 - `checklist` puede ser `null`.
 - `installation` puede ser `null`.
 - `interventions` puede estar vacío.
-- Una OT puede tener múltiples intervenciones.
+- Una Orden de Trabajo (OT) puede tener múltiples intervenciones.
 
 ---
 
@@ -711,7 +718,7 @@ Notas:
 
 ### PUT `/work-orders/{workOrderId}/assignment`
 
-Crea o actualiza la única asignación activa de la OT.
+Crea o actualiza la única asignación activa de la Orden de Trabajo (OT).
 
 Request:
 
@@ -725,12 +732,12 @@ Request:
 
 Reglas:
 
-1. La OT debe existir.
+1. La Orden de Trabajo (OT) debe existir.
 2. El técnico debe existir.
 3. `plannedStartAt < plannedEndAt`.
 4. El intervalo debe estar contenido en la disponibilidad del técnico.
 5. No debe solaparse con otra asignación del mismo técnico.
-6. Al confirmar la asignación, la OT queda en `ASSIGNED`.
+6. Al confirmar la asignación, la Orden de Trabajo (OT) queda en `ASSIGNED`.
 
 Respuesta `200`:
 
@@ -811,7 +818,7 @@ Cualquier otro destino se rechaza con `422 INVALID_STATUS_TRANSITION` y debe alc
 
 ### POST `/work-orders/{workOrderId}/checklist`
 
-Crea el único checklist de la OT junto con todos sus ítems en una sola operación.
+Crea la única checklist de la Orden de Trabajo (OT) junto con todos sus ítems en una sola operación.
 
 Request:
 
@@ -847,7 +854,7 @@ Respuesta `201`:
 
 Reglas:
 
-- Una OT solo puede tener un checklist.
+- Una Orden de Trabajo (OT) solo puede tener una checklist.
 - No existe versionado en el MVP.
 - Si ya existe, responder `409 CHECKLIST_ALREADY_EXISTS`.
 
@@ -857,7 +864,7 @@ Reglas:
 
 ### POST `/work-orders/{workOrderId}/interventions`
 
-Inicia una nueva intervención para una OT.
+Inicia una nueva intervención para una Orden de Trabajo (OT).
 
 Request:
 
@@ -870,10 +877,10 @@ Request:
 
 Reglas:
 
-- La OT debe existir.
+- La Orden de Trabajo (OT) debe existir.
 - El técnico debe existir.
-- Para el flujo normal del MVP, el técnico debe coincidir con el técnico asignado a la OT.
-- El backend establece el estado de la intervención y de la OT en `IN_PROGRESS`.
+- Para el flujo normal del MVP, el técnico debe coincidir con el técnico asignado a la Orden de Trabajo (OT).
+- El backend establece el estado de la intervención y de la Orden de Trabajo (OT) en `IN_PROGRESS`.
 
 Respuesta `201`:
 
@@ -944,11 +951,11 @@ Request:
 Reglas:
 
 1. `endedAt >= startedAt`.
-2. Cada `checklistItemId` debe pertenecer al checklist de la misma OT.
+2. Cada `checklistItemId` debe pertenecer a la checklist de la misma Orden de Trabajo (OT).
 3. No puede haber dos respuestas al mismo ítem dentro de la misma intervención.
 4. `evidence.reference` es una referencia lógica; este contrato no define el mecanismo físico de upload/storage.
 5. El backend guarda el conjunto de datos de forma transaccional.
-6. Al finalizar correctamente, la intervención y la OT pasan a `PENDING_CUSTOMER_CONFIRMATION`.
+6. Al finalizar correctamente, la intervención y la Orden de Trabajo (OT) pasan a `PENDING_CUSTOMER_CONFIRMATION`.
 
 Respuesta `200`:
 
@@ -980,7 +987,7 @@ Reglas:
 
 - Una intervención puede tener como máximo una conformidad.
 - La intervención debe haber enviado su reporte.
-- Tras registrar la conformidad, la OT puede pasar a `COMPLETED`.
+- Tras registrar la conformidad, la Orden de Trabajo (OT) puede pasar a `COMPLETED`.
 - El backend actualiza intervención y OT de manera consistente.
 
 Respuesta `201`:
@@ -1120,26 +1127,26 @@ El MVP no incluye un scheduler avanzado ni una API independiente para reglas de 
 
 # 6. Resumen del contrato
 
-| # | Método | Ruta | Objetivo |
-|---:|---|---|---|
-| 1 | GET | `/equipment` | Seleccionar equipo con cliente/ubicación |
-| 2 | GET | `/service-types` | Consultar tipos de servicio |
-| 3 | GET | `/technicians` | Consultar técnicos |
-| 4 | POST | `/technicians/{id}/availability` | Registrar disponibilidad |
-| 5 | GET | `/technicians/{id}/availability` | Consultar disponibilidad |
-| 6 | POST | `/work-orders` | Crear OT |
-| 7 | GET | `/work-orders` | Seguimiento de OTs |
-| 8 | GET | `/work-orders/{id}` | Vista completa y trazabilidad de una OT |
-| 9 | PUT | `/work-orders/{id}/assignment` | Asignar/reprogramar técnico |
-| 10 | GET | `/technicians/{id}/agenda` | Obtener agenda desde asignaciones |
-| 11 | PATCH | `/work-orders/{id}/status` | `EN_ROUTE` / `RESCHEDULED` |
-| 12 | POST | `/work-orders/{id}/checklist` | Crear checklist e ítems |
-| 13 | POST | `/work-orders/{id}/interventions` | Iniciar intervención |
-| 14 | PUT | `/interventions/{id}/report` | Registrar ejecución completa |
-| 15 | POST | `/interventions/{id}/conformity` | Registrar conformidad |
-| 16 | GET | `/equipment/{id}/maintenance-history` | Consultar historial derivado |
-| 17 | POST | `/equipment/{id}/preventive-maintenance-plans` | Crear mantenimiento preventivo |
-| 18 | GET | `/equipment/{id}/preventive-maintenance-plans` | Consultar planes preventivos |
+|  # | Método | Ruta                                           | Objetivo                                 |
+|---:|--------|------------------------------------------------|------------------------------------------|
+|  1 | GET    | `/equipment`                                   | Seleccionar equipo con cliente/ubicación |
+|  2 | GET    | `/service-types`                               | Consultar tipos de servicio              |
+|  3 | GET    | `/technicians`                                 | Consultar técnicos                       |
+|  4 | POST   | `/technicians/{id}/availability`               | Registrar disponibilidad                 |
+|  5 | GET    | `/technicians/{id}/availability`               | Consultar disponibilidad                 |
+|  6 | POST   | `/work-orders`                                 | Crear OT                                 |
+|  7 | GET    | `/work-orders`                                 | Seguimiento de OTs                       |
+|  8 | GET    | `/work-orders/{id}`                            | Vista completa y trazabilidad de una OT  |
+|  9 | PUT    | `/work-orders/{id}/assignment`                 | Asignar/reprogramar técnico              |
+| 10 | GET    | `/technicians/{id}/agenda`                     | Obtener agenda desde asignaciones        |
+| 11 | PATCH  | `/work-orders/{id}/status`                     | `EN_ROUTE` / `RESCHEDULED`               |
+| 12 | POST   | `/work-orders/{id}/checklist`                  | Crear checklist e ítems                  |
+| 13 | POST   | `/work-orders/{id}/interventions`              | Iniciar intervención                     |
+| 14 | PUT    | `/interventions/{id}/report`                   | Registrar ejecución completa             |
+| 15 | POST   | `/interventions/{id}/conformity`               | Registrar conformidad                    |
+| 16 | GET    | `/equipment/{id}/maintenance-history`          | Consultar historial derivado             |
+| 17 | POST   | `/equipment/{id}/preventive-maintenance-plans` | Crear mantenimiento preventivo           |
+| 18 | GET    | `/equipment/{id}/preventive-maintenance-plans` | Consultar planes preventivos             |
 
 **Total del contrato MVP: 18 endpoints.**
 
@@ -1175,14 +1182,14 @@ Tampoco se agregan endpoints individuales de CRUD para `failure`, `repair`, `int
 El contrato se considera suficiente para el MVP cuando permite ejecutar de punta a punta este escenario:
 
 1. Seleccionar un equipo existente y conocer su cliente/ubicación.
-2. Crear una OT.
+2. Crear una Orden de Trabajo (OT).
 3. Consultar disponibilidad.
 4. Asignar un técnico.
 5. Consultar su agenda.
 6. Marcar salida a campo.
 7. Iniciar la intervención.
 8. Registrar checklist, fallas/reparaciones/componentes, notas y evidencia.
-9. Dejar la OT pendiente de conformidad.
+9. Dejar la Orden de Trabajo (OT) pendiente de conformidad.
 10. Registrar conformidad.
 11. Consultar la OT completa en estado `COMPLETED`.
 12. Consultar esa intervención desde el historial del equipo.
