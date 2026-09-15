@@ -1,15 +1,20 @@
 # FieldFlow — Contrato de API del MVP
 
-**Este documento es el contrato entre el backend y los clientes que consuman la API de FieldFlow durante el MVP.** Define las rutas, estructuras JSON, reglas funcionales, códigos HTTP y convenciones mínimas necesarias para implementar y demostrar el flujo operativo acordado.
+**Este documento es el contrato entre el backend y los clientes que consuman la API de FieldFlow durante el MVP.**
+Define las rutas, estructuras JSON, reglas funcionales, códigos HTTP y convenciones mínimas necesarias para implementar
+y demostrar el flujo operativo acordado.
 
 - **Versión:** `v1`
 - **Estado:** contrato MVP
 - **Base path:** `/api/v1`
 - **Base URL local:** `http://localhost:8080/api/v1`
 - **Base URL staging:** `https://fieldflow-api-2lfo.onrender.com`
-- **OpenAPI / Swagger:** la especificación generada desde el código debe reflejar este contrato; su ubicación concreta queda definida por la configuración del backend.
+- **OpenAPI / Swagger:** la especificación generada desde el código debe reflejar este contrato; su ubicación concreta
+  queda definida por la configuración del backend.
 
-> Este archivo representa el **acuerdo funcional y HTTP**. La especificación OpenAPI generada desde el código representa su **implementación ejecutable**. Si ambos difieren, existe una inconsistencia que debe corregirse antes de considerar terminado el endpoint.
+> Este archivo representa el **acuerdo funcional y HTTP**. La especificación OpenAPI generada desde el código representa
+> su **implementación ejecutable**. Si ambos difieren, existe una inconsistencia que debe corregirse antes de considerar
+> terminado el endpoint.
 
 ---
 
@@ -17,9 +22,11 @@
 
 ### 1.1 Objetivo
 
-Este documento define el contrato HTTP mínimo necesario para implementar el MVP de FieldFlow durante las cuatro semanas restantes de desarrollo.
+Este documento define el contrato HTTP mínimo necesario para implementar el MVP de FieldFlow durante las cuatro semanas
+restantes de desarrollo.
 
-El criterio rector es **proteger el MVP**. La API no replica cada tabla como un CRUD independiente: expone únicamente los casos de uso necesarios para completar el flujo operativo y demostrar trazabilidad de punta a punta.
+El criterio rector es **proteger el MVP**. La API no replica cada tabla como un CRUD independiente: expone únicamente
+los casos de uso necesarios para completar el flujo operativo y demostrar trazabilidad de punta a punta.
 
 Flujo principal soportado:
 
@@ -33,9 +40,11 @@ El contrato se deriva exclusivamente de:
 
 - [`project-description.md`](project-description.md) — fuente de verdad funcional.
 - [`modules-and-entities.md`](modules-and-entities.md) — módulos, entidades, relaciones y límites del MVP.
-- [`V1__initial_schema.sql`](../database/migrations/V1__initial_schema.sql) — esquema físico PostgreSQL/Supabase y restricciones ya definidas.
+- [`V1__initial_schema.sql`](../database/migrations/V1__initial_schema.sql) — esquema físico PostgreSQL/Supabase y
+  restricciones ya definidas.
 
-Si aparece una necesidad que no puede justificarse a partir de estas fuentes y no es necesaria para ejecutar el escenario de aceptación global definido al final de este documento, debe considerarse **post-MVP**.
+Si aparece una necesidad que no puede justificarse a partir de estas fuentes y no es necesaria para ejecutar el
+escenario de aceptación global definido al final de este documento, debe considerarse **post-MVP**.
 
 ### 1.3 Cómo cambiar este contrato
 
@@ -69,7 +78,8 @@ Se consideran **cambios compatibles**, siempre que no alteren el flujo existente
 - ampliar un detalle de error sin eliminar campos existentes;
 - documentar de forma más precisa una regla ya vigente.
 
-Agregar un endpoint nuevo no rompe técnicamente `v1`, pero durante las cuatro semanas restantes requiere además justificar que es imprescindible para el MVP.
+Agregar un endpoint nuevo no rompe técnicamente `v1`, pero durante las cuatro semanas restantes requiere además
+justificar que es imprescindible para el MVP.
 
 ---
 
@@ -88,7 +98,8 @@ La API permite:
 7. Registrar los estados operativos que no se producen automáticamente por otra acción.
 8. Asociar una checklist a una Orden de Trabajo.
 9. Iniciar una intervención.
-10. Registrar en una única operación el reporte de campo: resultado, observaciones, fallas, reparaciones, componentes, checklist, notas y evidencia.
+10. Registrar en una única operación el reporte de campo: resultado, observaciones, fallas, reparaciones, componentes,
+    checklist, notas y evidencia.
 11. Registrar conformidad del cliente.
 12. Consultar el historial de mantenimiento de un equipo.
 13. Crear y consultar un plan de mantenimiento preventivo con recurrencia simple.
@@ -115,11 +126,13 @@ No se exponen rutas ni capacidades adicionales para:
 - idempotencia basada en `Idempotency-Key`;
 - versionado optimista o control de concurrencia explícito en el contrato.
 
-Estas capacidades pueden ser válidas en una evolución futura, pero no forman parte del trabajo necesario para demostrar el MVP actual.
+Estas capacidades pueden ser válidas en una evolución futura, pero no forman parte del trabajo necesario para demostrar
+el MVP actual.
 
 ### 2.3 Datos maestros durante el MVP
 
-Para evitar consumir tiempo de desarrollo en pantallas y CRUD que no son necesarios para demostrar el criterio de éxito, los siguientes datos se consideran precargados mediante seed/migración o administración directa controlada:
+Para evitar consumir tiempo de desarrollo en pantallas y CRUD que no son necesarios para demostrar el criterio de éxito,
+los siguientes datos se consideran precargados mediante seed/migración o administración directa controlada:
 
 - `client`
 - `site`
@@ -196,7 +209,8 @@ startedAt <= endedAt
 
 ### 3.4 Duración estimada
 
-La base de datos define `estimated_duration` como entero, pero no fija una unidad. Para eliminar ambigüedad en el contrato HTTP, el MVP adopta **minutos** y expone el campo como:
+La base de datos define `estimated_duration` como entero, pero no fija una unidad. Para eliminar ambigüedad en el
+contrato HTTP, el MVP adopta **minutos** y expone el campo como:
 
 ```json
 {
@@ -238,7 +252,8 @@ No se aceptan filtros adicionales no documentados en cada endpoint.
 
 ## 3.7 Formato uniforme de errores
 
-Todas las respuestas de error HTTP deben utilizar una estructura compatible con **RFC 9457 (Problem Details for HTTP API)**.
+Todas las respuestas de error HTTP deben utilizar una estructura compatible con **RFC 9457 (Problem Details for HTTP
+API)**.
 
 El contrato agrega dos extensiones útiles para FieldFlow:
 
@@ -265,7 +280,8 @@ Formato base:
 }
 ```
 
-`traceId` es opcional durante el MVP. Si la infraestructura ya dispone de un identificador de correlación, debe exponerse aquí; no es requisito crear un sistema de tracing únicamente para cumplir este contrato.
+`traceId` es opcional durante el MVP. Si la infraestructura ya dispone de un identificador de correlación, debe
+exponerse aquí; no es requisito crear un sistema de tracing únicamente para cumplir este contrato.
 
 ### 3.8 Significado de los campos de error
 
@@ -354,11 +370,13 @@ El frontend debe tomar decisiones utilizando `status` y/o `code`, **no comparand
 | `422 Unprocessable Content` | La request es válida estructuralmente pero viola una regla funcional o transición permitida |
 | `500 Internal Server Error` | Error inesperado del servidor                                                               |
 
-No se incorporan `202`, `204`, `401`, `403` ni `429` porque los endpoints del MVP actual no requieren procesamiento asíncrono, respuestas sin cuerpo, autenticación/autorización ni rate limiting.
+No se incorporan `202`, `204`, `401`, `403` ni `429` porque los endpoints del MVP actual no requieren procesamiento
+asíncrono, respuestas sin cuerpo, autenticación/autorización ni rate limiting.
 
 ### 3.11 Catálogo mínimo de códigos de error
 
-Los siguientes códigos cubren las reglas explícitas del contrato. No es necesario crear un código distinto para cada validación trivial.
+Los siguientes códigos cubren las reglas explícitas del contrato. No es necesario crear un código distinto para cada
+validación trivial.
 
 |  HTTP | `code`                             | Situación                                                                                          |
 |------:|------------------------------------|----------------------------------------------------------------------------------------------------|
@@ -374,7 +392,8 @@ Los siguientes códigos cubren las reglas explícitas del contrato. No es necesa
 | `422` | `CHECKLIST_ITEM_NOT_IN_WORK_ORDER` | Un `checklistItemId` no pertenece al checklist de la OT de la intervención                         |
 | `500` | `INTERNAL_ERROR`                   | Error inesperado no atribuible a la request                                                        |
 
-Para errores `500`, la respuesta no debe exponer stack traces, SQL, credenciales ni detalles internos de infraestructura.
+Para errores `500`, la respuesta no debe exponer stack traces, SQL, credenciales ni detalles internos de
+infraestructura.
 
 ---
 
@@ -402,7 +421,8 @@ Para reducir estados inválidos desde el cliente, varias transiciones son respon
 | Registrar conformidad              | `COMPLETED`                                        |
 | Reprogramar                        | `RESCHEDULED`, hasta confirmar la nueva asignación |
 
-El endpoint genérico de estado queda restringido a `EN_ROUTE` y `RESCHEDULED`. Los demás estados se alcanzan mediante las acciones de negocio correspondientes.
+El endpoint genérico de estado queda restringido a `EN_ROUTE` y `RESCHEDULED`. Los demás estados se alcanzan mediante
+las acciones de negocio correspondientes.
 
 ---
 
@@ -410,13 +430,16 @@ El endpoint genérico de estado queda restringido a `EN_ROUTE` y `RESCHEDULED`. 
 
 Todos los paths de esta sección son relativos a `/api/v1`.
 
-Salvo que un endpoint indique lo contrario, pueden aplicarse los errores comunes `400 VALIDATION_ERROR`, `404 RESOURCE_NOT_FOUND` y `500 INTERNAL_ERROR` cuando corresponda. Los errores de negocio específicos se documentan en cada operación o en el catálogo global de errores.
+Salvo que un endpoint indique lo contrario, pueden aplicarse los errores comunes `400 VALIDATION_ERROR`,
+`404 RESOURCE_NOT_FOUND` y `500 INTERNAL_ERROR` cuando corresponda. Los errores de negocio específicos se documentan en
+cada operación o en el catálogo global de errores.
 
 ## 5.1 Catálogos operativos
 
 ### GET `/equipment`
 
-Devuelve los equipos disponibles para seleccionar al crear una Orden de Trabajo (OT), incluyendo contexto de cliente y ubicación.
+Devuelve los equipos disponibles para seleccionar al crear una Orden de Trabajo (OT), incluyendo contexto de cliente y
+ubicación.
 
 Query params opcionales:
 
@@ -615,6 +638,7 @@ Respuesta `200`:
       "id": "4cc315c5-0b93-4e19-a02d-3902ab688d02",
       "name": "Mantenimiento preventivo"
     },
+    "instructions": "Revisar vibración y temperatura del equipo.",
     "priority": "HIGH",
     "estimatedDurationMinutes": 90,
     "status": "ASSIGNED"
@@ -630,7 +654,8 @@ No se incorpora paginación en el MVP.
 
 **Endpoint principal de trazabilidad del MVP.**
 
-Debe permitir reconstruir desde una Orden de Trabajo (OT) toda la información necesaria para responder al criterio de éxito del proyecto.
+Debe permitir reconstruir desde una Orden de Trabajo (OT) toda la información necesaria para responder al criterio de
+éxito del proyecto.
 
 Respuesta `200`:
 
@@ -792,7 +817,8 @@ Respuesta `200`:
 
 ### PATCH `/work-orders/{workOrderId}/status`
 
-Se utiliza únicamente para estados que representan una acción operativa explícita y no son consecuencia de otro endpoint.
+Se utiliza únicamente para estados que representan una acción operativa explícita y no son consecuencia de otro
+endpoint.
 
 Request permitido:
 
@@ -810,7 +836,8 @@ o:
 }
 ```
 
-Cualquier otro destino se rechaza con `422 INVALID_STATUS_TRANSITION` y debe alcanzarse mediante la operación de negocio correspondiente.
+Cualquier otro destino se rechaza con `422 INVALID_STATUS_TRANSITION` y debe alcanzarse mediante la operación de negocio
+correspondiente.
 
 ---
 
@@ -1011,7 +1038,8 @@ Conflicto:
 
 ### GET `/equipment/{equipmentId}/maintenance-history`
 
-El historial no corresponde a una tabla independiente. Se construye consultando las Órdenes de Trabajo e intervenciones del equipo.
+El historial no corresponde a una tabla independiente. Se construye consultando las Órdenes de Trabajo e intervenciones
+del equipo.
 
 Respuesta `200`:
 
@@ -1154,7 +1182,8 @@ El MVP no incluye un scheduler avanzado ni una API independiente para reglas de 
 
 # 7. Endpoints explícitamente post-MVP
 
-Estos endpoints no deben incorporarse durante las cuatro semanas restantes salvo que el flujo principal esté terminado, probado y congelado:
+Estos endpoints no deben incorporarse durante las cuatro semanas restantes salvo que el flujo principal esté terminado,
+probado y congelado:
 
 ```text
 POST/PATCH/DELETE /clients/**
@@ -1173,7 +1202,9 @@ DELETE /interventions/**
 /api/v1/checklist-versions/**
 ```
 
-Tampoco se agregan endpoints individuales de CRUD para `failure`, `repair`, `intervention_component`, `checklist_response`, `technical_note` o `evidence`; esas escrituras forman parte del reporte transaccional de intervención.
+Tampoco se agregan endpoints individuales de CRUD para `failure`, `repair`, `intervention_component`,
+`checklist_response`, `technical_note` o `evidence`; esas escrituras forman parte del reporte transaccional de
+intervención.
 
 ---
 
@@ -1195,4 +1226,5 @@ El contrato se considera suficiente para el MVP cuando permite ejecutar de punta
 12. Consultar esa intervención desde el historial del equipo.
 13. Crear y consultar una recurrencia preventiva simple.
 
-Si una nueva ruta no es necesaria para completar alguno de estos pasos o una capacidad expresamente definida en las fuentes del MVP, se considera fuera de alcance.
+Si una nueva ruta no es necesaria para completar alguno de estos pasos o una capacidad expresamente definida en las
+fuentes del MVP, se considera fuera de alcance.
