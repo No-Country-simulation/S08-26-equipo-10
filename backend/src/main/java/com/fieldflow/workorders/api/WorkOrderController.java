@@ -7,6 +7,7 @@ import com.fieldflow.workorders.api.dto.WorkOrderSummaryResponse;
 import com.fieldflow.workorders.application.WorkOrderService;
 import com.fieldflow.workorders.domain.WorkOrderStatus;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.MediaType;
@@ -38,6 +39,7 @@ public class WorkOrderController {
 					con la opción de filtrar por estado y/o ID del equipo.
 					"""
 	)
+	@ApiResponse(responseCode = "200", description = "Lista de órdenes de trabajo obtenida exitosamente.")
 	@ApiJsonExample(
 			description = "Ejemplo de respuesta para obtener todas las órdenes de trabajo",
 			path = "/static/swagger/examples/workorders/list-work-orders-200.json",
@@ -60,6 +62,7 @@ public class WorkOrderController {
 					Una orden de trabajo (OT) puede tener múltiples intervenciones.
 					"""
 	)
+	@ApiResponse(responseCode = "200", description = "Detalles de la orden de trabajo obtenido exitosamente.")
 	@ApiJsonExample(
 			description = "Ejemplo de respuesta para obtener detalles de una orden de trabajo",
 			path = "/static/swagger/examples/workorders/get-work-order-detail-200.json",
@@ -78,9 +81,10 @@ public class WorkOrderController {
 					Devuelve una respuesta con el ID de la orden de trabajo creada.
 					"""
 	)
+	@ApiResponse(responseCode = "201", description = "Orden de trabajo creada exitosamente.")
 	@ApiJsonExample(
 			status = "201",
-			description = "Ejemplo de respuesta para crear una nueva orden de trabajo",
+			description = "Ejemplo de respuesta al crear una nueva orden de trabajo",
 			path = "/static/swagger/examples/workorders/create-work-order-201.json",
 			summary = "Orden de trabajo creada"
 	)

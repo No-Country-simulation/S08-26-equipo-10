@@ -6,6 +6,7 @@ import com.fieldflow.planning.api.dto.TechnicianSummaryResponse;
 import com.fieldflow.planning.application.TechnicianService;
 import com.fieldflow.shared.annotations.ApiJsonExample;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.MediaType;
@@ -34,6 +35,7 @@ public class TechnicianController {
 					Si no hay técnicos, devuelve una lista vacía.
 					"""
 	)
+	@ApiResponse(responseCode = "200", description = "Lista de técnicos obtenida correctamente.")
 	@ApiJsonExample(
 			description = "Lista de técnicos presentes en la plataforma.",
 			path = "/static/swagger/examples/planning/list-technicians-200.json",
@@ -51,6 +53,7 @@ public class TechnicianController {
 					Crea una nueva disponibilidad para el técnico especificado.
 					"""
 	)
+	@ApiResponse(responseCode = "201", description = "Disponibilidad creada correctamente.")
 	@ApiJsonExample(
 			status = "201",
 			description = "Disponibilidad creada correctamente.",
