@@ -535,7 +535,10 @@ Respuesta `201`:
 ```json
 {
   "id": "8cfe0116-83b1-4a19-88c8-9510aa929c18",
-  "technicianId": "1e1d6a75-b50d-4daa-8a76-c4409302a575",
+  "technician": {
+    "id": "2e1d6a75-b50d-4daa-8a76-c4409302a576",
+    "name": "Técnico Dos"
+  },
   "startsAt": "2026-09-14T08:00:00-03:00",
   "endsAt": "2026-09-14T17:00:00-03:00"
 }

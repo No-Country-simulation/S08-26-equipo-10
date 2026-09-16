@@ -81,7 +81,7 @@ public class WorkOrderController {
 	@ApiJsonExample(
 			status = "201",
 			description = "Ejemplo de respuesta para crear una nueva orden de trabajo",
-			path = "/static/swagger/examples/workorders/create-work-order-200.json",
+			path = "/static/swagger/examples/workorders/create-work-order-201.json",
 			summary = "Orden de trabajo creada"
 	)
 	@PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
