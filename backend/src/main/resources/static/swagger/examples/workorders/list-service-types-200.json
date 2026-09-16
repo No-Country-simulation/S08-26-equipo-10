@@ -1,0 +1,14 @@
+[
+  {
+    "id": "4cc315c5-0b93-4e19-a02d-3902ab688d02",
+    "name": "Mantenimiento preventivo"
+  },
+  {
+    "id": "7f28ee8b-22a0-438b-a9bb-8716313c193c",
+    "name": "Reparación correctiva"
+  },
+  {
+    "id": "8a39ff9c-33b1-449c-b0cc-9827424d204d",
+    "name": "Inspección técnica"
+  }
+]

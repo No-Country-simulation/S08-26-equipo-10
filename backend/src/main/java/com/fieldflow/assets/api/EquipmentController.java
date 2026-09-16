@@ -4,6 +4,7 @@ import com.fieldflow.assets.api.dto.EquipmentDetailResponse;
 import com.fieldflow.assets.application.EquipmentService;
 import com.fieldflow.shared.annotations.ApiJsonExample;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -26,11 +27,6 @@ public class EquipmentController {
 		this.equipmentService = equipmentService;
 	}
 
-	@ApiJsonExample(
-			description = "Lista de equipos. Si no hay equipos, devuelve un array vacío.",
-			path = "/static/swagger/examples/assets/list-equipments-200.json",
-			summary = "Lista de equipos"
-	)
 	@Operation(
 			summary = "Obtiene todos los equipos",
 			description = """
@@ -39,6 +35,12 @@ public class EquipmentController {
 					Los equipos pueden o no tener una instalación asociada, en cuyo caso se representará como `null`.
 					Si no hay equipos, devuelve un arreglo vacío.
 					"""
+	)
+	@ApiResponse(responseCode = "200", description = "Lista de equipos obtenida correctamente.")
+	@ApiJsonExample(
+			description = "Lista de equipos. Si no hay equipos, devuelve un array vacío.",
+			path = "/static/swagger/examples/assets/list-equipments-200.json",
+			summary = "Lista de equipos"
 	)
 	@GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<List<EquipmentDetailResponse>> getAllEquipments(@RequestParam(required = false) UUID siteId,
