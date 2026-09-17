@@ -785,8 +785,26 @@ Respuesta `200`:
 ```json
 {
   "id": "fb9f85b0-5abe-4d45-91a1-9cdaf97bc91f",
-  "workOrderId": "8c9fb9c4-93c7-4d13-a347-33262872b95a",
-  "technicianId": "1e1d6a75-b50d-4daa-8a76-c4409302a575",
+  "workOrder": {
+    "id": "8c9fb9c4-93c7-4d13-a347-33262872b95a",
+    "equipment": {
+      "id": "1fc79768-93cd-4f66-a225-08b30153b5de",
+      "identifier": "EQ-001",
+      "name": "Compresor principal"
+    },
+    "serviceType": {
+      "id": "4cc315c5-0b93-4e19-a02d-3902ab688d02",
+      "name": "Mantenimiento preventivo"
+    },
+    "instructions": "Revisar vibración y temperatura del equipo.",
+    "priority": "HIGH",
+    "estimatedDurationMinutes": 90,
+    "status": "ASSIGNED"
+  },
+  "technician": {
+    "id": "1e1d6a75-b50d-4daa-8a76-c4409302a575",
+    "name": "Técnico Uno"
+  },
   "plannedStartAt": "2026-09-14T09:00:00-03:00",
   "plannedEndAt": "2026-09-14T10:30:00-03:00"
 }
