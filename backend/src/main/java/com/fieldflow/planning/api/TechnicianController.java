@@ -14,8 +14,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
+
+import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.fromMethodCall;
+import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 @RestController
 @RequestMapping("/api/v1/technicians")
@@ -66,9 +70,33 @@ public class TechnicianController {
 	) {
 		TechnicianAvailabilityResponse response = technicianService.createTechnicianAvailability(technicianId, request);
 
-		// TODO: cambiar a fromMethodCall cuando GET /technicians/{technicianId}/availability esté disponible
-		URI location = URI.create("/api/v1/technicians/" + technicianId + "/availability");
+		URI location = fromMethodCall(on(TechnicianController.class)
+				.getTechnicianAvailability(technicianId, response.startsAt(), response.endsAt())).build().toUri();
 
 		return ResponseEntity.created(location).body(response);
+	}
+
+	@Operation(
+			summary = "Obtener disponibilidad de un técnico",
+			description = """
+					Devuelve la disponibilidad del técnico especificado en el rango de fecha y hora indicado.
+					"""
+	)
+	@ApiResponse(responseCode = "200", description = "Disponibilidad obtenida correctamente.")
+	@ApiJsonExample(
+			description = "Disponibilidad obtenida correctamente.",
+			path = "/static/swagger/examples/planning/get-technician-availability-200.json",
+			summary = "Disponibilidad obtenida"
+	)
+	@GetMapping(value = "/{technicianId}/availability", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<List<TechnicianAvailabilityResponse>> getTechnicianAvailability(
+			@PathVariable UUID technicianId,
+			@RequestParam OffsetDateTime from,
+			@RequestParam OffsetDateTime to
+	) {
+		List<TechnicianAvailabilityResponse> response = technicianService
+				.getTechnicianAvailability(technicianId, from, to);
+
+		return ResponseEntity.ok(response);
 	}
 }
