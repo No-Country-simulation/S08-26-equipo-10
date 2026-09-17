@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -42,7 +43,7 @@ public class TechnicianServiceImpl implements TechnicianService {
 
 	@Override
 	@Transactional
-	public TechnicianAvailabilityResponse createTechnicianAvailability(UUID technicianId,
+	public TechnicianAvailabilityResponse createTechnicianAvailability(UUID id,
 	                                                                   CreateTechnicianAvailabilityRequest request) {
 		if (!request.startsAt().isBefore(request.endsAt())) {
 			throw ApiException.badRequest("La fecha y hora de inicio debe ser anterior a la fecha y hora de fin.");
@@ -53,8 +54,8 @@ public class TechnicianServiceImpl implements TechnicianService {
 			throw ApiException.badRequest("La duración mínima de disponibilidad es de 4 horas.");
 		}
 
-		var technician = technicianRepository.findById(technicianId)
-				.orElseThrow(() -> ApiException.notFound("No existe técnico asociado al ID " + technicianId));
+		var technician = technicianRepository.findById(id)
+				.orElseThrow(() -> ApiException.notFound("No existe técnico asociado al ID " + id));
 
 		TechnicianAvailability technicianAvailability = new TechnicianAvailability(
 				technician,
@@ -64,5 +65,26 @@ public class TechnicianServiceImpl implements TechnicianService {
 		technicianAvailability = technicianAvailabilityRepository.save(technicianAvailability);
 
 		return technicianMapper.toAvailabilityResponse(technicianAvailability);
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<TechnicianAvailabilityResponse> getTechnicianAvailability(UUID id,
+	                                                                      OffsetDateTime from,
+	                                                                      OffsetDateTime to) {
+		if (!from.isBefore(to)) {
+			throw ApiException.badRequest("La fecha 'from' debe ser anterior a 'to'.");
+		}
+
+		if (!technicianRepository.existsById(id)) {
+			throw ApiException.notFound("No existe técnico asociado al ID " + id);
+		}
+
+		List<TechnicianAvailability> technicianAvailabilities = technicianAvailabilityRepository
+				.findAllByTechnicianIdAndRange(id, from, to);
+
+		return technicianAvailabilities.stream()
+				.map(technicianMapper::toAvailabilityResponse)
+				.toList();
 	}
 }

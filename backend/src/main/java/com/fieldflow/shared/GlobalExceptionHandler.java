@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
@@ -153,6 +154,29 @@ public class GlobalExceptionHandler {
 		problem.setInstance(URI.create(request.getRequestURI()));
 		problem.setProperty("code", ex.getType().getCode());
 		return problem;
+	}
+
+	/**
+	 * Maneja excepciones de parámetros de solicitud obligatorios faltantes.
+	 * No afecta a parámetros opcionales.
+	 * <p>
+	 * Ejemplo:
+	 * <p>
+	 * ?equipmentId=1234567890
+	 * <p>
+	 * ?status=ACTIVE
+	 */
+	@ExceptionHandler(MissingServletRequestParameterException.class)
+	public ProblemDetail handleMissingRequestParameter(MissingServletRequestParameterException ex,
+	                                                   HttpServletRequest request) {
+		String detail = "Uno o más parámetros requeridos no fueron enviados.";
+
+		Map<String, String> error = Map.of(
+				"field", ex.getParameterName(),
+				"message", "es obligatorio"
+		);
+
+		return buildValidationProblem(request, detail, List.of(error));
 	}
 
 	/**
