@@ -1,46 +1,40 @@
+import type { WorkOrderStatus } from "@/types/workOrder";
 import { Badge } from "../common/Badge";
+import { workOrderStatusLabels } from "@/utils/workOrderTranslation";
 
 
-type Status =
-    | "En ejecución"
-    | "En camino"
-    | "Asignada"
-    | "Pendiente conformidad"
-    | "Pendiente"
-    | "Finalizada"
-    | "Reprogramada";
 
 interface StatusBadgeProps {
-    status: Status;
+    status: WorkOrderStatus;
 }
 
-const statusStyles: Record<Status, string> = {
-    "En ejecución":
+const statusStyles: Record<WorkOrderStatus, string> = {
+    "IN_PROGRESS":
         "border-purple-500/40 bg-purple-500/10 text-purple-300",
 
-    "En camino":
+    "EN_ROUTE":
         "border-cyan-500/40 bg-cyan-500/10 text-cyan-300",
 
-    Asignada:
+    "ASSIGNED":
         "border-blue-500/40 bg-blue-500/10 text-blue-300",
 
-    "Pendiente conformidad":
+    "PENDING_CUSTOMER_CONFIRMATION":
         "border-orange-500/40 bg-orange-500/10 text-orange-300",
 
-    Pendiente:
+    "PENDING":
         "border-yellow-500/40 bg-yellow-500/10 text-yellow-300",
 
-    Finalizada:
+    "COMPLETED":
         "border-emerald-500/40 bg-emerald-500/10 text-emerald-300",
 
-    Reprogramada:
+    "RESCHEDULED":
         "border-pink-500/40 bg-pink-500/10 text-pink-300",
 };
 
 export function StatusBadge({ status }: StatusBadgeProps) {
     return (
-        <Badge className={statusStyles[status]}>
-            {status}
+        <Badge className={`${statusStyles[status]}`} >
+            {workOrderStatusLabels[status]}
         </Badge>
     );
 }

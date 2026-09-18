@@ -22,7 +22,7 @@ const navigationItems = [
         label: 'Órdenes de Trabajo',
         path: '/fieldflow/ordenesDeTrabajo',
         icon: ClipboardList,
-        badge: 4,
+
         disabled: false,
     },
     {
@@ -55,7 +55,6 @@ const navigationItems = [
         label: 'Mantenimiento',
         path: '/fieldflow/mantenimientos',
         icon: Wrench,
-        badge: 2,
         disabled: false,
     },
 ]
@@ -138,11 +137,7 @@ function Sidebar() {
 
                             <span className="flex-1">{item.label}</span>
 
-                            {item.badge && (
-                                <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-blue-600 px-1.5 text-[10px] font-semibold text-white">
-                                    {item.badge}
-                                </span>
-                            )}
+
                         </NavLink>
                     )
                 })}
