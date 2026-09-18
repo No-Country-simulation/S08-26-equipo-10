@@ -108,4 +108,8 @@ public class WorkOrder {
 	public Checklist getChecklist() {
 		return checklist;
 	}
+
+	public void setStatus(WorkOrderStatus status) {
+		this.status = status;
+	}
 }
