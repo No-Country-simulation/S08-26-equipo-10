@@ -15,5 +15,15 @@ export default defineConfig({
     alias: {
       '@': path.resolve(__dirname, './src'),
     },
+
+  },
+  server: {
+    proxy: {
+      '/api': {
+        target: 'https://fieldflow-api-2lfo.onrender.com',
+        changeOrigin: true
+      }
+    }
   }
+
 })

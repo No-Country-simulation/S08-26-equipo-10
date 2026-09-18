@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import TecnicoCard, {
     type Tecnico,
 } from "@/components/ui/TechnicianCard";
@@ -235,6 +235,10 @@ function StatCard({
     value,
     valueClass,
 }: StatCardProps) {
+
+
+
+
     return (
         <div className="rounded-xl border border-slate-700 bg-[#131a22] px-5 py-4">
             <p className="text-sm tracking-wide text-blue-300">

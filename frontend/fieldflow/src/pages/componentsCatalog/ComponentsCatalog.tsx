@@ -45,27 +45,31 @@ const technicians: Technician[] = [
 export default function ComponentsCatalog() {
     const [modalOpen, setModalOpen] = useState(false);
 
-    const technicianColumns = [
-        {
-            header: "Técnico",
-            accessor: "name" as keyof Technician,
-        },
-        {
-            header: "Código",
-            accessor: "code" as keyof Technician,
-        },
-        {
-            header: "Estado",
-            accessor: "status" as keyof Technician,
-            render: (value: Technician["status"]) => (
-                <TechnicianStatusBadge
-                    status={
-                        value as "En campo" | "Disponible" | "Ocupado"
-                    }
-                />
-            ),
-        },
-    ];
+    const technicianColumns: Array<{
+        header: string;
+        accessor: keyof Technician;
+        render?: (value: unknown, row: Technician) => React.ReactNode;
+    }> = [
+            {
+                header: "Técnico",
+                accessor: "name",
+            },
+            {
+                header: "Código",
+                accessor: "code",
+            },
+            {
+                header: "Estado",
+                accessor: "status",
+                render: (value: unknown) => (
+                    <TechnicianStatusBadge
+                        status={
+                            value as "En campo" | "Disponible" | "Ocupado"
+                        }
+                    />
+                ),
+            },
+        ];
 
     return (
         <main className="min-h-screen bg-slate-950 p-6 text-white">
@@ -186,9 +190,10 @@ export default function ComponentsCatalog() {
                             </ComponentLabel>
 
                             <div className="flex flex-wrap gap-3">
-                                <PriorityBadge priority="Crítica" />
-                                <PriorityBadge priority="Alta" />
-                                <PriorityBadge priority="Media" />
+                                <PriorityBadge priority="CRITICAL" />
+                                <PriorityBadge priority="HIGH" />
+                                <PriorityBadge priority="MEDIUM" />
+                                <PriorityBadge priority="LOW" />
                             </div>
                         </div>
 
@@ -199,12 +204,12 @@ export default function ComponentsCatalog() {
                             </ComponentLabel>
 
                             <div className="flex flex-wrap gap-3">
-                                <StatusBadge status="En ejecución" />
-                                <StatusBadge status="En camino" />
-                                <StatusBadge status="Asignada" />
-                                <StatusBadge status="Pendiente" />
-                                <StatusBadge status="Finalizada" />
-                                <StatusBadge status="Reprogramada" />
+                                <StatusBadge status="IN_PROGRESS" />
+                                <StatusBadge status="EN_ROUTE" />
+                                <StatusBadge status="ASSIGNED" />
+                                <StatusBadge status="PENDING" />
+                                <StatusBadge status="COMPLETED" />
+                                <StatusBadge status="RESCHEDULED" />
                             </div>
                         </div>
 

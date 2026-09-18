@@ -1,6 +1,6 @@
 import { Navigate, Route, Routes } from "react-router"
 import MainLayout from "../components/layouts/MainLayout"
-import OrdenesTrabajoPage from "../pages/ordenes/OrdenesTrabajoiPage"
+import OrdenesTrabajoPage from "../pages/ordenes/OrdenesTrabajoPage"
 import Dashboard from "../pages/dashboard/Dashboard"
 import Login from "../pages/auth/Login"
 import TecnicosPage from "../pages/tecnicos/TecnicosPage"
