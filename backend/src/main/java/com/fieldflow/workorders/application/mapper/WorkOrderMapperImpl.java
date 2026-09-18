@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class WorkOrderMapperImpl implements WorkOrderMapper {
+public class WorkOrderMapperImpl implements WorkOrderMapper, WorkOrderSummaryMapper {
 
 	private final EquipmentMapper equipmentMapper;
 	private final AssignmentMapper assignmentMapper;
