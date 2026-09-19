@@ -12,18 +12,16 @@ import java.util.UUID;
 public class ChecklistServiceImpl implements ChecklistService {
 
 	private final ChecklistRepository repository;
-	private final ChecklistMapper mapper;
 
-	public ChecklistServiceImpl(ChecklistRepository repository, ChecklistMapper mapper) {
+	public ChecklistServiceImpl(ChecklistRepository repository) {
 		this.repository = repository;
-		this.mapper = mapper;
 	}
 
 	@Override
 	@Transactional(readOnly = true)
 	public ChecklistDetailResponse getChecklistDetailByWorkOrderId(UUID workOrderId) {
 		return repository.findByWorkOrderIdWithItems(workOrderId)
-				.map(mapper::toDetailResponse)
+				.map(ChecklistMapper::toDetailResponse)
 				.orElse(null);
 	}
 }

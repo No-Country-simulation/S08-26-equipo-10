@@ -15,11 +15,9 @@ import java.util.UUID;
 public class EquipmentServiceImpl implements EquipmentService {
 
 	private final EquipmentRepository equipmentRepository;
-	private final EquipmentMapper equipmentMapper;
 
-	public EquipmentServiceImpl(EquipmentRepository equipmentRepository, EquipmentMapper equipmentMapper) {
+	public EquipmentServiceImpl(EquipmentRepository equipmentRepository) {
 		this.equipmentRepository = equipmentRepository;
-		this.equipmentMapper = equipmentMapper;
 	}
 
 	@Override
@@ -27,7 +25,7 @@ public class EquipmentServiceImpl implements EquipmentService {
 	public List<EquipmentDetailResponse> getAllEquipments(UUID siteId, UUID clientId) {
 		return equipmentRepository.findAllWithContext(siteId, clientId)
 				.stream()
-				.map(equipmentMapper::toDetailResponse)
+				.map(EquipmentMapper::toDetailResponse)
 				.toList();
 	}
 

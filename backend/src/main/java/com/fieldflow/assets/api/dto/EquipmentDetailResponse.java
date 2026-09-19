@@ -11,23 +11,4 @@ public record EquipmentDetailResponse(
 		SiteSummaryResponse site,
 		InstallationSummaryResponse installation
 ) {
-
-	public record ClientSummaryResponse(
-			UUID id,
-			String name
-	) {
-	}
-
-	public record SiteSummaryResponse(
-			UUID id,
-			String name,
-			String address
-	) {
-	}
-
-	public record InstallationSummaryResponse(
-			UUID id,
-			String name
-	) {
-	}
 }

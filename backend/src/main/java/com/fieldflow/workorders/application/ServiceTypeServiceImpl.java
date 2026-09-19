@@ -15,18 +15,16 @@ import java.util.UUID;
 public class ServiceTypeServiceImpl implements ServiceTypeService {
 
 	private final ServiceTypeRepository serviceTypeRepository;
-	private final ServiceTypeMapper serviceTypeMapper;
 
-	public ServiceTypeServiceImpl(ServiceTypeRepository serviceTypeRepository, ServiceTypeMapper serviceTypeMapper) {
+	public ServiceTypeServiceImpl(ServiceTypeRepository serviceTypeRepository) {
 		this.serviceTypeRepository = serviceTypeRepository;
-		this.serviceTypeMapper = serviceTypeMapper;
 	}
 
 	@Override
 	@Transactional(readOnly = true)
 	public List<ServiceTypeResponse> getAllServiceTypes() {
 		return serviceTypeRepository.findAll().stream()
-				.map(serviceTypeMapper::toResponse)
+				.map(ServiceTypeMapper::toResponse)
 				.toList();
 	}
 
