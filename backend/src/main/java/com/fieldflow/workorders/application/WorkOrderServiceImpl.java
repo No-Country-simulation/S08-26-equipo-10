@@ -21,7 +21,6 @@ import java.util.UUID;
 public class WorkOrderServiceImpl implements WorkOrderService {
 
 	private final WorkOrderRepository repository;
-	private final WorkOrderMapper mapper;
 
 	private final ChecklistService checklistService;
 	private final InterventionService interventionService;
@@ -29,13 +28,11 @@ public class WorkOrderServiceImpl implements WorkOrderService {
 	private final ServiceTypeService serviceTypeService;
 
 	public WorkOrderServiceImpl(WorkOrderRepository repository,
-	                            WorkOrderMapper mapper,
 	                            ChecklistService checklistService,
 	                            InterventionService interventionService,
 	                            EquipmentService equipmentService,
 	                            ServiceTypeService serviceTypeService) {
 		this.repository = repository;
-		this.mapper = mapper;
 		this.checklistService = checklistService;
 		this.interventionService = interventionService;
 		this.equipmentService = equipmentService;
@@ -46,7 +43,7 @@ public class WorkOrderServiceImpl implements WorkOrderService {
 	@Transactional(readOnly = true)
 	public List<WorkOrderSummaryResponse> getAllWorkOrders(WorkOrderStatus status, UUID equipmentId) {
 		return repository.findAllWithContext(status, equipmentId).stream()
-				.map(mapper::toSummaryResponse)
+				.map(WorkOrderMapper::toSummaryResponse)
 				.toList();
 	}
 
@@ -61,7 +58,7 @@ public class WorkOrderServiceImpl implements WorkOrderService {
 
 		var interventions = interventionService.getInterventionsByWorkOrderId(id);
 
-		return mapper.toDetailResponse(workOrder, checklist, interventions);
+		return WorkOrderMapper.toDetailResponse(workOrder, checklist, interventions);
 	}
 
 	@Override
@@ -79,7 +76,13 @@ public class WorkOrderServiceImpl implements WorkOrderService {
 				WorkOrderStatus.PENDING
 		);
 		workOrder = repository.save(workOrder);
+		return WorkOrderMapper.toSummaryResponse(workOrder);
+	}
 
-		return mapper.toSummaryResponse(workOrder);
+	@Override
+	@Transactional(readOnly = true)
+	public WorkOrder getWorkOrderEntityById(UUID id) {
+		return repository.findByIdWithContext(id)
+				.orElseThrow(() -> ApiException.notFound("Orden de trabajo no encontrada para ID: " + id));
 	}
 }

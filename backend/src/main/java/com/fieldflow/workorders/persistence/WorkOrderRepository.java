@@ -41,4 +41,13 @@ public interface WorkOrderRepository extends JpaRepository<WorkOrder, UUID> {
 			WHERE wo.id = :workOrderId
 			""")
 	Optional<WorkOrder> findDetailBaseById(@Param("workOrderId") UUID id);
+
+	@Query("""
+			SELECT wo
+			FROM WorkOrder wo
+			JOIN FETCH wo.equipment
+			JOIN FETCH wo.serviceType
+			WHERE wo.id = :workOrderId
+			""")
+	Optional<WorkOrder> findByIdWithContext(@Param("workOrderId") UUID id);
 }
