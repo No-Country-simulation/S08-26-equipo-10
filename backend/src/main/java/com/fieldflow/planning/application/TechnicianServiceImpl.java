@@ -4,6 +4,7 @@ import com.fieldflow.planning.api.dto.CreateTechnicianAvailabilityRequest;
 import com.fieldflow.planning.api.dto.TechnicianAvailabilityResponse;
 import com.fieldflow.planning.api.dto.TechnicianSummaryResponse;
 import com.fieldflow.planning.application.mapper.TechnicianMapper;
+import com.fieldflow.planning.domain.Technician;
 import com.fieldflow.planning.domain.TechnicianAvailability;
 import com.fieldflow.planning.persistence.TechnicianAvailabilityRepository;
 import com.fieldflow.planning.persistence.TechnicianRepository;
@@ -23,21 +24,18 @@ public class TechnicianServiceImpl implements TechnicianService {
 
 	private final TechnicianAvailabilityRepository technicianAvailabilityRepository;
 	private final TechnicianRepository technicianRepository;
-	private final TechnicianMapper technicianMapper;
 
 	public TechnicianServiceImpl(TechnicianAvailabilityRepository technicianAvailabilityRepository,
-	                             TechnicianRepository technicianRepository,
-	                             TechnicianMapper technicianMapper) {
+	                             TechnicianRepository technicianRepository) {
 		this.technicianAvailabilityRepository = technicianAvailabilityRepository;
 		this.technicianRepository = technicianRepository;
-		this.technicianMapper = technicianMapper;
 	}
 
 	@Override
 	@Transactional(readOnly = true)
 	public List<TechnicianSummaryResponse> getAllTechnicians() {
 		return technicianRepository.findAll().stream()
-				.map(technicianMapper::toSummaryResponse)
+				.map(TechnicianMapper::toSummaryResponse)
 				.toList();
 	}
 
@@ -64,7 +62,7 @@ public class TechnicianServiceImpl implements TechnicianService {
 		);
 		technicianAvailability = technicianAvailabilityRepository.save(technicianAvailability);
 
-		return technicianMapper.toAvailabilityResponse(technicianAvailability);
+		return TechnicianMapper.toAvailabilityResponse(technicianAvailability);
 	}
 
 	@Override
@@ -84,7 +82,14 @@ public class TechnicianServiceImpl implements TechnicianService {
 				.findAllByTechnicianIdAndRange(id, from, to);
 
 		return technicianAvailabilities.stream()
-				.map(technicianMapper::toAvailabilityResponse)
+				.map(TechnicianMapper::toAvailabilityResponse)
 				.toList();
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public Technician getTechnicianEntityById(UUID id) {
+		return technicianRepository.findById(id)
+				.orElseThrow(() -> ApiException.notFound("No existe técnico asociado al ID " + id));
 	}
 }

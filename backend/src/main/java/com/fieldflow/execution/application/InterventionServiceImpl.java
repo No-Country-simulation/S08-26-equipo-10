@@ -20,7 +20,6 @@ import java.util.stream.Collectors;
 public class InterventionServiceImpl implements InterventionService {
 
 	private final InterventionRepository repository;
-	private final InterventionMapper mapper;
 
 	private final FailureRepository failureRepository;
 	private final RepairRepository repairRepository;
@@ -30,7 +29,6 @@ public class InterventionServiceImpl implements InterventionService {
 	private final EvidenceRepository evidenceRepository;
 
 	public InterventionServiceImpl(InterventionRepository repository,
-	                               InterventionMapper mapper,
 	                               FailureRepository failureRepository,
 	                               RepairRepository repairRepository,
 	                               InterventionComponentRepository componentRepository,
@@ -38,7 +36,6 @@ public class InterventionServiceImpl implements InterventionService {
 	                               TechnicalNoteRepository technicalNoteRepository,
 	                               EvidenceRepository evidenceRepository) {
 		this.repository = repository;
-		this.mapper = mapper;
 		this.failureRepository = failureRepository;
 		this.repairRepository = repairRepository;
 		this.componentRepository = componentRepository;
@@ -59,7 +56,7 @@ public class InterventionServiceImpl implements InterventionService {
 				.map(intervention -> {
 					InterventionDetails details = detailsByInterventionId.getOrDefault(intervention.getId(),
 							InterventionDetails.empty());
-					return mapper.toDetailResponse(intervention, details);
+					return InterventionMapper.toDetailResponse(intervention, details);
 				}).toList();
 	}
 

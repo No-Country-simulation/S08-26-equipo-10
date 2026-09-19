@@ -63,4 +63,16 @@ public class Assignment {
 	public OffsetDateTime getPlannedEndAt() {
 		return plannedEndAt;
 	}
+
+	public void setTechnician(Technician technician) {
+		this.technician = technician;
+	}
+
+	public void setPlannedStartAt(OffsetDateTime plannedStartAt) {
+		this.plannedStartAt = plannedStartAt;
+	}
+
+	public void setPlannedEndAt(OffsetDateTime plannedEndAt) {
+		this.plannedEndAt = plannedEndAt;
+	}
 }

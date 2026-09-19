@@ -25,4 +25,13 @@ public interface TechnicianAvailabilityRepository extends JpaRepository<Technici
 	List<TechnicianAvailability> findAllByTechnicianIdAndRange(@Param("technicianId") UUID technicianId,
 	                                                           @Param("from") OffsetDateTime from,
 	                                                           @Param("to") OffsetDateTime to);
+
+	@Query("""
+			SELECT COUNT(ta)
+			FROM TechnicianAvailability ta
+			WHERE ta.technician.id = :technicianId
+			  AND ta.startsAt <= :plannedStartAt
+			  AND ta.endsAt >= :plannedEndAt
+			""")
+	long countContainingAvailability(UUID technicianId, OffsetDateTime plannedStartAt, OffsetDateTime plannedEndAt);
 }
