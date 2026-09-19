@@ -1,14 +1,34 @@
 package com.fieldflow.planning.application.mapper;
 
-import com.fieldflow.planning.api.dto.AssignmentResponse;
+import com.fieldflow.planning.api.dto.AssignmentDetailResponse;
 import com.fieldflow.planning.api.dto.AssignmentSummaryResponse;
 import com.fieldflow.planning.domain.Assignment;
-import com.fieldflow.planning.domain.Technician;
-import com.fieldflow.workorders.domain.WorkOrder;
+import com.fieldflow.workorders.application.mapper.WorkOrderMapper;
 
-public interface AssignmentMapper {
+public final class AssignmentMapper {
 
-	AssignmentSummaryResponse toSummaryResponse(Assignment entity);
+	private AssignmentMapper() {
+	}
 
-	AssignmentResponse toResponse(Assignment entity, Technician technician, WorkOrder workOrder);
+	public static AssignmentSummaryResponse toSummaryResponse(Assignment entity) {
+		return entity == null ? null : new AssignmentSummaryResponse(
+				entity.getId(),
+
+				// ------------- technician -------------
+				TechnicianMapper.toSummaryResponse(entity.getTechnician()),
+
+				entity.getPlannedStartAt(),
+				entity.getPlannedEndAt()
+		);
+	}
+
+	public static AssignmentDetailResponse toDetailResponse(Assignment entity) {
+		return entity == null ? null : new AssignmentDetailResponse(
+				entity.getId(),
+				WorkOrderMapper.toSummaryResponse(entity.getWorkOrder()),
+				TechnicianMapper.toSummaryResponse(entity.getTechnician()),
+				entity.getPlannedStartAt(),
+				entity.getPlannedEndAt()
+		);
+	}
 }
