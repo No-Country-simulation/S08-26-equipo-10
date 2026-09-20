@@ -20,8 +20,6 @@ function Navbar() {
 
     const pageName = pageNames[currentPage] ?? 'FieldFlow'
 
-    const currentDate = new Date().getDate()
-
     return (
         <header className="flex h-14 items-center justify-between border-b border-slate-800 bg-slate-950 px-4">
             {/* Breadcrumb */}
