@@ -9,6 +9,7 @@ import MantenimientosPage from "../pages/mantenimiento/Preventivos"
 import NotFound from "../pages/notFound/NotFound"
 import EquiposPage from "@/pages/equipos/Equipos"
 import ComponentsCatalog from "@/pages/componentsCatalog/ComponentsCatalog"
+import OrdenTrabajoDetailPage from "@/pages/ordenes/WorkOrderDetail"
 
 function AppRoutes() {
     return (<Routes>
@@ -28,6 +29,7 @@ function AppRoutes() {
             <Route element={<MainLayout />}>
                 <Route path="dashboard" element={<Dashboard />} />
                 <Route path="ordenesDeTrabajo" element={<OrdenesTrabajoPage />} />
+                <Route path="ordenesDeTrabajo/:id" element={<OrdenTrabajoDetailPage />} />
                 <Route path="tecnicos" element={<TecnicosPage />} />
                 <Route path="clientes" element={<ClientesPage />} />
                 <Route path="mantenimientos" element={<MantenimientosPage />} />
