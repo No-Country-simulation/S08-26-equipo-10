@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import TecnicoCard, {
     type Tecnico,
 } from "@/components/ui/TechnicianCard";
@@ -113,7 +113,7 @@ const tecnicosIniciales: Tecnico[] = [
     },
 ];
 
-function TecnicosPage() {
+function TechniciansPage() {
     const [tecnicos, setTecnicos] =
         useState<Tecnico[]>(tecnicosIniciales);
 
@@ -252,4 +252,4 @@ function StatCard({
     );
 }
 
-export default TecnicosPage;
+export default TechniciansPage;

@@ -212,14 +212,6 @@ function TecnicoForm({
                 <input
                     placeholder="Ej. RETIE, ASHRAE, PLC Siemens"
                     className="w-full rounded-lg border border-slate-700 bg-slate-900 px-4 py-3 text-sm text-white outline-none placeholder:text-slate-600 focus:border-blue-500"
-                    onChange={(event) => {
-                        const value = event.target.value
-                            .split(",")
-                            .map((item) => item.trim())
-                            .filter(Boolean);
-
-                        // Necesitamos registrar el valor manualmente.
-                    }}
                 />
 
                 <p className="mt-1 text-xs text-slate-500">

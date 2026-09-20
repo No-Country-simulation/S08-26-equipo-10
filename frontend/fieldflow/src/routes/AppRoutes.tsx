@@ -1,15 +1,15 @@
 import { Navigate, Route, Routes } from "react-router"
 import MainLayout from "../components/layouts/MainLayout"
-import OrdenesTrabajoPage from "../pages/ordenes/OrdenesTrabajoPage"
+import OrdenesTrabajoPage from "../pages/workOrders/WorkOrdersPage"
 import Dashboard from "../pages/dashboard/Dashboard"
 import Login from "../pages/auth/Login"
-import TecnicosPage from "../pages/tecnicos/TecnicosPage"
-import ClientesPage from "../pages/clientes/ClientesPage"
-import MantenimientosPage from "../pages/mantenimiento/Preventivos"
+import TechniciansPage from "../pages/technicians/TechniciansPage"
+import ClientsPage from "../pages/clients/ClientsPage"
+import MaintenancesPage from "../pages/maintenance/PreventiveMaintenance"
 import NotFound from "../pages/notFound/NotFound"
-import EquiposPage from "@/pages/equipos/Equipos"
+import EquipmentPage from "@/pages/equipment/Equipment"
 import ComponentsCatalog from "@/pages/componentsCatalog/ComponentsCatalog"
-import OrdenTrabajoDetailPage from "@/pages/ordenes/WorkOrderDetail"
+import WorkOrderDetailPage from "@/pages/workOrders/WorkOrderDetail"
 
 function AppRoutes() {
     return (<Routes>
@@ -29,11 +29,11 @@ function AppRoutes() {
             <Route element={<MainLayout />}>
                 <Route path="dashboard" element={<Dashboard />} />
                 <Route path="ordenesDeTrabajo" element={<OrdenesTrabajoPage />} />
-                <Route path="ordenesDeTrabajo/:id" element={<OrdenTrabajoDetailPage />} />
-                <Route path="tecnicos" element={<TecnicosPage />} />
-                <Route path="clientes" element={<ClientesPage />} />
-                <Route path="mantenimientos" element={<MantenimientosPage />} />
-                <Route path="equipos" element={<EquiposPage />} />
+                <Route path="ordenesDeTrabajo/:id" element={<WorkOrderDetailPage />} />
+                <Route path="tecnicos" element={<TechniciansPage />} />
+                <Route path="clientes" element={<ClientsPage />} />
+                <Route path="mantenimientos" element={<MaintenancesPage />} />
+                <Route path="equipos" element={<EquipmentPage />} />
                 <Route path="componentes" element={<ComponentsCatalog />} />
             </Route>
 
