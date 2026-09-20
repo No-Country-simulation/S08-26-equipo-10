@@ -1,5 +1,7 @@
 package com.fieldflow.workorders.api;
 
+import com.fieldflow.planning.api.dto.AssignmentDetailResponse;
+import com.fieldflow.planning.api.dto.AssignmentRequest;
 import com.fieldflow.shared.annotations.ApiJsonExample;
 import com.fieldflow.workorders.api.dto.CreateWorkOrderRequest;
 import com.fieldflow.workorders.api.dto.WorkOrderDetailResponse;
@@ -95,5 +97,25 @@ public class WorkOrderController {
 		URI location = fromMethodCall(on(WorkOrderController.class).getWorkOrderDetail(response.id())).build().toUri();
 
 		return ResponseEntity.created(location).body(response);
+	}
+
+	@Operation(
+			summary = "Asigna una orden de trabajo a un trabajador",
+			description = """
+					Permite asignar una orden de trabajo a un trabajador específico.
+					La orden de trabajo pasa a `ASSIGNED`.
+					"""
+	)
+	@ApiResponse(responseCode = "200", description = "La orden de trabajo se asignó correctamente")
+	@ApiJsonExample(
+			description = "Ejemplo de asignación de una orden de trabajo",
+			path = "/static/swagger/examples/planning/work-order-assignment-200.json",
+			summary = "Orden de trabajo asignada"
+	)
+	@PutMapping(value = "/{workOrderId}/assignment", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<AssignmentDetailResponse> assignWorkOrder(@PathVariable("workOrderId") UUID workOrderId,
+	                                                                @Valid @RequestBody AssignmentRequest request) {
+		var response = workOrderService.assignWorkOrder(workOrderId, request);
+		return ResponseEntity.ok(response);
 	}
 }
