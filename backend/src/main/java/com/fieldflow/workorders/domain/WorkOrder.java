@@ -41,6 +41,9 @@ public class WorkOrder {
 	@Column(name = "status", nullable = false, length = 50)
 	private WorkOrderStatus status;
 
+	// TODO: eliminar relaciones OneToOne desde WorkOrder hacia Checklist y Assignment
+	// WorkOrder no es el propietario de las relaciones
+
 	@OneToOne(mappedBy = "workOrder", fetch = FetchType.LAZY)
 	private Assignment assignment;
 
