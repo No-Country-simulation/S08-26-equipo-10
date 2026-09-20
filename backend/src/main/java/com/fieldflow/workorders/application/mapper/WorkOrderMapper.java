@@ -3,6 +3,7 @@ package com.fieldflow.workorders.application.mapper;
 import com.fieldflow.assets.application.mapper.EquipmentMapper;
 import com.fieldflow.execution.api.dto.ChecklistDetailResponse;
 import com.fieldflow.execution.api.dto.InterventionDetailResponse;
+import com.fieldflow.planning.api.dto.AgendaWorkOrderResponse;
 import com.fieldflow.planning.application.mapper.AssignmentMapper;
 import com.fieldflow.workorders.api.dto.WorkOrderDetailResponse;
 import com.fieldflow.workorders.api.dto.WorkOrderSummaryResponse;
@@ -54,6 +55,18 @@ public final class WorkOrderMapper {
 
 				// ----------------- interventions -----------------
 				interventions
+		);
+	}
+
+	public static AgendaWorkOrderResponse toAgendaResponse(WorkOrder entity) {
+		return entity == null ? null : new AgendaWorkOrderResponse(
+				entity.getId(),
+				entity.getStatus(),
+				entity.getPriority(),
+				entity.getEquipment().getIdentifier(),
+				entity.getEquipment().getName(),
+				entity.getEquipment().getSite().getName(),
+				entity.getEquipment().getSite().getAddress()
 		);
 	}
 }

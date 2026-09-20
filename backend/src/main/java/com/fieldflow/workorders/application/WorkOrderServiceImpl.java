@@ -5,7 +5,7 @@ import com.fieldflow.execution.application.ChecklistService;
 import com.fieldflow.execution.application.InterventionService;
 import com.fieldflow.planning.api.dto.AssignmentDetailResponse;
 import com.fieldflow.planning.api.dto.AssignmentRequest;
-import com.fieldflow.planning.application.AssignmentService;
+import com.fieldflow.planning.application.SchedulingService;
 import com.fieldflow.planning.application.mapper.AssignmentMapper;
 import com.fieldflow.shared.exception.ApiException;
 import com.fieldflow.workorders.api.dto.CreateWorkOrderRequest;
@@ -30,20 +30,20 @@ public class WorkOrderServiceImpl implements WorkOrderService {
 	private final InterventionService interventionService;
 	private final EquipmentService equipmentService;
 	private final ServiceTypeService serviceTypeService;
-	private final AssignmentService assignmentService;
+	private final SchedulingService schedulingService;
 
 	public WorkOrderServiceImpl(WorkOrderRepository repository,
 	                            ChecklistService checklistService,
 	                            InterventionService interventionService,
 	                            EquipmentService equipmentService,
 	                            ServiceTypeService serviceTypeService,
-	                            AssignmentService assignmentService) {
+	                            SchedulingService schedulingService) {
 		this.repository = repository;
 		this.checklistService = checklistService;
 		this.interventionService = interventionService;
 		this.equipmentService = equipmentService;
 		this.serviceTypeService = serviceTypeService;
-		this.assignmentService = assignmentService;
+		this.schedulingService = schedulingService;
 	}
 
 	@Override
@@ -96,7 +96,7 @@ public class WorkOrderServiceImpl implements WorkOrderService {
 		var worOrder = repository.findByIdWithContext(workOrderId)
 				.orElseThrow(() -> ApiException.notFound("Orden de trabajo no encontrada para ID: " + workOrderId));
 
-		var assignment = assignmentService.createAssignment(worOrder, request);
+		var assignment = schedulingService.createAssignment(worOrder, request);
 
 		worOrder.setStatus(WorkOrderStatus.ASSIGNED);
 

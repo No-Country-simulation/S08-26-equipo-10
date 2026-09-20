@@ -1,9 +1,10 @@
 package com.fieldflow.planning.api;
 
 import com.fieldflow.planning.api.dto.CreateTechnicianAvailabilityRequest;
+import com.fieldflow.planning.api.dto.TechnicianAgendaResponse;
 import com.fieldflow.planning.api.dto.TechnicianAvailabilityResponse;
 import com.fieldflow.planning.api.dto.TechnicianSummaryResponse;
-import com.fieldflow.planning.application.TechnicianService;
+import com.fieldflow.planning.application.SchedulingService;
 import com.fieldflow.shared.annotations.ApiJsonExample;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -26,10 +27,10 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 @Tag(name = "Técnicos", description = "Endpoints para la gestión de técnicos.")
 public class TechnicianController {
 
-	private final TechnicianService technicianService;
+	private final SchedulingService schedulingService;
 
-	public TechnicianController(TechnicianService technicianService) {
-		this.technicianService = technicianService;
+	public TechnicianController(SchedulingService schedulingService) {
+		this.schedulingService = schedulingService;
 	}
 
 	@Operation(
@@ -47,7 +48,7 @@ public class TechnicianController {
 	)
 	@GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<List<TechnicianSummaryResponse>> getAllTechnicians() {
-		List<TechnicianSummaryResponse> technicians = technicianService.getAllTechnicians();
+		List<TechnicianSummaryResponse> technicians = schedulingService.getAllTechnicians();
 		return ResponseEntity.ok(technicians);
 	}
 
@@ -68,7 +69,7 @@ public class TechnicianController {
 	public ResponseEntity<TechnicianAvailabilityResponse> createTechnicianAvailability(
 			@PathVariable UUID technicianId, @Valid @RequestBody CreateTechnicianAvailabilityRequest request
 	) {
-		TechnicianAvailabilityResponse response = technicianService.createTechnicianAvailability(technicianId, request);
+		TechnicianAvailabilityResponse response = schedulingService.createTechnicianAvailability(technicianId, request);
 
 		URI location = fromMethodCall(on(TechnicianController.class)
 				.getTechnicianAvailability(technicianId, response.startsAt(), response.endsAt())).build().toUri();
@@ -94,8 +95,33 @@ public class TechnicianController {
 			@RequestParam OffsetDateTime from,
 			@RequestParam OffsetDateTime to
 	) {
-		List<TechnicianAvailabilityResponse> response = technicianService
+		List<TechnicianAvailabilityResponse> response = schedulingService
 				.getTechnicianAvailability(technicianId, from, to);
+
+		return ResponseEntity.ok(response);
+	}
+
+	@Operation(
+			summary = "Obtener la agenda de un técnico",
+			description = """
+					Devuelve la agenda del técnico especificado en el rango de fecha y hora indicado.
+					La agenda contendrá las órdenes de trabajo que el técnico tiene asignadas.
+					Facilita la planificación de las órdenes de trabajo.
+					"""
+	)
+	@ApiResponse(responseCode = "200", description = "Agenda obtenida correctamente.")
+	@ApiJsonExample(
+			description = "Agenda obtenida correctamente.",
+			path = "/static/swagger/examples/planning/get-technician-agenda-200.json",
+			summary = "Agenda obtenida"
+	)
+	@GetMapping(value = "/{technicianId}/agenda", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<List<TechnicianAgendaResponse>> getTechnicianAgenda(
+			@PathVariable UUID technicianId,
+			@RequestParam OffsetDateTime from,
+			@RequestParam OffsetDateTime to
+	) {
+		List<TechnicianAgendaResponse> response = schedulingService.getTechnicianAgenda(technicianId, from, to);
 
 		return ResponseEntity.ok(response);
 	}
