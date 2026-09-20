@@ -3,6 +3,10 @@ package com.fieldflow.workorders.application;
 import com.fieldflow.assets.application.EquipmentService;
 import com.fieldflow.execution.application.ChecklistService;
 import com.fieldflow.execution.application.InterventionService;
+import com.fieldflow.planning.api.dto.AssignmentDetailResponse;
+import com.fieldflow.planning.api.dto.AssignmentRequest;
+import com.fieldflow.planning.application.AssignmentService;
+import com.fieldflow.planning.application.mapper.AssignmentMapper;
 import com.fieldflow.shared.exception.ApiException;
 import com.fieldflow.workorders.api.dto.CreateWorkOrderRequest;
 import com.fieldflow.workorders.api.dto.WorkOrderDetailResponse;
@@ -26,17 +30,20 @@ public class WorkOrderServiceImpl implements WorkOrderService {
 	private final InterventionService interventionService;
 	private final EquipmentService equipmentService;
 	private final ServiceTypeService serviceTypeService;
+	private final AssignmentService assignmentService;
 
 	public WorkOrderServiceImpl(WorkOrderRepository repository,
 	                            ChecklistService checklistService,
 	                            InterventionService interventionService,
 	                            EquipmentService equipmentService,
-	                            ServiceTypeService serviceTypeService) {
+	                            ServiceTypeService serviceTypeService,
+	                            AssignmentService assignmentService) {
 		this.repository = repository;
 		this.checklistService = checklistService;
 		this.interventionService = interventionService;
 		this.equipmentService = equipmentService;
 		this.serviceTypeService = serviceTypeService;
+		this.assignmentService = assignmentService;
 	}
 
 	@Override
@@ -80,9 +87,19 @@ public class WorkOrderServiceImpl implements WorkOrderService {
 	}
 
 	@Override
-	@Transactional(readOnly = true)
-	public WorkOrder getWorkOrderEntityById(UUID id) {
-		return repository.findByIdWithContext(id)
-				.orElseThrow(() -> ApiException.notFound("Orden de trabajo no encontrada para ID: " + id));
+	@Transactional
+	public AssignmentDetailResponse assignWorkOrder(UUID workOrderId, AssignmentRequest request) {
+		if (!request.plannedStartAt().isBefore(request.plannedEndAt())) {
+			throw ApiException.badRequest("plannedStartAt debe ser anterior a plannedEndAt.");
+		}
+
+		var worOrder = repository.findByIdWithContext(workOrderId)
+				.orElseThrow(() -> ApiException.notFound("Orden de trabajo no encontrada para ID: " + workOrderId));
+
+		var assignment = assignmentService.createAssignment(worOrder, request);
+
+		worOrder.setStatus(WorkOrderStatus.ASSIGNED);
+
+		return AssignmentMapper.toDetailResponse(assignment);
 	}
 }

@@ -1,9 +1,10 @@
 package com.fieldflow.workorders.application;
 
+import com.fieldflow.planning.api.dto.AssignmentDetailResponse;
+import com.fieldflow.planning.api.dto.AssignmentRequest;
 import com.fieldflow.workorders.api.dto.CreateWorkOrderRequest;
 import com.fieldflow.workorders.api.dto.WorkOrderDetailResponse;
 import com.fieldflow.workorders.api.dto.WorkOrderSummaryResponse;
-import com.fieldflow.workorders.domain.WorkOrder;
 import com.fieldflow.workorders.domain.WorkOrderStatus;
 
 import java.util.List;
@@ -17,5 +18,6 @@ public interface WorkOrderService {
 
 	WorkOrderSummaryResponse createWorkOrder(CreateWorkOrderRequest request);
 
-	WorkOrder getWorkOrderEntityById(UUID id);
+	AssignmentDetailResponse assignWorkOrder(UUID workOrderId, AssignmentRequest request);
+
 }
