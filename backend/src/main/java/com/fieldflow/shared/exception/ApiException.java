@@ -8,6 +8,8 @@ import org.springframework.http.HttpStatus;
  */
 public class ApiException extends RuntimeException {
 
+	// TODO: mejorar las funciones que retornan ApiException para que no sean genéricas
+
 	private final HttpStatus status;
 	private final ApiErrorType type;
 
@@ -79,6 +81,19 @@ public class ApiException extends RuntimeException {
 	 */
 	public static ApiException conflict(String message, ApiErrorType type) {
 		return new ApiException(HttpStatus.CONFLICT, type, message);
+	}
+
+	/**
+	 * Crea una excepción de transición de estado inválida.
+	 * <p>
+	 * Nota: Esta función permite crear una excepción cuando se intenta realizar una transición de estado
+	 * que no es válida según la lógica del sistema.
+	 *
+	 * @param message el mensaje de error
+	 * @return una instancia de ApiException con estado 422 y tipo INVALID_STATUS_TRANSITION
+	 */
+	public static ApiException invalidStatusTransition(String message) {
+		return new ApiException(HttpStatus.UNPROCESSABLE_CONTENT, ApiErrorType.INVALID_STATUS_TRANSITION, message);
 	}
 
 	public HttpStatus getStatus() {

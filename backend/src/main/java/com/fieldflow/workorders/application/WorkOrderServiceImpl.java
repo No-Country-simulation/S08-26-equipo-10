@@ -8,9 +8,7 @@ import com.fieldflow.planning.api.dto.AssignmentRequest;
 import com.fieldflow.planning.application.SchedulingService;
 import com.fieldflow.planning.application.mapper.AssignmentMapper;
 import com.fieldflow.shared.exception.ApiException;
-import com.fieldflow.workorders.api.dto.CreateWorkOrderRequest;
-import com.fieldflow.workorders.api.dto.WorkOrderDetailResponse;
-import com.fieldflow.workorders.api.dto.WorkOrderSummaryResponse;
+import com.fieldflow.workorders.api.dto.*;
 import com.fieldflow.workorders.application.mapper.WorkOrderMapper;
 import com.fieldflow.workorders.domain.WorkOrder;
 import com.fieldflow.workorders.domain.WorkOrderStatus;
@@ -20,6 +18,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
+
+import static com.fieldflow.workorders.domain.WorkOrderStatus.*;
 
 @Service
 public class WorkOrderServiceImpl implements WorkOrderService {
@@ -98,8 +98,51 @@ public class WorkOrderServiceImpl implements WorkOrderService {
 
 		var assignment = schedulingService.createAssignment(worOrder, request);
 
-		worOrder.setStatus(WorkOrderStatus.ASSIGNED);
+		worOrder.setStatus(ASSIGNED);
 
 		return AssignmentMapper.toDetailResponse(assignment);
+	}
+
+	@Override
+	@Transactional
+	public WorkOrderStatusResponse updateStatus(UUID id, WorkOrderStatusUpdateRequest request) {
+		validatePatchAllowedStatus(request.status());
+
+		var workOrder = repository.findById(id)
+				.orElseThrow(() -> ApiException.notFound("No existe una orden de trabajo asociada al ID: " + id));
+
+		var currentStatus = workOrder.getStatus();
+		var newStatus = request.status();
+
+		validateCurrentStatus(currentStatus, newStatus);
+
+		workOrder.setStatus(newStatus);
+
+		return new WorkOrderStatusResponse(
+				workOrder.getId(),
+				workOrder.getStatus()
+		);
+	}
+
+	private void validatePatchAllowedStatus(WorkOrderStatus newStatus) {
+		if (newStatus != EN_ROUTE && newStatus != RESCHEDULED) {
+			throw ApiException.invalidStatusTransition(
+					"El estado solicitado no puede establecerse mediante este endpoint."
+			);
+		}
+	}
+
+	private void validateCurrentStatus(WorkOrderStatus currentStatus, WorkOrderStatus newStatus) {
+		if (newStatus == EN_ROUTE && currentStatus != ASSIGNED) {
+			throw ApiException.invalidStatusTransition(
+					"La Orden de Trabajo debe estar en ASSIGNED para pasar a EN_ROUTE."
+			);
+		}
+
+		if (newStatus == RESCHEDULED && currentStatus != ASSIGNED && currentStatus != EN_ROUTE) {
+			throw ApiException.invalidStatusTransition(
+					"La Orden de Trabajo no puede reprogramarse desde su estado actual."
+			);
+		}
 	}
 }
