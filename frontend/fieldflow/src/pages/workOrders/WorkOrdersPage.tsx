@@ -6,7 +6,7 @@ import { Select } from "@/components/common/Select";
 import { Table, createColumn } from "@/components/common/Table";
 import { PriorityBadge } from "@/components/ui/PriorityBadge";
 import { StatusBadge } from "@/components/ui/StatusBadge";
-import { useWorkOrders } from "@/hooks/useWorkOrders";
+import { useWorkOrders } from "@/hooks/workorder/useWorkOrders";
 import type { WorkOrder } from "@/types/workOrder";
 
 
