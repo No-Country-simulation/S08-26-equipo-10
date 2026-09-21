@@ -3,9 +3,7 @@ package com.fieldflow.workorders.api;
 import com.fieldflow.planning.api.dto.AssignmentDetailResponse;
 import com.fieldflow.planning.api.dto.AssignmentRequest;
 import com.fieldflow.shared.annotations.ApiJsonExample;
-import com.fieldflow.workorders.api.dto.CreateWorkOrderRequest;
-import com.fieldflow.workorders.api.dto.WorkOrderDetailResponse;
-import com.fieldflow.workorders.api.dto.WorkOrderSummaryResponse;
+import com.fieldflow.workorders.api.dto.*;
 import com.fieldflow.workorders.application.WorkOrderService;
 import com.fieldflow.workorders.domain.WorkOrderStatus;
 import io.swagger.v3.oas.annotations.Operation;
@@ -116,6 +114,27 @@ public class WorkOrderController {
 	public ResponseEntity<AssignmentDetailResponse> assignWorkOrder(@PathVariable("workOrderId") UUID workOrderId,
 	                                                                @Valid @RequestBody AssignmentRequest request) {
 		var response = workOrderService.assignWorkOrder(workOrderId, request);
+		return ResponseEntity.ok(response);
+	}
+
+	@Operation(
+			summary = "Actualiza el estado de una orden de trabajo",
+			description = """
+					Permite actualizar el estado de una orden de trabajo.
+					Solo se permiten 2 estados: `EN_ROUTE` o `RESCHEDULED`.
+					"""
+	)
+	@ApiResponse(responseCode = "200", description = "El estado de la orden de trabajo se actualizó correctamente")
+	@ApiJsonExample(
+			description = "Ejemplo de actualización de estado de una orden de trabajo",
+			path = "/static/swagger/examples/workorders/work-order-status-update-200.json",
+			summary = "Orden de trabajo con estado actualizado"
+	)
+	@PatchMapping(value = "/{workOrderId}/status", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<WorkOrderStatusResponse> assignWorkOrder(
+			@PathVariable("workOrderId") UUID workOrderId, @Valid @RequestBody WorkOrderStatusUpdateRequest request
+	) {
+		var response = workOrderService.updateStatus(workOrderId, request);
 		return ResponseEntity.ok(response);
 	}
 }

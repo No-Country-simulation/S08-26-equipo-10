@@ -873,6 +873,15 @@ o:
 Cualquier otro destino se rechaza con `422 INVALID_STATUS_TRANSITION` y debe alcanzarse mediante la operación de negocio
 correspondiente.
 
+Respuesta `200`:
+
+```json
+{
+  "id": "8c9fb9c4-93c7-4d13-a347-33262872b95a",
+  "status": "EN_ROUTE"
+}
+```
+
 ---
 
 ## 5.5 Checklist de la Orden de Trabajo
