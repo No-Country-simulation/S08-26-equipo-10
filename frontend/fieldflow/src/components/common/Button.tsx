@@ -28,7 +28,8 @@ export function Button({
 
     return (
         <button
-            className={`inline-flex items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition ${variants[variant]} ${className} cursor-pointer`}
+            className={`inline-flex items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition ${variants[variant]} ${className} cursor-pointer  disabled:cursor-not-allowed
+            disabled:opacity-50`}
             {...props}
         >
             {Icon && iconPosition === "left" && <Icon className="h-4 w-4 shrink-0" />}
