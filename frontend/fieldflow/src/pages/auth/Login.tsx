@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Mail, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
 import fieldflowLogo from "@/assets/logo.svg";
 import { useNavigate } from "react-router";
+import fondo from "@/assets/images/fondo.png";
 
 function Login() {
     const [showPassword, setShowPassword] = useState(false);
@@ -23,7 +24,7 @@ function Login() {
             <div
                 className="absolute inset-0 bg-cover bg-center"
                 style={{
-                    backgroundImage: "url('@/assets/images/fondo.png')",
+                    backgroundImage: `url(${fondo})`,
                 }}
             />
 
