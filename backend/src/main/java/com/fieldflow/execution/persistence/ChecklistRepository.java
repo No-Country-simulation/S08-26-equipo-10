@@ -19,4 +19,6 @@ public interface ChecklistRepository extends JpaRepository<Checklist, UUID> {
 			WHERE checklist.workOrder.id = :workOrderId
 			""")
 	Optional<Checklist> findByWorkOrderIdWithItems(@Param("workOrderId") UUID workOrderId);
+
+	boolean existsByWorkOrderId(UUID workOrderId);
 }

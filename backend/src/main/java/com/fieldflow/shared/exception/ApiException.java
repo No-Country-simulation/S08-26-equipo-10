@@ -84,6 +84,19 @@ public class ApiException extends RuntimeException {
 	}
 
 	/**
+	 * Crea una excepción de checklist ya existente.
+	 * <p>
+	 * Nota: Esta función permite crear una excepción cuando se intenta crear una checklist que ya existe
+	 * para una orden de trabajo específica.
+	 *
+	 * @param message el mensaje de error
+	 * @return una instancia de ApiException con estado 409 y tipo CHECKLIST_ALREADY_EXISTS
+	 */
+	public static ApiException checklistAlreadyExists(String message) {
+		return conflict(message, ApiErrorType.CHECKLIST_ALREADY_EXISTS);
+	}
+
+	/**
 	 * Crea una excepción de transición de estado inválida.
 	 * <p>
 	 * Nota: Esta función permite crear una excepción cuando se intenta realizar una transición de estado

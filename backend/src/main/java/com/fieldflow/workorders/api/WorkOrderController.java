@@ -1,5 +1,7 @@
 package com.fieldflow.workorders.api;
 
+import com.fieldflow.execution.api.dto.ChecklistCreationResponse;
+import com.fieldflow.execution.api.dto.CreateChecklistRequest;
 import com.fieldflow.planning.api.dto.AssignmentDetailResponse;
 import com.fieldflow.planning.api.dto.AssignmentRequest;
 import com.fieldflow.shared.annotations.ApiJsonExample;
@@ -89,7 +91,8 @@ public class WorkOrderController {
 			summary = "Orden de trabajo creada"
 	)
 	@PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<WorkOrderSummaryResponse> createWorkOrder(@Valid @RequestBody CreateWorkOrderRequest request) {
+	public ResponseEntity<WorkOrderSummaryResponse> createWorkOrder(@Valid @RequestBody
+	                                                                CreateWorkOrderRequest request) {
 		WorkOrderSummaryResponse response = workOrderService.createWorkOrder(request);
 
 		URI location = fromMethodCall(on(WorkOrderController.class).getWorkOrderDetail(response.id())).build().toUri();
@@ -136,5 +139,29 @@ public class WorkOrderController {
 	) {
 		var response = workOrderService.updateStatus(workOrderId, request);
 		return ResponseEntity.ok(response);
+	}
+
+	@Operation(
+			summary = "Crea un checklist para una orden de trabajo",
+			description = """
+					Permite crear un checklist con una lista de items para una orden de trabajo específica.
+					"""
+	)
+	@ApiResponse(responseCode = "201", description = "El checklist se creó correctamente")
+	@ApiJsonExample(
+			status = "201",
+			description = "Ejemplo de creación de un checklist para una orden de trabajo",
+			path = "/static/swagger/examples/workorders/create-work-order-checklist-201.json",
+			summary = "Checklist creado"
+	)
+	@PostMapping(value = "/{workOrderId}/checklist", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<ChecklistCreationResponse> assignWorkOrder(
+			@PathVariable("workOrderId") UUID workOrderId, @Valid @RequestBody CreateChecklistRequest request
+	) {
+		var response = workOrderService.createChecklist(workOrderId, request);
+
+		URI location = fromMethodCall(on(WorkOrderController.class).getWorkOrderDetail(response.id())).build().toUri();
+
+		return ResponseEntity.created(location).body(response);
 	}
 }
