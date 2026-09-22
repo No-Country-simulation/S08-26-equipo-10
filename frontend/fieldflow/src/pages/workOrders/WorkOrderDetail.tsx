@@ -4,327 +4,531 @@ import { useNavigate, useParams } from "react-router";
 import { Button } from "@/components/common/Button";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { PriorityBadge } from "@/components/ui/PriorityBadge";
-
 import { DetailCard } from "@/components/ui/DetailCard";
 import { DetailRow } from "@/components/ui/DetailRow";
+import { useWorkOrderById } from "@/hooks/workorder/useWorkOrderById";
+import { EmptyState } from "@/components/common/EmptyState";
 
 export default function OrdenTrabajoDetailPage() {
     const navigate = useNavigate();
     const { id } = useParams();
 
-    // Temporal mientras conectamos el endpoint de detalle
-    const workOrder = {
-        id: id ?? "OT-2025-0041",
-        status: "IN_PROGRESS" as const,
-        priority: "CRITICAL" as const,
-        type: "Correctivo",
+    const {
+        data: workOrder,
+        isLoading,
+        isError,
+    } = useWorkOrderById(id ?? "");
 
-        description:
-            "Chiller presenta fuga de refrigerante R-134a. Se requiere verificación del circuito primario y recarga de gas.",
+    if (isLoading) {
+        return (
+            <div className="flex min-h-100 items-center justify-center">
+                <p className="text-slate-400">Cargando orden de trabajo...</p>
+            </div>
+        );
+    }
 
-        scheduledAt: "2025-01-04 08:00",
-        estimatedDuration: "4h",
-        createdAt: "2025-01-03",
-        updatedAt: "2025-01-04",
+    if (isError || !workOrder) {
+        return (
+            <div className="flex min-h-100 flex-col items-center justify-center gap-4">
+                <p className="text-slate-400">
+                    No se pudo cargar la orden de trabajo.
+                </p>
 
-        client: {
-            company: "Metalúrgica del Norte S.A.",
-            ruc: "20501234567",
-            sector: "Industrial",
-            contact: "Ing. Jorge Paredes",
-            phone: "+51 944 112 233",
-            email: "mantenimiento@metalnorte.pe",
-        },
+                <Button onClick={() => navigate("/fieldflow/ordenesDeTrabajo")}>
+                    Volver a órdenes
+                </Button>
+            </div>
+        );
+    }
 
-        site: {
-            name: "Planta Principal",
-            address: "Av. Industrial 2450",
-            city: "Lima",
-            contact: "César Villanueva",
-            phone: "+51 944 223 344",
-        },
-
-        equipment: {
-            name: "Chiller Industrial Carrier",
-            model: "Carrier 30XA-200",
-            serialNumber: "CAR-2020-01122",
-        },
-
-        technician: {
-            name: "Carlos Mendoza Ruiz",
-            code: "TEC-001",
-            specialty: "HVAC & Refrigeración",
-        },
-    };
+    const intervention = workOrder.interventions?.[0];
 
     return (
-        <section className="min-h-full bg-[#0b1015] p-6 text-white">
-
+        <div className="space-y-6 p-6">
             {/* Header */}
-            <div className="mb-6 flex items-start justify-between gap-6">
+            <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                    <Button
+                        variant="ghost"
 
-                <div className="min-w-0">
-
-                    <button
-                        type="button"
                         onClick={() => navigate("/fieldflow/ordenesDeTrabajo")}
-                        className="mb-3 flex items-center gap-2 text-sm text-slate-400 transition hover:text-white"
                     >
-                        <ArrowLeft className="h-4 w-4" />
-                        Órdenes de Trabajo
-                    </button>
+                        <ArrowLeft size={20} />
+                    </Button>
 
-                    <div className="flex flex-wrap items-center gap-3">
+                    <div>
+                        <div className="flex items-center gap-3">
+                            <h1 className="text-2xl font-semibold text-white">
+                                Orden de Trabajo
+                            </h1>
 
-                        <h1 className="font-mono text-2xl font-bold text-white">
-                            {workOrder.id}
-                        </h1>
+                            <StatusBadge status={workOrder.status} />
+                            <PriorityBadge priority={workOrder.priority} />
+                        </div>
 
-                        <StatusBadge status={workOrder.status} />
-
-                        <PriorityBadge
-                            priority={workOrder.priority}
-                        />
-
-                        <span className="font-semibold text-red-400">
-                            {workOrder.type}
-                        </span>
-
+                        <p className="mt-1 text-sm text-slate-400">
+                            OT #{workOrder.id}
+                        </p>
                     </div>
-
-                    <p className="mt-2 max-w-5xl text-base text-slate-400">
-                        {workOrder.description}
-                    </p>
-
                 </div>
 
-                <div className="flex shrink-0 gap-3">
-
-                    <Button icon={Pencil}>
-                        Editar
-                    </Button>
-
-                    <Button>
-                        Actualizar Estado
-                    </Button>
-
-                </div>
+                <Button>
+                    <Pencil size={16} />
+                    Editar
+                </Button>
             </div>
-
 
             {/* Summary */}
-            <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
-
-                <SummaryCard
-                    label="FECHA"
-                    value={workOrder.scheduledAt}
-                />
-
-                <SummaryCard
-                    label="DURACIÓN EST."
-                    value={workOrder.estimatedDuration}
-                />
-
-                <SummaryCard
-                    label="CREADA"
-                    value={workOrder.createdAt}
-                />
-
-                <SummaryCard
-                    label="ACTUALIZADA"
-                    value={workOrder.updatedAt}
-                />
-
-            </div>
-
-
-            {/* Tabs */}
-            <div className="mb-6 overflow-x-auto border-b border-slate-700">
-
-                <div className="flex min-w-max gap-8">
-
-                    <Tab active>
-                        Información
-                    </Tab>
-
-                    <Tab>
-                        Checklist
-                    </Tab>
-
-                    <Tab>
-                        Notas Técnicas
-                    </Tab>
-
-                    <Tab>
-                        Mediciones
-                    </Tab>
-
-                    <Tab>
-                        Conformidad
-                    </Tab>
-
-                    <Tab>
-                        Historial
-                    </Tab>
-
-                </div>
-
-            </div>
-
-
-            {/* Information */}
-            <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
-
-                <DetailCard title="Cliente">
-
-                    <DetailRow
-                        label="Empresa"
-                        value={workOrder.client.company}
-                    />
-
-                    <DetailRow
-                        label="RUC"
-                        value={workOrder.client.ruc}
-                    />
-
-                    <DetailRow
-                        label="Sector"
-                        value={workOrder.client.sector}
-                    />
-
-                    <DetailRow
-                        label="Contacto"
-                        value={workOrder.client.contact}
-                    />
-
-                    <DetailRow
-                        label="Teléfono"
-                        value={workOrder.client.phone}
-                    />
-
-                    <DetailRow
-                        label="Email"
-                        value={workOrder.client.email}
-                    />
-
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+                <DetailCard title="Tipo de servicio">
+                    <p className="text-white">
+                        {workOrder.serviceType.name}
+                    </p>
                 </DetailCard>
-
-
-                <DetailCard title="Sede">
-
-                    <DetailRow
-                        label="Nombre"
-                        value={workOrder.site.name}
-                    />
-
-                    <DetailRow
-                        label="Dirección"
-                        value={workOrder.site.address}
-                    />
-
-                    <DetailRow
-                        label="Ciudad"
-                        value={workOrder.site.city}
-                    />
-
-                    <DetailRow
-                        label="Contacto"
-                        value={workOrder.site.contact}
-                    />
-
-                    <DetailRow
-                        label="Teléfono"
-                        value={workOrder.site.phone}
-                    />
-
-                </DetailCard>
-
 
                 <DetailCard title="Equipo">
+                    <p className="text-white">
+                        {workOrder.equipment.name}
+                    </p>
 
-                    <DetailRow
-                        label="Nombre"
-                        value={workOrder.equipment.name}
-                    />
-
-                    <DetailRow
-                        label="Marca / Modelo"
-                        value={workOrder.equipment.model}
-                    />
-
-                    <DetailRow
-                        label="N° Serie"
-                        value={workOrder.equipment.serialNumber}
-                    />
-
+                    <p className="text-sm text-slate-400">
+                        {workOrder.equipment.identifier}
+                    </p>
                 </DetailCard>
 
-
-                <DetailCard title="Técnico Asignado">
-
-                    <DetailRow
-                        label="Nombre"
-                        value={workOrder.technician.name}
-                    />
-
-                    <DetailRow
-                        label="Código"
-                        value={workOrder.technician.code}
-                    />
-
-                    <DetailRow
-                        label="Especialidad"
-                        value={workOrder.technician.specialty}
-                    />
-
+                <DetailCard title="Técnico asignado">
+                    <p className="text-white">
+                        {workOrder.assignment?.technician.name ?? "Sin asignar"}
+                    </p>
                 </DetailCard>
 
+                <DetailCard title="Duración estimada">
+                    <p className="text-white">
+                        {workOrder.estimatedDurationMinutes} minutos
+                    </p>
+                </DetailCard>
             </div>
 
-        </section>
-    );
-}
+            {/* Tabs */}
+            <div className="border-b border-slate-700">
+                <div className="flex gap-6 overflow-x-auto">
+                    <button className="border-b-2 border-blue-500 px-1 py-3 text-sm font-medium text-blue-400">
+                        Información
+                    </button>
 
-interface SummaryCardProps {
-    label: string;
-    value: string;
-}
+                    <button className="px-1 py-3 text-sm text-slate-400 hover:text-white">
+                        Checklist
+                    </button>
 
-function SummaryCard({
-    label,
-    value,
-}: SummaryCardProps) {
-    return (
-        <div className="rounded-lg border border-slate-700 bg-slate-900/70 p-4">
-            <p className="text-sm text-slate-400">
-                {label}
-            </p>
+                    <button className="px-1 py-3 text-sm text-slate-400 hover:text-white">
+                        Intervenciones
+                    </button>
 
-            <p className="mt-1 font-mono text-lg font-semibold text-white">
-                {value}
-            </p>
+                    <button className="px-1 py-3 text-sm text-slate-400 hover:text-white">
+                        Notas técnicas
+                    </button>
+
+                    <button className="px-1 py-3 text-sm text-slate-400 hover:text-white">
+                        Evidencias
+                    </button>
+
+                    <button className="px-1 py-3 text-sm text-slate-400 hover:text-white">
+                        Conformidad
+                    </button>
+                </div>
+            </div>
+
+            {/* Información */}
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                {/* Cliente */}
+                <DetailCard title="Cliente">
+                    <div className="space-y-3">
+                        <DetailRow
+                            label="Nombre"
+                            value={workOrder.equipment.client.name}
+                        />
+
+                        <DetailRow
+                            label="ID"
+                            value={workOrder.equipment.client.id}
+                        />
+                    </div>
+                </DetailCard>
+
+                {/* Sede */}
+                <DetailCard title="Sede">
+                    <div className="space-y-3">
+                        <DetailRow
+                            label="Nombre"
+                            value={workOrder.equipment.site.name}
+                        />
+
+                        <DetailRow
+                            label="Dirección"
+                            value={workOrder.equipment.site.address}
+                        />
+
+                        <DetailRow
+                            label="ID"
+                            value={workOrder.equipment.site.id}
+                        />
+                    </div>
+                </DetailCard>
+
+                {/* Instalación */}
+                {workOrder.equipment.installation ? <DetailCard title="Instalación">
+                    <div className="space-y-3">
+                        <DetailRow
+                            label="Nombre"
+                            value={workOrder.equipment.installation.name}
+                        />
+
+                        <DetailRow
+                            label="ID"
+                            value={workOrder.equipment.installation.id}
+                        />
+                    </div>
+                </DetailCard> : <EmptyState title="Instalación" description="No hay instalación asociada a este equipo." />}
+
+                {/* Equipo */}
+                <DetailCard title="Equipo">
+                    <div className="space-y-3">
+                        <DetailRow
+                            label="Nombre"
+                            value={workOrder.equipment.name}
+                        />
+
+                        <DetailRow
+                            label="Identificador"
+                            value={workOrder.equipment.identifier}
+                        />
+
+                        <DetailRow
+                            label="Estado"
+                            value={workOrder.equipment.currentStatus}
+                        />
+
+                        <DetailRow
+                            label="ID"
+                            value={workOrder.equipment.id}
+                        />
+                    </div>
+                </DetailCard>
+
+                {/* Servicio */}
+                <DetailCard title="Servicio">
+                    <div className="space-y-3">
+                        <DetailRow
+                            label="Tipo"
+                            value={workOrder.serviceType.name}
+                        />
+
+                        <DetailRow
+                            label="ID"
+                            value={workOrder.serviceType.id}
+                        />
+
+                        <DetailRow
+                            label="Prioridad"
+                            value={workOrder.priority}
+                        />
+
+                        <DetailRow
+                            label="Estado"
+                            value={workOrder.status}
+                        />
+                    </div>
+                </DetailCard>
+
+                {/* Asignación */}
+                {workOrder.assignment ? <DetailCard title="Asignación">
+                    <div className="space-y-3">
+                        <DetailRow
+                            label="Técnico"
+                            value={
+                                workOrder.assignment?.technician.name ?? "Sin asignar"
+                            }
+                        />
+
+                        <DetailRow
+                            label="Inicio"
+                            value={
+                                workOrder.assignment
+                                    ? new Date(
+                                        workOrder.assignment.plannedStartAt
+                                    ).toLocaleString()
+                                    : "Sin programar"
+                            }
+                        />
+
+                        <DetailRow
+                            label="Fin"
+                            value={
+                                workOrder.assignment
+                                    ? new Date(
+                                        workOrder.assignment.plannedEndAt
+                                    ).toLocaleString()
+                                    : "Sin programar"
+                            }
+                        />
+                    </div>
+                </DetailCard> : <EmptyState title="Asignaciones" description="No hay asignación para esta orden de trabajo." />}
+            </div>
+
+            {/* Instrucciones */}
+            <DetailCard title="Instrucciones">
+                <p className="text-sm leading-6 text-slate-300">
+                    {workOrder.instructions}
+                </p>
+            </DetailCard>
+
+            {/* Checklist */}
+            {workOrder.checklist && (<DetailCard title="Checklist">
+                <div className="space-y-3">
+                    <p className="font-medium text-white">
+                        {workOrder.checklist.name}
+                    </p>
+
+                    {workOrder.checklist.items.map((item) => (
+                        <div
+                            key={item.id}
+                            className="flex items-center gap-3 rounded-lg border border-slate-700 bg-slate-800/50 p-3"
+                        >
+                            <div className="h-2 w-2 rounded-full bg-slate-400" />
+
+                            <span className="text-sm text-slate-300">
+                                {item.label}
+                            </span>
+                        </div>
+                    ))}
+                </div>
+            </DetailCard>)}
+
+            {/* Intervención */}
+            {intervention && (
+                <DetailCard title="Intervención">
+                    <div className="space-y-4">
+                        <DetailRow
+                            label="Técnico"
+                            value={intervention.technician.name}
+                        />
+
+                        <DetailRow
+                            label="Estado"
+                            value={intervention.status}
+                        />
+
+                        <DetailRow
+                            label="Inicio"
+                            value={new Date(
+                                intervention.startedAt
+                            ).toLocaleString()}
+                        />
+
+                        <DetailRow
+                            label="Finalización"
+                            value={new Date(
+                                intervention.endedAt
+                            ).toLocaleString()}
+                        />
+
+                        <DetailRow
+                            label="Resultado"
+                            value={intervention.result}
+                        />
+
+                        <DetailRow
+                            label="Observaciones"
+                            value={intervention.observations}
+                        />
+                    </div>
+                </DetailCard>
+            )}
+
+            {/* Fallas y reparaciones */}
+            {intervention && (
+                <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                    <DetailCard title="Fallas detectadas">
+                        <div className="space-y-3">
+                            {intervention.failures.length > 0 ? (
+                                intervention.failures.map((failure) => (
+                                    <div
+                                        key={failure.id}
+                                        className="rounded-lg border border-slate-700 p-3"
+                                    >
+                                        <p className="text-sm text-slate-300">
+                                            {failure.description}
+                                        </p>
+                                    </div>
+                                ))
+                            ) : (
+                                <p className="text-sm text-slate-500">
+                                    No se registraron fallas.
+                                </p>
+                            )}
+                        </div>
+                    </DetailCard>
+
+                    <DetailCard title="Reparaciones">
+                        <div className="space-y-3">
+                            {intervention.repairs.length > 0 ? (
+                                intervention.repairs.map((repair) => (
+                                    <div
+                                        key={repair.id}
+                                        className="rounded-lg border border-slate-700 p-3"
+                                    >
+                                        <p className="text-sm text-slate-300">
+                                            {repair.description}
+                                        </p>
+                                    </div>
+                                ))
+                            ) : (
+                                <p className="text-sm text-slate-500">
+                                    No se registraron reparaciones.
+                                </p>
+                            )}
+                        </div>
+                    </DetailCard>
+                </div>
+            )}
+
+            {/* Componentes */}
+            {intervention ? (
+                <DetailCard title="Componentes intervenidos">
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left text-sm">
+                            <thead>
+                                <tr className="border-b border-slate-700 text-slate-400">
+                                    <th className="px-4 py-3">Componente</th>
+                                    <th className="px-4 py-3">Acción</th>
+                                    <th className="px-4 py-3">Descripción</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                {intervention.components.map((component) => (
+                                    <tr
+                                        key={component.id}
+                                        className="border-b border-slate-800"
+                                    >
+                                        <td className="px-4 py-3 text-white">
+                                            {component.componentName}
+                                        </td>
+
+                                        <td className="px-4 py-3 text-slate-300">
+                                            {component.action}
+                                        </td>
+
+                                        <td className="px-4 py-3 text-slate-400">
+                                            {component.description}
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </DetailCard>
+            ) : (
+                <EmptyState title="Intervenciónes" description="No se ha registrado ninguna intervención para este orden de trabajo." />
+            )}
+
+            {/* Respuestas del checklist */}
+            {intervention && (
+                <DetailCard title="Resultados del checklist">
+                    <div className="space-y-3">
+                        {intervention.checklistAnswers.map((answer) => (
+                            <div
+                                key={answer.id}
+                                className="rounded-lg border border-slate-700 p-4"
+                            >
+                                <div className="flex items-center justify-between gap-4">
+                                    <p className="text-sm font-medium text-white">
+                                        {answer.item.label}
+                                    </p>
+
+                                    <span className="text-xs text-slate-400">
+                                        {answer.value}
+                                    </span>
+                                </div>
+
+                                {answer.observation && (
+                                    <p className="mt-2 text-sm text-slate-400">
+                                        {answer.observation}
+                                    </p>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                </DetailCard>
+            )}
+
+            {/* Notas técnicas */}
+            {intervention && (
+                <DetailCard title="Notas técnicas">
+                    <div className="space-y-3">
+                        {intervention.technicalNotes.length > 0 ? (
+                            intervention.technicalNotes.map((note) => (
+                                <div
+                                    key={note.id}
+                                    className="rounded-lg border border-slate-700 p-3"
+                                >
+                                    <p className="text-sm text-slate-300">
+                                        {note.content}
+                                    </p>
+                                </div>
+                            ))
+                        ) : (
+                            <p className="text-sm text-slate-500">
+                                No hay notas técnicas.
+                            </p>
+                        )}
+                    </div>
+                </DetailCard>
+            )}
+
+            {/* Evidencias */}
+            {intervention && (
+                <DetailCard title="Evidencias">
+                    <div className="space-y-3">
+                        {intervention.evidence.length > 0 ? (
+                            intervention.evidence.map((evidence) => (
+                                <div
+                                    key={evidence.id}
+                                    className="rounded-lg border border-slate-700 p-4"
+                                >
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-sm font-medium text-white">
+                                            {evidence.type}
+                                        </span>
+
+                                        <span className="text-xs text-slate-500">
+                                            {evidence.reference}
+                                        </span>
+                                    </div>
+
+                                    <p className="mt-2 text-sm text-slate-400">
+                                        {evidence.description}
+                                    </p>
+                                </div>
+                            ))
+                        ) : (
+                            <p className="text-sm text-slate-500">
+                                No hay evidencias registradas.
+                            </p>
+                        )}
+                    </div>
+                </DetailCard>
+            )}
+
+            {/* Conformidad */}
+            {intervention?.conformity && (
+                <DetailCard title="Conformidad">
+                    <DetailRow
+                        label="Firma"
+                        value={intervention.conformity.signature}
+                    />
+                </DetailCard>
+            )}
         </div>
-    );
-}
-
-interface TabProps {
-    children: React.ReactNode;
-    active?: boolean;
-}
-
-function Tab({
-    children,
-    active = false,
-}: TabProps) {
-    return (
-        <button
-            type="button"
-            className={`border-b-2 px-1 pb-4 pt-2 text-sm font-medium transition ${active
-                ? "border-blue-500 text-white"
-                : "border-transparent text-slate-400 hover:text-white"
-                }`}
-        >
-            {children}
-        </button>
     );
 }

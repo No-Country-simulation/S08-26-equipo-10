@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { Loading } from "./loading";
 import { ErrorMessage } from "./ErrorMessage";
 import { EmptyState } from "./EmptyState";
+import { useNavigate } from "react-router";
 
 export interface Column<T> {
     header: string;
@@ -40,6 +41,7 @@ export function Table<T>({
     errorMessage = "Ocurrió un error al cargar los datos",
     emptyMessage = "No hay registros para mostrar",
 }: TableProps<T>) {
+    const navigate = useNavigate();
     return (
         <div className="overflow-x-auto rounded-lg border border-slate-700">
             {isLoading ? (
@@ -67,7 +69,11 @@ export function Table<T>({
                         {data.map((row, index) => (
                             <tr
                                 key={index}
-                                className="border-b border-slate-800 last:border-0"
+                                className="border-b border-slate-800 last:border-0 cursor-pointer hover:bg-slate-900 transition"
+                                onClick={() => {
+                                    navigate(`/fieldflow/ordenesDeTrabajo/${row[columns[0].accessor]}`);
+                                }}
+
                             >
                                 {columns.map((column) => (
                                     <td
