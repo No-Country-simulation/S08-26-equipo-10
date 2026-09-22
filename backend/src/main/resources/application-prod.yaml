@@ -1,0 +1,30 @@
+# Configuración específica del perfil PROD.
+# Activar con: SPRING_PROFILES_ACTIVE=prod
+#
+# Las credenciales, URLs y secretos reales deben llegar mediante
+# variables de entorno. Nunca deben escribirse en este archivo.
+
+spring:
+  jpa:
+    properties:
+      hibernate:
+        # En producción no se necesita formatear SQL ni generar comentarios
+        # de trazabilidad de consultas.
+        format_sql: false
+        use_sql_comments: false
+
+app:
+  db-status:
+    # Evita exponer host, usuario o estado interno del pool.
+    show-details: false
+
+logging:
+  level:
+    root: INFO
+
+    # Logging normal de la aplicación.
+    com.fieldflow: INFO
+
+    # No registrar SQL ni valores de parámetros en producción.
+    org.hibernate.SQL: OFF
+    org.hibernate.orm.jdbc.bind: OFF

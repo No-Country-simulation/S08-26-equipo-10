@@ -1,0 +1,30 @@
+[
+  {
+    "assignmentId": "09000000-0000-4000-8000-000000000001",
+    "plannedStartAt": "2026-09-21T12:00:00Z",
+    "plannedEndAt": "2026-09-21T13:30:00Z",
+    "workOrder": {
+      "id": "08000000-0000-4000-8000-000000000001",
+      "status": "ASSIGNED",
+      "priority": "HIGH",
+      "equipmentIdentifier": "EQ-AGENDA-001",
+      "equipmentName": "Compresor Agenda Test",
+      "siteName": "Planta Córdoba",
+      "siteAddress": "Av. Test 123, Córdoba"
+    }
+  },
+  {
+    "assignmentId": "09000000-0000-4000-8000-000000000002",
+    "plannedStartAt": "2026-09-21T16:00:00Z",
+    "plannedEndAt": "2026-09-21T17:00:00Z",
+    "workOrder": {
+      "id": "08000000-0000-4000-8000-000000000002",
+      "status": "ASSIGNED",
+      "priority": "MEDIUM",
+      "equipmentIdentifier": "EQ-AGENDA-001",
+      "equipmentName": "Compresor Agenda Test",
+      "siteName": "Planta Córdoba",
+      "siteAddress": "Av. Test 123, Córdoba"
+    }
+  }
+]

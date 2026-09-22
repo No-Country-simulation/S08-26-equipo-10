@@ -1,0 +1,16 @@
+{
+  "id": "08000000-0000-4000-8000-000000000001",
+  "equipment": {
+    "id": "04000000-0000-4000-8000-000000000001",
+    "identifier": "EQ-001",
+    "name": "Compresor principal"
+  },
+  "serviceType": {
+    "id": "05000000-0000-4000-8000-000000000001",
+    "name": "Mantenimiento preventivo"
+  },
+  "instructions": "Revisar vibración y temperatura del equipo.",
+  "priority": "HIGH",
+  "estimatedDurationMinutes": 90,
+  "status": "PENDING"
+}

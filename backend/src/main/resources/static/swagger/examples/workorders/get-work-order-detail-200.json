@@ -1,0 +1,131 @@
+{
+  "id": "08000000-0000-4000-8000-000000000106",
+  "instructions": "Escenario de prueba: Work Order completamente poblada.",
+  "priority": "CRITICAL",
+  "estimatedDurationMinutes": 120,
+  "status": "COMPLETED",
+  "serviceType": {
+    "id": "05000000-0000-4000-8000-000000000001",
+    "name": "Mantenimiento preventivo"
+  },
+  "equipment": {
+    "id": "04000000-0000-4000-8000-000000000004",
+    "identifier": "EQ-004",
+    "name": "Unidad HVAC",
+    "currentStatus": "OPERATIONAL",
+    "client": {
+      "id": "01000000-0000-4000-8000-000000000002",
+      "name": "Servicios Andinos"
+    },
+    "site": {
+      "id": "02000000-0000-4000-8000-000000000003",
+      "name": "Centro Operativo Mendoza",
+      "address": "Acceso Sur 2100, Godoy Cruz, Mendoza, Argentina"
+    },
+    "installation": {
+      "id": "03000000-0000-4000-8000-000000000003",
+      "name": "Taller de mantenimiento"
+    }
+  },
+  "assignment": {
+    "id": "09000000-0000-4000-8000-000000000106",
+    "technician": {
+      "id": "06000000-0000-4000-8000-000000000003",
+      "name": "Martín Díaz"
+    },
+    "plannedStartAt": "2026-09-13T12:00:00Z",
+    "plannedEndAt": "2026-09-13T14:00:00Z"
+  },
+  "checklist": {
+    "id": "0a000000-0000-4000-8000-000000000106",
+    "name": "Checklist completo - prueba",
+    "items": [
+      {
+        "id": "0b000000-0000-4000-8000-000000000106",
+        "label": "Verificar filtros"
+      },
+      {
+        "id": "0b000000-0000-4000-8000-000000000116",
+        "label": "Verificar conexiones eléctricas"
+      }
+    ]
+  },
+  "interventions": [
+    {
+      "id": "0c000000-0000-4000-8000-000000000106",
+      "technician": {
+        "id": "06000000-0000-4000-8000-000000000003",
+        "name": "Martín Díaz"
+      },
+      "startedAt": "2026-09-13T12:05:00Z",
+      "endedAt": "2026-09-13T13:50:00Z",
+      "status": "COMPLETED",
+      "result": "Mantenimiento completo ejecutado correctamente.",
+      "observations": "Sin novedades pendientes.",
+      "failures": [
+        {
+          "id": "0d000000-0000-4000-8000-000000000106",
+          "description": "Filtro con saturación."
+        }
+      ],
+      "repairs": [
+        {
+          "id": "0e000000-0000-4000-8000-000000000106",
+          "description": "Se reemplazó el filtro saturado."
+        }
+      ],
+      "components": [
+        {
+          "id": "0f000000-0000-4000-8000-000000000106",
+          "componentName": "Filtro principal",
+          "action": "REPLACED",
+          "description": "Filtro reemplazado y alojamiento limpiado."
+        }
+      ],
+      "checklistAnswers": [
+        {
+          "id": "10000000-0000-4000-8000-000000000106",
+          "item": {
+            "id": "0b000000-0000-4000-8000-000000000106",
+            "label": "Verificar filtros"
+          },
+          "value": "REPLACED",
+          "observation": "Filtro reemplazado."
+        },
+        {
+          "id": "10000000-0000-4000-8000-000000000116",
+          "item": {
+            "id": "0b000000-0000-4000-8000-000000000116",
+            "label": "Verificar conexiones eléctricas"
+          },
+          "value": "OK",
+          "observation": null
+        }
+      ],
+      "technicalNotes": [
+        {
+          "id": "11000000-0000-4000-8000-000000000106",
+          "content": "Revisar el filtro nuevamente en el próximo mantenimiento."
+        }
+      ],
+      "evidence": [
+        {
+          "id": "12000000-0000-4000-8000-000000000106",
+          "type": "PHOTO",
+          "reference": "examples/evidence/test/wo-106-after.jpg",
+          "description": "Estado final del equipo."
+        },
+        {
+          "id": "12000000-0000-4000-8000-000000000116",
+          "type": "MEASUREMENT",
+          "reference": "examples/evidence/test/wo-106-measurement.json",
+          "description": null
+        }
+      ],
+      "conformity": {
+        "id": "13000000-0000-4000-8000-000000000106",
+        "signature": "example-signature-reference/test/wo-106"
+      }
+    }
+  ]
+}

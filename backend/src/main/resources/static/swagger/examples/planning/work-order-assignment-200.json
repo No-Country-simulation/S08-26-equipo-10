@@ -1,0 +1,25 @@
+{
+  "id": "82f8126c-6183-4131-a64d-1e237d95c8d2",
+  "workOrder": {
+    "id": "10000000-0000-4000-8000-000000000002",
+    "equipment": {
+      "id": "c0000000-0000-4000-8000-000000000001",
+      "identifier": "EQ-ASSIGN-001",
+      "name": "Compresor Assignment Test"
+    },
+    "serviceType": {
+      "id": "d0000000-0000-4000-8000-000000000001",
+      "name": "Mantenimiento preventivo"
+    },
+    "instructions": "WO 2 - Validaciones de disponibilidad.",
+    "priority": "MEDIUM",
+    "estimatedDurationMinutes": 60,
+    "status": "ASSIGNED"
+  },
+  "technician": {
+    "id": "e0000000-0000-4000-8000-000000000001",
+    "name": "Ana Disponible"
+  },
+  "plannedStartAt": "2026-09-22T13:00:00Z",
+  "plannedEndAt": "2026-09-22T13:30:00Z"
+}

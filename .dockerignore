@@ -1,0 +1,30 @@
+# Secrects
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+secrets/
+
+# Compilation artifacts
+**/target/
+*.jar
+*.log
+
+# Frontend:
+frontend/
+**/node_modules/
+**/.next/
+
+# Build areas
+design/
+docs/
+testing/
+.github/
+
+# Git and tools
+.git/
+.gitignore
+.idea/
+.vscode/
+.claude/
