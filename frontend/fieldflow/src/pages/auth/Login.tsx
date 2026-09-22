@@ -1,19 +1,18 @@
 import { useState } from "react";
 import { Mail, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
 import fieldflowLogo from "@/assets/logo.svg";
+import { useNavigate } from "react-router";
 
 function Login() {
     const [showPassword, setShowPassword] = useState(false);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const navigate = useNavigate();
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        console.log({
-            email,
-            password,
-        });
+        navigate("/dashboard"); // Redirige al dashboard después de iniciar sesión
 
         // Aquí posteriormente conectaremos con el backend
     };
@@ -24,7 +23,7 @@ function Login() {
             <div
                 className="absolute inset-0 bg-cover bg-center"
                 style={{
-                    backgroundImage: "url('/src/assets/images/fondo.png')",
+                    backgroundImage: "url('@/assets/images/fondo.png')",
                 }}
             />
 
