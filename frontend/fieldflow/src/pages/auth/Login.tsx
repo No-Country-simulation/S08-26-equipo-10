@@ -12,7 +12,7 @@ function Login() {
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        navigate("/dashboard"); // Redirige al dashboard después de iniciar sesión
+        navigate("/fieldflow/dashboard"); // Redirige al dashboard después de iniciar sesión
 
         // Aquí posteriormente conectaremos con el backend
     };
