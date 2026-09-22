@@ -15,6 +15,7 @@ export function ClientListItem({
         (total, site) => total + site.installations.length,
         0
     );
+    const siteCount = client.sites.length;
 
     return (
         <button
