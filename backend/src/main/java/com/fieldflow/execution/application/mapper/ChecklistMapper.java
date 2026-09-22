@@ -1,6 +1,7 @@
 package com.fieldflow.execution.application.mapper;
 
 import com.fieldflow.execution.api.dto.ChecklistAnswerSummaryResponse;
+import com.fieldflow.execution.api.dto.ChecklistCreationResponse;
 import com.fieldflow.execution.api.dto.ChecklistDetailResponse;
 import com.fieldflow.execution.api.dto.ChecklistItemSummaryResponse;
 import com.fieldflow.execution.domain.Checklist;
@@ -24,6 +25,17 @@ public final class ChecklistMapper {
 	public static ChecklistDetailResponse toDetailResponse(Checklist entity) {
 		return entity == null ? null : new ChecklistDetailResponse(
 				entity.getId(),
+				entity.getName(),
+				entity.getItems().stream()
+						.map(ChecklistMapper::toChecklistItemSummaryResponse)
+						.toList()
+		);
+	}
+
+	public static ChecklistCreationResponse toCreationResponse(Checklist entity) {
+		return entity == null ? null : new ChecklistCreationResponse(
+				entity.getId(),
+				entity.getWorkOrder().getId(),
 				entity.getName(),
 				entity.getItems().stream()
 						.map(ChecklistMapper::toChecklistItemSummaryResponse)

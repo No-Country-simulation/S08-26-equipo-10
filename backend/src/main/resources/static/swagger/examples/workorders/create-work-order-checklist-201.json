@@ -1,0 +1,11 @@
+{
+  "id": "93a67117-96cc-4e30-8db2-4bcd15155741",
+  "workOrderId": "8c9fb9c4-93c7-4d13-a347-33262872b95a",
+  "name": "Checklist preventivo",
+  "items": [
+    {
+      "id": "00c9c86e-eb8a-4e16-9694-16cb40866dfc",
+      "label": "Verificar temperatura"
+    }
+  ]
+}
