@@ -1,5 +1,5 @@
 import { ChevronRight, MapPin } from "lucide-react";
-import type { Site } from "@/types/client";
+import type { Site } from "@/features/clients/types/client";
 
 type Props = {
     site: Site;

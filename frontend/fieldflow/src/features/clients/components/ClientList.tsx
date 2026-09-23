@@ -1,6 +1,6 @@
 import { Search } from "lucide-react";
-import type { Client } from "@/types/client";
-import { ClientListItem } from "./ClientListItem";
+import type { Client } from "@/features/clients/types/client";
+import { ClientListItem } from "@/features/clients/components/ClientListItem";
 import { useMemo, useState } from "react";
 
 type Props = {

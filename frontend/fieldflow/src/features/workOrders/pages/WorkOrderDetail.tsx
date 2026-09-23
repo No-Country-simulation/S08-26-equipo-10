@@ -6,7 +6,7 @@ import { StatusBadge } from "@/components/ui/StatusBadge";
 import { PriorityBadge } from "@/components/ui/PriorityBadge";
 import { DetailCard } from "@/components/ui/DetailCard";
 import { DetailRow } from "@/components/ui/DetailRow";
-import { useWorkOrderById } from "@/hooks/workorder/useWorkOrderById";
+import { useWorkOrderById } from "@/features/workOrders/hook/useWorkOrderById";
 import { EmptyState } from "@/components/common/EmptyState";
 
 export default function OrdenTrabajoDetailPage() {

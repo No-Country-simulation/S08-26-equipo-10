@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { ClientDetail } from "@/pages/clients/ClientDetail";
-import { ClientList } from "@/pages/clients/ClientList";
-import { clients } from "@/pages/clients/clients.mock";
-import { CreateClientModal } from "./CreateClientModal";
-import { CreateSiteModal } from "./createSiteModal";
+import { ClientDetail } from "@/features/clients/components/ClientDetail";
+import { ClientList } from "@/features/clients/components/ClientList";
+import { clients } from "@/features/clients/services/clients.mock";
+import { CreateClientModal } from "@/features/clients/components/CreateClientModal";
+import { CreateSiteModal } from "@/features/clients/components/createSiteModal";
 
 export default function ClientesPage() {
     const [selectedClientId, setSelectedClientId] = useState<string>(
