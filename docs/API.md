@@ -436,6 +436,33 @@ cada operación o en el catálogo global de errores.
 
 ## 5.1 Catálogos operativos
 
+### GET `/clients`
+
+Devuelve los clientes disponibles.
+
+Respuesta `200`:
+
+```json
+[
+  {
+    "id": "51000000-0000-4000-8000-000000000001",
+    "name": "Industrias del Sur",
+    "siteCount": 3,
+    "equipmentCount": 18
+  },
+  {
+    "id": "51000000-0000-4000-8000-000000000002",
+    "name": "Metalúrgica Central",
+    "siteCount": 1,
+    "equipmentCount": 6
+  }
+]
+```
+
+Si no existen clientes se devuelve una lista vacía.
+
+---
+
 ### GET `/equipment`
 
 Devuelve los equipos disponibles para seleccionar al crear una Orden de Trabajo (OT), incluyendo contexto de cliente y
