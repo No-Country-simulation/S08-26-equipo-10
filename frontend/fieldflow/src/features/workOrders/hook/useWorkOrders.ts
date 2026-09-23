@@ -1,7 +1,7 @@
 // hooks/useWorkOrders.ts
 
 import { useQuery } from '@tanstack/react-query';
-import { getWorkOrders } from '@/services/WorkOrderService';
+import { getWorkOrders } from '@/features/workOrders/services/WorkOrderService';
 
 export function useWorkOrders() {
     return useQuery({

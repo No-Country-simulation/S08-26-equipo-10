@@ -1,5 +1,5 @@
-import type { Client } from "@/types/client";
-import { SiteCard } from "@/pages/clients/SiteCard";
+import type { Client } from "@/features/clients/types/client";
+import { SiteCard } from "@/features/clients/components/SiteCard";
 
 type Props = {
     client: Client;

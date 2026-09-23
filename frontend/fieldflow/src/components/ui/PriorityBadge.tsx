@@ -1,4 +1,4 @@
-import type { WorkOrderPriority } from "@/types/workOrder";
+import type { WorkOrderPriority } from "@/features/workOrders/types/workOrder";
 import { Badge } from "../common/Badge";
 import { workOrderPriorityLabels } from "@/utils/workOrderTranslation";
 

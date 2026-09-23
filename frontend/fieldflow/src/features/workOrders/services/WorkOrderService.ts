@@ -1,5 +1,6 @@
-import type { WorkOrder } from '@/types/workOrder';
-import type { WorkOrderDetail } from '@/types/workOrderDetail';
+import type { WorkOrder } from "../types/workOrder";
+import type { WorkOrderDetail } from "../types/workOrderDetail";
+
 
 const API_URL =
     'https://fieldflow-api-2lfo.onrender.com/api/v1';
