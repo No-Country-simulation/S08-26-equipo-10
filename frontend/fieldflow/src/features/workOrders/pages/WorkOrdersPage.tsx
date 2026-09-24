@@ -8,6 +8,7 @@ import { PriorityBadge } from "@/components/ui/PriorityBadge";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { useWorkOrders } from "@/features/workOrders/hook/useWorkOrders";
 import type { WorkOrder } from "@/features/workOrders/types/workOrder";
+import { truncateId } from "@/utils/trucateId";
 
 
 
@@ -63,7 +64,7 @@ function OrdenesTrabajoPage() {
             accessor: "id",
             render: (value) => (
                 <span className="font-mono text-xs  text-cyan-400">
-                    {value}
+                    {truncateId(value)}
                 </span>
             ),
         }),
