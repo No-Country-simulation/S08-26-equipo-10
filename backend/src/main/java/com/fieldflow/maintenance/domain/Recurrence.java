@@ -24,15 +24,16 @@ public class Recurrence {
 	@Column(name = "\"interval\"", nullable = false)
 	private Integer interval;
 
+	@Enumerated(EnumType.STRING)
 	@Column(name = "frequency", nullable = false, length = 50)
-	private String frequency;
+	private RecurrenceFrequency frequency;
 
 	protected Recurrence() {
 	}
 
 	public Recurrence(
 			PreventiveMaintenancePlan preventiveMaintenancePlan,
-			String frequency,
+			RecurrenceFrequency frequency,
 			Integer interval
 	) {
 		this.preventiveMaintenancePlan = preventiveMaintenancePlan;
@@ -48,11 +49,15 @@ public class Recurrence {
 		return preventiveMaintenancePlan;
 	}
 
-	public String getFrequency() {
+	public RecurrenceFrequency getFrequency() {
 		return frequency;
 	}
 
 	public Integer getInterval() {
 		return interval;
+	}
+
+	void assignPlan(PreventiveMaintenancePlan plan) {
+		this.preventiveMaintenancePlan = plan;
 	}
 }
