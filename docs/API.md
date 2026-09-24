@@ -463,7 +463,7 @@ Si no existen clientes se devuelve una lista vacía.
 
 ---
 
-### GET `/equipment`
+### GET `/equipments/{equipmentId}`
 
 Devuelve los equipos disponibles para seleccionar al crear una Orden de Trabajo (OT), incluyendo contexto de cliente y
 ubicación.
@@ -1106,7 +1106,7 @@ Conflicto:
 
 ## 5.8 Historial de mantenimiento
 
-### GET `/equipment/{equipmentId}/maintenance-history`
+### GET `/equipments/{equipmentId}/maintenance-history`
 
 El historial no corresponde a una tabla independiente. Se construye consultando las Órdenes de Trabajo e intervenciones
 del equipo.
@@ -1155,7 +1155,7 @@ No se crea ni actualiza una entidad `maintenance_history`.
 
 ## 5.9 Mantenimiento preventivo
 
-### POST `/equipment/{equipmentId}/preventive-maintenance-plans`
+### POST `/equipments/{equipmentId}/preventive-maintenance-plans`
 
 Crea un plan preventivo y su recurrencia simple en una única operación.
 
@@ -1196,7 +1196,7 @@ Respuesta `201`:
 
 ---
 
-### GET `/equipment/{equipmentId}/preventive-maintenance-plans`
+### GET `/equipments/{equipmentId}/preventive-maintenance-plans`
 
 Lista los planes preventivos del equipo.
 
@@ -1225,26 +1225,26 @@ El MVP no incluye un scheduler avanzado ni una API independiente para reglas de 
 
 # 6. Resumen del contrato
 
-|  # | Método | Ruta                                           | Objetivo                                 |
-|---:|--------|------------------------------------------------|------------------------------------------|
-|  1 | GET    | `/equipment`                                   | Seleccionar equipo con cliente/ubicación |
-|  2 | GET    | `/service-types`                               | Consultar tipos de servicio              |
-|  3 | GET    | `/technicians`                                 | Consultar técnicos                       |
-|  4 | POST   | `/technicians/{id}/availability`               | Registrar disponibilidad                 |
-|  5 | GET    | `/technicians/{id}/availability`               | Consultar disponibilidad                 |
-|  6 | POST   | `/work-orders`                                 | Crear OT                                 |
-|  7 | GET    | `/work-orders`                                 | Seguimiento de OTs                       |
-|  8 | GET    | `/work-orders/{id}`                            | Vista completa y trazabilidad de una OT  |
-|  9 | PUT    | `/work-orders/{id}/assignment`                 | Asignar/reprogramar técnico              |
-| 10 | GET    | `/technicians/{id}/agenda`                     | Obtener agenda desde asignaciones        |
-| 11 | PATCH  | `/work-orders/{id}/status`                     | `EN_ROUTE` / `RESCHEDULED`               |
-| 12 | POST   | `/work-orders/{id}/checklist`                  | Crear checklist e ítems                  |
-| 13 | POST   | `/work-orders/{id}/interventions`              | Iniciar intervención                     |
-| 14 | PUT    | `/interventions/{id}/report`                   | Registrar ejecución completa             |
-| 15 | POST   | `/interventions/{id}/conformity`               | Registrar conformidad                    |
-| 16 | GET    | `/equipment/{id}/maintenance-history`          | Consultar historial derivado             |
-| 17 | POST   | `/equipment/{id}/preventive-maintenance-plans` | Crear mantenimiento preventivo           |
-| 18 | GET    | `/equipment/{id}/preventive-maintenance-plans` | Consultar planes preventivos             |
+|  # | Método | Ruta                                            | Objetivo                                 |
+|---:|--------|-------------------------------------------------|------------------------------------------|
+|  1 | GET    | `/equipments/{equipmentId}`                     | Seleccionar equipo con cliente/ubicación |
+|  2 | GET    | `/service-types`                                | Consultar tipos de servicio              |
+|  3 | GET    | `/technicians`                                  | Consultar técnicos                       |
+|  4 | POST   | `/technicians/{id}/availability`                | Registrar disponibilidad                 |
+|  5 | GET    | `/technicians/{id}/availability`                | Consultar disponibilidad                 |
+|  6 | POST   | `/work-orders`                                  | Crear OT                                 |
+|  7 | GET    | `/work-orders`                                  | Seguimiento de OTs                       |
+|  8 | GET    | `/work-orders/{id}`                             | Vista completa y trazabilidad de una OT  |
+|  9 | PUT    | `/work-orders/{id}/assignment`                  | Asignar/reprogramar técnico              |
+| 10 | GET    | `/technicians/{id}/agenda`                      | Obtener agenda desde asignaciones        |
+| 11 | PATCH  | `/work-orders/{id}/status`                      | `EN_ROUTE` / `RESCHEDULED`               |
+| 12 | POST   | `/work-orders/{id}/checklist`                   | Crear checklist e ítems                  |
+| 13 | POST   | `/work-orders/{id}/interventions`               | Iniciar intervención                     |
+| 14 | PUT    | `/interventions/{id}/report`                    | Registrar ejecución completa             |
+| 15 | POST   | `/interventions/{id}/conformity`                | Registrar conformidad                    |
+| 16 | GET    | `/equipments/{id}/maintenance-history`          | Consultar historial derivado             |
+| 17 | POST   | `/equipments/{id}/preventive-maintenance-plans` | Crear mantenimiento preventivo           |
+| 18 | GET    | `/equipments/{id}/preventive-maintenance-plans` | Consultar planes preventivos             |
 
 **Total del contrato MVP: 18 endpoints.**
 
@@ -1259,7 +1259,7 @@ probado y congelado:
 POST/PATCH/DELETE /clients/**
 POST/PATCH/DELETE /sites/**
 POST/PATCH/DELETE /installations/**
-POST/PATCH/DELETE /equipment/**
+POST/PATCH/DELETE /equipments/**
 POST/PATCH/DELETE /service-types/**
 POST/PATCH/DELETE /technicians/**
 DELETE /work-orders/**
