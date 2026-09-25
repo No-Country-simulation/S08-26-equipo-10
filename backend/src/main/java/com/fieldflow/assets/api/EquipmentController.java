@@ -9,13 +9,16 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.List;
 import java.util.UUID;
+
+import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.fromMethodCall;
+import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 @RestController
 @RequestMapping("/api/v1/equipments")
@@ -71,7 +74,8 @@ public class EquipmentController {
 			@PathVariable UUID equipmentId, @Valid @RequestBody CreatePreventiveMaintenancePlanRequest request
 	) {
 		var response = equipmentService.createPreventiveMaintenancePlan(equipmentId, request);
-		return ResponseEntity.status(HttpStatus.CREATED).body(response);
+		URI location = fromMethodCall(on(EquipmentController.class).getMaintenancePlan(response.id())).build().toUri();
+		return ResponseEntity.created(location).body(response);
 	}
 
 	@Operation(
