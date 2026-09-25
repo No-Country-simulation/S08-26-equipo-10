@@ -2,6 +2,7 @@ package com.fieldflow.maintenance.application.mapper;
 
 import com.fieldflow.maintenance.api.dto.PreventiveMaintenancePlanResponse;
 import com.fieldflow.maintenance.domain.PreventiveMaintenancePlan;
+import com.fieldflow.workorders.application.mapper.ServiceTypeMapper;
 
 public final class PreventivePlanMapper {
 
@@ -11,8 +12,7 @@ public final class PreventivePlanMapper {
 	public static PreventiveMaintenancePlanResponse toResponse(PreventiveMaintenancePlan entity) {
 		return entity == null ? null : new PreventiveMaintenancePlanResponse(
 				entity.getId(),
-				entity.getEquipment().getId(),
-				entity.getServiceType().getId(),
+				ServiceTypeMapper.toResponse(entity.getServiceType()),
 				entity.getNextExecutionAt(),
 				RecurrenceMapper.toResponse(entity.getRecurrence())
 		);

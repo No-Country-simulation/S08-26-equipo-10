@@ -1183,8 +1183,10 @@ Respuesta `201`:
 ```json
 {
   "id": "0dd493de-e301-4e43-b04e-f7006eb0ad0d",
-  "equipmentId": "1fc79768-93cd-4f66-a225-08b30153b5de",
-  "serviceTypeId": "4cc315c5-0b93-4e19-a02d-3902ab688d02",
+  "serviceType": {
+    "id": "4cc315c5-0b93-4e19-a02d-3902ab688d02",
+    "name": "Mantenimiento preventivo"
+  },
   "nextExecutionAt": "2026-10-15T09:00:00-03:00",
   "recurrence": {
     "id": "4868476d-f452-40b7-a9df-154027776ffe",
