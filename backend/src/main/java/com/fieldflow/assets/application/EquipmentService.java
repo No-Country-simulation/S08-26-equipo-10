@@ -16,4 +16,6 @@ public interface EquipmentService {
 	                                                                  CreatePreventiveMaintenancePlanRequest request);
 
 	Equipment getEntityById(UUID id);
+
+	List<PreventiveMaintenancePlanResponse> getMaintenancePlansByEquipmentId(UUID equipmentId);
 }
