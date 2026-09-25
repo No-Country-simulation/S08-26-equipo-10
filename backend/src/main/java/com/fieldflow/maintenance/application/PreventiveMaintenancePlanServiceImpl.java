@@ -9,6 +9,9 @@ import com.fieldflow.workorders.domain.ServiceType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.UUID;
+
 @Service
 public class PreventiveMaintenancePlanServiceImpl implements PreventiveMaintenancePlanService {
 
@@ -38,5 +41,11 @@ public class PreventiveMaintenancePlanServiceImpl implements PreventiveMaintenan
 		maintenancePlan.assignRecurrence(recurrence);
 
 		return preventivePlanRepository.save(maintenancePlan);
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<PreventiveMaintenancePlan> getMaintenancePlansByEquipmentId(UUID equipmentId) {
+		return preventivePlanRepository.findAllByEquipmentIdWithDetails(equipmentId);
 	}
 }

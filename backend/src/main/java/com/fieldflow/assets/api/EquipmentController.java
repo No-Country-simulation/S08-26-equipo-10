@@ -73,4 +73,22 @@ public class EquipmentController {
 		var response = equipmentService.createPreventiveMaintenancePlan(equipmentId, request);
 		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
+
+	@Operation(
+			summary = "Obtiene los planes de mantenimiento preventivo de un equipo",
+			description = """
+					Obtiene los planes de mantenimiento preventivo asociados a un equipo específico.
+					"""
+	)
+	@ApiResponse(responseCode = "200", description = "Planes de mantenimiento preventivo obtenidos correctamente.")
+	@ApiJsonExample(
+			description = "Ejemplo de planes de mantenimiento preventivo obtenidos correctamente.",
+			path = "/static/swagger/examples/assets/get-equipment-maintenance-plans-200.json",
+			summary = "Planes de mantenimiento preventivo obtenidos"
+	)
+	@GetMapping(value = "/{equipmentId}/preventive-maintenance-plans", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<List<PreventiveMaintenancePlanResponse>> getMaintenancePlan(@PathVariable UUID equipmentId) {
+		var response = equipmentService.getMaintenancePlansByEquipmentId(equipmentId);
+		return ResponseEntity.ok(response);
+	}
 }

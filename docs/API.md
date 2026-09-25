@@ -1214,6 +1214,7 @@ Respuesta `200`:
     },
     "nextExecutionAt": "2026-10-15T09:00:00-03:00",
     "recurrence": {
+      "id": "4868476d-f452-40b7-a9df-154027776ffe",
       "frequency": "MONTH",
       "interval": 1
     }

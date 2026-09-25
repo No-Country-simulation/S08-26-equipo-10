@@ -59,4 +59,17 @@ public class EquipmentServiceImpl implements EquipmentService {
 		return equipmentRepository.findById(id)
 				.orElseThrow(() -> ApiException.notFound("No existe un equipo asociado al ID " + id));
 	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<PreventiveMaintenancePlanResponse> getMaintenancePlansByEquipmentId(UUID equipmentId) {
+		if (!equipmentRepository.existsById(equipmentId)) {
+			throw ApiException.notFound("No existe un equipo asociado al ID " + equipmentId);
+		}
+
+		var preventiveMaintenancePlans = preventiveMaintenancePlanService.getMaintenancePlansByEquipmentId(equipmentId);
+		return preventiveMaintenancePlans.stream()
+				.map(PreventivePlanMapper::toResponse)
+				.toList();
+	}
 }
