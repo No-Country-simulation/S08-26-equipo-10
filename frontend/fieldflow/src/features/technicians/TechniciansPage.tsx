@@ -151,15 +151,15 @@ function TechniciansPage() {
     };
 
     return (
-        <div className="min-h-full bg-[#0b1015] p-6 text-white">
+        <div className="min-h-full  p-6 text-white">
             {/* Header */}
-            <div className="mb-8 flex items-start justify-between gap-4">
+            <div className="flex items-start justify-between gap-4 mb-4">
                 <div>
-                    <h1 className="text-2xl font-semibold">
+                    <h1 className="text-2xl font-bold text-white">
                         Técnicos
                     </h1>
 
-                    <p className="mt-1 text-base text-slate-400">
+                    <p className="mt-1 text-base text-[#78a0d2] ">
                         {tecnicos.length} técnicos registrados
                     </p>
                 </div>

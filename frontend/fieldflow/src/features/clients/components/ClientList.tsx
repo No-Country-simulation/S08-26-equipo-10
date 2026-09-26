@@ -37,7 +37,7 @@ export function ClientList({
                         placeholder="Buscar cliente..."
                         className="
               w-full rounded-lg border border-[#293545]
-              bg-[#121922] py-2.5 pl-10 pr-3
+              bg-slate-900/70 py-2.5 pl-10 pr-3
               text-sm text-white outline-none
               placeholder:text-[#526b8c]
               focus:border-blue-500

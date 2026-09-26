@@ -27,13 +27,13 @@ export default function ClientesPage() {
 
     return (
         <div className="h-full min-h-0 p-6">
-            <header className="mb-6 flex items-start justify-between gap-4">
+            <header className="flex items-start justify-between gap-4 mb-4">
                 <div>
-                    <h1 className="text-2xl font-semibold text-white">
+                    <h1 className="text-2xl font-bold text-white">
                         Clientes
                     </h1>
 
-                    <p className="mt-1 text-sm text-[#78a0d2]">
+                    <p className="mt-1 text-base text-[#78a0d2]">
                         {clients.length} clientes registrados
                     </p>
                 </div>
