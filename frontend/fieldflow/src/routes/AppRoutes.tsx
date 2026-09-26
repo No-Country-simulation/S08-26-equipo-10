@@ -7,7 +7,7 @@ import TechniciansPage from "../features/technicians/TechniciansPage"
 import ClientsPage from "../features/clients/pages/ClientsPage"
 import MaintenancesPage from "../features/maintenance/PreventiveMaintenance"
 import NotFound from "../features/notFound/NotFound"
-import EquipmentPage from "@/features/equipment/Equipment"
+import EquipmentPage from "@/features/equipment/pages/EquipmentPage"
 import ComponentsCatalog from "@/features/componentsCatalog/ComponentsCatalog"
 import WorkOrderDetailPage from "@/features/workOrders/pages/WorkOrderDetail"
 
