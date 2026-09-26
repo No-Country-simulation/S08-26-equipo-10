@@ -8,6 +8,7 @@ import com.fieldflow.execution.api.dto.*;
 import com.fieldflow.execution.application.InterventionDetails;
 import com.fieldflow.execution.domain.*;
 import com.fieldflow.planning.application.mapper.TechnicianMapper;
+import com.fieldflow.workorders.application.mapper.WorkOrderMapper;
 
 public final class InterventionMapper {
 
@@ -37,6 +38,17 @@ public final class InterventionMapper {
 
 				// ----------------------- conformity -----------------------
 				toConformitySummaryResponse(entity.getConformity())
+		);
+	}
+
+	public static InterventionCreatedResponse toCreatedResponse(Intervention entity) {
+		return entity == null ? null : new InterventionCreatedResponse(
+				entity.getId(),
+				entity.getStartedAt(),
+				entity.getEndedAt(),
+				entity.getStatus(),
+				TechnicianMapper.toSummaryResponse(entity.getTechnician()),
+				WorkOrderMapper.toSummaryResponse(entity.getWorkOrder())
 		);
 	}
 

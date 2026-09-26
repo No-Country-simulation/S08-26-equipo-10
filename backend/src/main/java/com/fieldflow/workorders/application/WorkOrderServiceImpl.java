@@ -3,9 +3,12 @@ package com.fieldflow.workorders.application;
 import com.fieldflow.assets.application.EquipmentService;
 import com.fieldflow.execution.api.dto.ChecklistCreationResponse;
 import com.fieldflow.execution.api.dto.CreateChecklistRequest;
+import com.fieldflow.execution.api.dto.CreateInterventionRequest;
+import com.fieldflow.execution.api.dto.InterventionCreatedResponse;
 import com.fieldflow.execution.application.ChecklistService;
 import com.fieldflow.execution.application.InterventionService;
 import com.fieldflow.execution.application.mapper.ChecklistMapper;
+import com.fieldflow.execution.application.mapper.InterventionMapper;
 import com.fieldflow.planning.api.dto.AssignmentDetailResponse;
 import com.fieldflow.planning.api.dto.AssignmentRequest;
 import com.fieldflow.planning.application.SchedulingService;
@@ -136,6 +139,21 @@ public class WorkOrderServiceImpl implements WorkOrderService {
 		var checklist = checklistService.createChecklistWithItems(workOrder, request);
 
 		return ChecklistMapper.toCreationResponse(checklist);
+	}
+
+	@Override
+	@Transactional
+	public InterventionCreatedResponse startWorkOrderIntervention(UUID workOrderId, CreateInterventionRequest request) {
+		var workOrder = repository.findByIdWithContext(workOrderId)
+				.orElseThrow(() -> ApiException.notFound(
+						"No existe una orden de trabajo asociada al ID: " + workOrderId
+				));
+
+		var interventionCreated = interventionService.recordInterventionStart(workOrder, request);
+
+		workOrder.setStatus(WorkOrderStatus.IN_PROGRESS);
+
+		return InterventionMapper.toCreatedResponse(interventionCreated);
 	}
 
 	private void validatePatchAllowedStatus(WorkOrderStatus newStatus) {

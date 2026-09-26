@@ -2,6 +2,7 @@ package com.fieldflow.planning.application;
 
 import com.fieldflow.planning.api.dto.*;
 import com.fieldflow.planning.domain.Assignment;
+import com.fieldflow.planning.domain.Technician;
 import com.fieldflow.workorders.domain.WorkOrder;
 
 import java.time.OffsetDateTime;
@@ -19,4 +20,6 @@ public interface SchedulingService {
 	List<TechnicianAvailabilityResponse> getTechnicianAvailability(UUID id, OffsetDateTime from, OffsetDateTime to);
 
 	List<TechnicianAgendaResponse> getTechnicianAgenda(UUID id, OffsetDateTime from, OffsetDateTime to);
+
+	Technician getAssignedTechnicianForWorkOrder(UUID workOrderId);
 }
