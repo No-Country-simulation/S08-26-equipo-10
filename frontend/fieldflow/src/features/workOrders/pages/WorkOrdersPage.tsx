@@ -166,7 +166,7 @@ function OrdenesTrabajoPage() {
     ];
 
     return (
-        <section className="min-h-full bg-[#0b1015] p-6 text-white">
+        <section className="min-h-full  p-6 text-white">
             {/* Header */}
             <div className="flex items-start justify-between gap-4 mb-4">
                 <div>
@@ -174,7 +174,7 @@ function OrdenesTrabajoPage() {
                         Órdenes de Trabajo
                     </h1>
 
-                    <p className="mt-1 text-sm text-slate-400">
+                    <p className="mt-1 text-base text-[#78a0d2]">
                         {filteredOrders.length} de {workOrders.length} registros
                     </p>
                 </div>

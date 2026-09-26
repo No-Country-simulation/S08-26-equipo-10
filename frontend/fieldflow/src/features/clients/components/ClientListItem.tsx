@@ -25,7 +25,7 @@ export function ClientListItem({
         w-full rounded-lg border p-4 text-left transition-colors cursor-pointer
         ${selected
                     ? "border-blue-500 bg-[#151d27]"
-                    : "border-[#293545] bg-[#121922] hover:border-[#3b4b60]"
+                    : "border-[#293545] bg-slate-900/70 hover:border-[#3b4b60]"
                 }
       `}
         >
