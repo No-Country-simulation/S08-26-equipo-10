@@ -12,12 +12,10 @@ export function EquipmentStats({
     ).length;
 
     const maintenance = equipment.filter(
-        (item) => item.currentStatus === "UNDER_MAINTENANCE"
+        (item) => item.currentStatus === "REQUIRES_ATTENTION"
     ).length;
 
-    const toReview = equipment.filter(
-        (item) => item.currentStatus === "TO_REVIEW"
-    ).length;
+
 
     const outOfService = equipment.filter(
         (item) => item.currentStatus === "OUT_OF_SERVICE"
@@ -34,11 +32,7 @@ export function EquipmentStats({
             value: maintenance,
             variant: "info",
         },
-        {
-            label: "Por revisar",
-            value: toReview,
-            variant: "warning",
-        },
+
         {
             label: "Fuera de servicio",
             value: outOfService,
