@@ -32,4 +32,5 @@ export type WorkOrder = {
     priority: WorkOrderPriority;
     estimatedDurationMinutes: number;
     status: WorkOrderStatus;
+
 };

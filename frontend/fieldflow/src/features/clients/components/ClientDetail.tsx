@@ -15,7 +15,7 @@ export function ClientDetail({ client, onAddSite }: Props) {
     return (
         <div className="space-y-5">
             {/* Información del cliente */}
-            <section className="rounded-lg border border-[#293545] bg-[#121922] p-6">
+            <section className="rounded-lg border border-[#293545] bg-slate-900/70 p-6">
                 <div className="flex items-start justify-between gap-4">
                     <div>
                         <h2 className="text-xl font-semibold text-white">
@@ -46,7 +46,7 @@ export function ClientDetail({ client, onAddSite }: Props) {
             </section>
 
             {/* Sedes */}
-            <section className="overflow-hidden rounded-lg border border-[#293545] bg-[#121922]">
+            <section className="overflow-hidden rounded-lg border border-[#293545] bg-slate-900/70">
                 <div className="flex items-center justify-between border-b border-[#293545] px-5 py-4">
                     <h2 className="font-semibold text-white">
                         Sedes
