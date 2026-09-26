@@ -109,6 +109,19 @@ public class ApiException extends RuntimeException {
 		return new ApiException(HttpStatus.UNPROCESSABLE_CONTENT, ApiErrorType.INVALID_STATUS_TRANSITION, message);
 	}
 
+	/**
+	 * Crea una excepción de técnico no asignado.
+	 * <p>
+	 * Nota: Esta función permite crear una excepción cuando se intenta realizar una acción
+	 * sin que un técnico esté asignado a la orden de trabajo.
+	 *
+	 * @param message el mensaje de error
+	 * @return una instancia de ApiException con estado 422 y tipo TECHNICIAN_NOT_ASSIGNED
+	 */
+	public static ApiException technicianNotAssigned(String message) {
+		return new ApiException(HttpStatus.UNPROCESSABLE_CONTENT, ApiErrorType.TECHNICIAN_NOT_ASSIGNED, message);
+	}
+
 	public HttpStatus getStatus() {
 		return status;
 	}

@@ -2,10 +2,14 @@ package com.fieldflow.execution.application;
 
 import com.fieldflow.conformity.domain.Evidence;
 import com.fieldflow.conformity.persistence.EvidenceRepository;
+import com.fieldflow.execution.api.dto.CreateInterventionRequest;
 import com.fieldflow.execution.api.dto.InterventionDetailResponse;
 import com.fieldflow.execution.application.mapper.InterventionMapper;
 import com.fieldflow.execution.domain.*;
 import com.fieldflow.execution.persistence.*;
+import com.fieldflow.planning.application.SchedulingService;
+import com.fieldflow.shared.exception.ApiException;
+import com.fieldflow.workorders.domain.WorkOrder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,13 +32,16 @@ public class InterventionServiceImpl implements InterventionService {
 	private final TechnicalNoteRepository technicalNoteRepository;
 	private final EvidenceRepository evidenceRepository;
 
+	private final SchedulingService schedulingService;
+
 	public InterventionServiceImpl(InterventionRepository repository,
 	                               FailureRepository failureRepository,
 	                               RepairRepository repairRepository,
 	                               InterventionComponentRepository componentRepository,
 	                               ChecklistItemAnswerRepository answerRepository,
 	                               TechnicalNoteRepository technicalNoteRepository,
-	                               EvidenceRepository evidenceRepository) {
+	                               EvidenceRepository evidenceRepository,
+	                               SchedulingService schedulingService) {
 		this.repository = repository;
 		this.failureRepository = failureRepository;
 		this.repairRepository = repairRepository;
@@ -42,6 +49,7 @@ public class InterventionServiceImpl implements InterventionService {
 		this.answerRepository = answerRepository;
 		this.technicalNoteRepository = technicalNoteRepository;
 		this.evidenceRepository = evidenceRepository;
+		this.schedulingService = schedulingService;
 	}
 
 	@Override
@@ -58,6 +66,35 @@ public class InterventionServiceImpl implements InterventionService {
 							InterventionDetails.empty());
 					return InterventionMapper.toDetailResponse(intervention, details);
 				}).toList();
+	}
+
+	@Override
+	@Transactional
+	public Intervention recordInterventionStart(WorkOrder workOrder, CreateInterventionRequest request) {
+		var technician = schedulingService.getAssignedTechnicianForWorkOrder(workOrder.getId());
+
+		if (!technician.getId().equals(request.technicianId())) {
+			throw ApiException.technicianNotAssigned("""
+					El técnico indicado no es el técnico asignado a esta Orden de Trabajo;
+					no puede iniciar la intervención.
+					""");
+		}
+
+		if (!workOrder.getStatus().canStartIntervention()) {
+			throw ApiException.invalidStatusTransition("""
+					No se puede iniciar la intervención.
+					La Orden de Trabajo debe encontrarse en estado ASSIGNED, EN_ROUTE o IN_PROGRESS.
+					""");
+		}
+
+		var intervention = new Intervention(
+				workOrder,
+				technician,
+				request.startedAt(),
+				InterventionStatus.IN_PROGRESS
+		);
+
+		return repository.save(intervention);
 	}
 
 	private Map<UUID, InterventionDetails> getDetailsByInterventionIds(Collection<UUID> interventionIds) {

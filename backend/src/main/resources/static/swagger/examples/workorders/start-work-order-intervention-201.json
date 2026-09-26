@@ -1,0 +1,26 @@
+{
+  "id": "0b915a57-61f5-4c38-b42d-461162e70698",
+  "startedAt": "2026-09-14T09:05:00-03:00",
+  "endedAt": null,
+  "status": "IN_PROGRESS",
+  "technician": {
+    "id": "1e1d6a75-b50d-4daa-8a76-c4409302a575",
+    "name": "Técnico Uno"
+  },
+  "workOrder": {
+    "id": "8c9fb9c4-93c7-4d13-a347-33262872b95a",
+    "equipment": {
+      "id": "1fc79768-93cd-4f66-a225-08b30153b5de",
+      "identifier": "EQ-001",
+      "name": "Compresor principal"
+    },
+    "serviceType": {
+      "id": "4cc315c5-0b93-4e19-a02d-3902ab688d02",
+      "name": "Mantenimiento preventivo"
+    },
+    "instructions": "Revisar vibración y temperatura del equipo.",
+    "priority": "HIGH",
+    "estimatedDurationMinutes": 90,
+    "status": "IN_PROGRESS"
+  }
+}

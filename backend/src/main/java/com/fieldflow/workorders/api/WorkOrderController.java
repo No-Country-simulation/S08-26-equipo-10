@@ -2,6 +2,8 @@ package com.fieldflow.workorders.api;
 
 import com.fieldflow.execution.api.dto.ChecklistCreationResponse;
 import com.fieldflow.execution.api.dto.CreateChecklistRequest;
+import com.fieldflow.execution.api.dto.CreateInterventionRequest;
+import com.fieldflow.execution.api.dto.InterventionCreatedResponse;
 import com.fieldflow.planning.api.dto.AssignmentDetailResponse;
 import com.fieldflow.planning.api.dto.AssignmentRequest;
 import com.fieldflow.shared.annotations.ApiJsonExample;
@@ -12,6 +14,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -163,5 +166,29 @@ public class WorkOrderController {
 		URI location = fromMethodCall(on(WorkOrderController.class).getWorkOrderDetail(response.id())).build().toUri();
 
 		return ResponseEntity.created(location).body(response);
+	}
+
+	@Operation(
+			summary = "Inicia una intervención para una orden de trabajo",
+			description = """
+					Permite que un técnico inicie una intervención para una orden de trabajo específica.
+					Una vez iniciada la intervención, ésta pasa a estar en estado `IN_PROGRESS`.
+					La orden de trabajo también pasa a estar en estado `IN_PROGRESS`.
+					"""
+	)
+	@ApiResponse(responseCode = "201", description = "La intervención se inició correctamente")
+	@ApiJsonExample(
+			status = "201",
+			description = "Ejemplo de inicio de una intervención para una orden de trabajo",
+			path = "/static/swagger/examples/workorders/start-work-order-intervention-201.json",
+			summary = "Intervención iniciada"
+	)
+	@PostMapping(value = "/{workOrderId}/interventions", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<InterventionCreatedResponse> startIntervention(
+			@PathVariable("workOrderId") UUID workOrderId, @Valid @RequestBody CreateInterventionRequest request
+	) {
+		var response = workOrderService.startWorkOrderIntervention(workOrderId, request);
+
+		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
 }
