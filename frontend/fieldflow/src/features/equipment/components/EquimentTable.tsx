@@ -14,8 +14,8 @@ export function EquipmentTable({
     onSelect,
 }: EquipmentTableProps) {
     return (
-        <div className="overflow-x-auto rounded-lg border border-slate-700">
-            <table className="w-sm min-w-225">
+        <div className=" rounded-lg border border-slate-700">
+            <table className="w-full">
                 <thead className="bg-slate-900">
                     <tr className="border-b border-slate-700">
                         <th className="px-5 py-4 text-left text-sm font-medium text-slate-400">
