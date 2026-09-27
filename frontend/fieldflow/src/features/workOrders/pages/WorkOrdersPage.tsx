@@ -71,15 +71,15 @@ function OrdenesTrabajoPage() {
 
         column({
             header: "CLIENTE / SEDE",
-            accessor: "equipment",
-            render: (value, row) => (
+            accessor: "client",
+            render: (value) => (
                 <div>
                     <p className="font-semibold text-white">
-                        {value.name}
+                        {value?.name ?? "-"}
                     </p>
 
                     <p className="text-sm text-slate-400">
-                        {row.equipment.identifier}
+                        {value?.site.name ?? "-"}
                     </p>
                 </div>
             ),
@@ -124,7 +124,7 @@ function OrdenesTrabajoPage() {
 
         column({
             header: "TÉCNICO",
-            accessor: "serviceType",
+            accessor: "technician",
             render: (value) => (
                 <span
                     className={
@@ -133,7 +133,7 @@ function OrdenesTrabajoPage() {
                             : "text-slate-500"
                     }
                 >
-                    {value.instructions ?? "Sin asignar"}
+                    {value?.nombre ?? "Sin asignar"}
                 </span>
             ),
         }),
