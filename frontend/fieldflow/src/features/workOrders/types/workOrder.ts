@@ -1,3 +1,6 @@
+import type { ClientWithSite } from "@/features/clients/types/client";
+import type { TechnicianWorkOrder } from "@/features/technicians/types/Technician";
+
 export type WorkOrderPriority =
     | 'LOW'
     | 'MEDIUM'
@@ -32,5 +35,6 @@ export type WorkOrder = {
     priority: WorkOrderPriority;
     estimatedDurationMinutes: number;
     status: WorkOrderStatus;
-
+    client?: ClientWithSite;
+    technician?: TechnicianWorkOrder;
 };

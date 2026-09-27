@@ -15,3 +15,9 @@ export type Client = {
     name: string;
     sites: Site[];
 };
+
+export type ClientWithSite = {
+    id: string;
+    name: string;
+    site: Site;
+};
