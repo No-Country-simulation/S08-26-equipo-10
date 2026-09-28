@@ -61,11 +61,6 @@ function AddWorkOrderPage() {
         (equipment) => equipment.id === equipmentId
     );
 
-    const canCreate =
-        equipmentId &&
-        serviceTypeId &&
-        estimatedDuration &&
-        instructions.trim();
 
     const validateForm = (): FormErrors => {
         const newErrors: FormErrors = {};
@@ -126,17 +121,6 @@ function AddWorkOrderPage() {
             return;
         }
 
-        const payload = {
-            equipmentId,
-            serviceTypeId,
-            estimatedDurationMinutes: Number(estimatedDuration),
-            priority,
-            instructions: instructions.trim(),
-            ...(schedule && {
-                plannedStart: `${date}T${time}`,
-                technicianId,
-            }),
-        };
 
         try {
             setIsSubmitting(true);
