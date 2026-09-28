@@ -11,6 +11,7 @@ import EquipmentPage from "@/features/equipment/pages/EquipmentPage"
 import ComponentsCatalog from "@/features/componentsCatalog/ComponentsCatalog"
 import WorkOrderDetailPage from "@/features/workOrders/pages/WorkOrderDetail"
 import AddWorkOrderPage from "@/features/workOrders/pages/AddWorkOrderPage"
+import AssignmentPage from "@/features/assignment/pages/AssignmentPage"
 
 function AppRoutes() {
     return (<Routes>
@@ -36,6 +37,7 @@ function AppRoutes() {
                 <Route path="clientes" element={<ClientsPage />} />
                 <Route path="mantenimientos" element={<MaintenancesPage />} />
                 <Route path="equipos" element={<EquipmentPage />} />
+                <Route path="asignaciones" element={<AssignmentPage />} />
                 <Route path="componentes" element={<ComponentsCatalog />} />
             </Route>
 
