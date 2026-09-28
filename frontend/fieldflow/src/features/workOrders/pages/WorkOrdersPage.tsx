@@ -9,6 +9,7 @@ import { StatusBadge } from "@/components/ui/StatusBadge";
 import { useWorkOrders } from "@/features/workOrders/hook/useWorkOrders";
 import type { WorkOrder } from "@/features/workOrders/types/workOrder";
 import { truncateId } from "@/utils/trucateId";
+import { useNavigate } from "react-router";
 
 
 
@@ -26,6 +27,7 @@ function OrdenesTrabajoPage() {
         isLoading,
         isError,
     } = useWorkOrders();
+    const navigate = useNavigate()
 
 
 
@@ -179,7 +181,7 @@ function OrdenesTrabajoPage() {
                     </p>
                 </div>
 
-                <Button icon={Plus}>
+                <Button onClick={() => navigate("nuevaOrden")} icon={Plus}>
                     Nueva OT
                 </Button>
             </div>
