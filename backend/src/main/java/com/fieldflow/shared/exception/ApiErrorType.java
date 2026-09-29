@@ -44,6 +44,11 @@ public enum ApiErrorType {
 			"urn:fieldflow:error:invalid-status-transition",
 			"Transición de estado inválida"
 	),
+	RESOURCE_STATE_CONFLICT(
+			"RESOURCE_STATE_CONFLICT",
+			"urn:fieldflow:error:resource-state-conflict",
+			"Conflicto con el estado actual del recurso"
+	),
 	TECHNICIAN_NOT_ASSIGNED(
 			"TECHNICIAN_NOT_ASSIGNED",
 			"urn:fieldflow:error:technician-not-assigned",

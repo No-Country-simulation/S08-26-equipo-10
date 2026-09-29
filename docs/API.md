@@ -1012,6 +1012,31 @@ Respuesta `201`:
 
 ---
 
+### POST `/interventions/{interventionId}/evidence-uploads`
+
+Carga una imagen como evidencia para una intervención específica.
+
+Reglas:
+
+- la intervención debe existir
+- la intervención y su orden de trabajo deben estar en estado `IN_PROGRESS`
+- `endedAt` de la intervención no debe estar definido ya que indica que la intervención ya fue finalizada
+- el archivo debe ser de tipo `image/jpeg` o `image/png`
+- la referencia a devolver en `reference` debe seguir el formato `evidence/{interventionId}/{uuid}.jpg|png`
+- el tamaño del archivo no debe exceder los 12MB
+- una vez cargada la evidencia al storage, dejar registro en la tabla `evidence_upload` con `created_at` y `uploaded_at`
+  en el momento de la carga
+
+Respuesta `201`:
+
+```json
+{
+  "reference": "evidence/0b915a57-61f5-4c38-b42d-461162e70698/3a0ddd52-3f15-4fb9-a455-c2d0ea0ddb0c.jpg"
+}
+```
+
+---
+
 ### PUT `/interventions/{interventionId}/report`
 
 Registra el resultado completo de la visita en una sola operación transaccional.

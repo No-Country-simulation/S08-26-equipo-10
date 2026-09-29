@@ -13,4 +13,6 @@ public interface InterventionService {
 	List<InterventionDetailResponse> getInterventionsByWorkOrderId(UUID workOrderId);
 
 	Intervention recordInterventionStart(WorkOrder workOrder, CreateInterventionRequest request);
+
+	void validateUploadAllowed(UUID interventionId);
 }

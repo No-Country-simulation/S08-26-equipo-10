@@ -10,6 +10,7 @@ import com.fieldflow.execution.persistence.*;
 import com.fieldflow.planning.application.SchedulingService;
 import com.fieldflow.shared.exception.ApiException;
 import com.fieldflow.workorders.domain.WorkOrder;
+import com.fieldflow.workorders.domain.WorkOrderStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -95,6 +96,23 @@ public class InterventionServiceImpl implements InterventionService {
 		);
 
 		return repository.save(intervention);
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public void validateUploadAllowed(UUID interventionId) {
+		Intervention intervention = repository.findByIdWithWorkOrder(interventionId)
+				.orElseThrow(() -> ApiException.notFound(
+						"No existe una intervención asociada al ID " + interventionId + "."
+				));
+
+		if (intervention.getStatus() != InterventionStatus.IN_PROGRESS
+				|| intervention.getEndedAt() != null
+				|| intervention.getWorkOrder().getStatus() != WorkOrderStatus.IN_PROGRESS) {
+			throw ApiException.resourceStateConflict(
+					"La intervención y su Orden de Trabajo deben estar en `IN_PROGRESS` para subir imágenes."
+			);
+		}
 	}
 
 	private Map<UUID, InterventionDetails> getDetailsByInterventionIds(Collection<UUID> interventionIds) {

@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -21,4 +22,12 @@ public interface InterventionRepository extends JpaRepository<Intervention, UUID
 			ORDER BY i.startedAt ASC
 			""")
 	List<Intervention> findAllByWorkOrderId(@Param("workOrderId") UUID workOrderId);
+
+	@Query("""
+			SELECT i
+			FROM Intervention i
+			JOIN FETCH i.workOrder workOrder
+			WHERE i.id = :interventionId
+			""")
+	Optional<Intervention> findByIdWithWorkOrder(UUID interventionId);
 }
