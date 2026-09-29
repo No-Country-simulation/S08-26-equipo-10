@@ -10,6 +10,7 @@ const pageNames: Record<string, string> = {
     mantenimientos: 'Mantenimientos',
     equipos: 'Equipos',
     agenda: 'Agenda',
+    nuevaOrden: 'Nueva orden'
 }
 
 function Navbar() {
