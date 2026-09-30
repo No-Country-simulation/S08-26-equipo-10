@@ -139,4 +139,11 @@ public class Intervention {
 	public Conformity getConformity() {
 		return conformity;
 	}
+
+	public void markAsPendingCustomerConfirmation(String result, String observations, OffsetDateTime endedAt) {
+		this.result = result;
+		this.observations = observations;
+		this.endedAt = endedAt;
+		this.status = InterventionStatus.PENDING_CUSTOMER_CONFIRMATION;
+	}
 }

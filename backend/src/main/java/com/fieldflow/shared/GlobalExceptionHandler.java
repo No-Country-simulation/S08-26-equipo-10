@@ -1,7 +1,6 @@
 package com.fieldflow.shared;
 
-import com.fieldflow.shared.exception.ApiErrorType;
-import com.fieldflow.shared.exception.ApiException;
+import com.fieldflow.shared.exception.*;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +13,7 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.exc.InvalidFormatException;
@@ -119,6 +119,76 @@ public class GlobalExceptionHandler {
 		return buildValidationProblem(request, detail, List.of(errors));
 	}
 
+	@ExceptionHandler(MaxUploadSizeExceededException.class)
+	public ProblemDetail handleMaxUploadSize(MaxUploadSizeExceededException ex, HttpServletRequest request) {
+		log.debug("Solicitud multipart demasiado grande: {}", ex.getMessage());
+		return buildUploadTooLargeProblem(request);
+	}
+
+	/**
+	 * Errores de validación del archivo detectados en EvidenceStorage.
+	 */
+	@ExceptionHandler(InvalidEvidenceFileException.class)
+	public ProblemDetail handleInvalidEvidenceFile(InvalidEvidenceFileException ex, HttpServletRequest request) {
+		return switch (ex.getReason()) {
+			case EMPTY -> buildValidationProblem(request, ex.getMessage(), List.of());
+			case TOO_LARGE -> buildUploadTooLargeProblem(request);
+			case UNSUPPORTED_TYPE -> {
+				ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.UNSUPPORTED_MEDIA_TYPE);
+				problem.setType(URI.create("urn:fieldflow:error:unsupported-media-type"));
+				problem.setTitle("Formato de archivo no admitido");
+				problem.setDetail(ex.getMessage());
+				problem.setInstance(URI.create(request.getRequestURI()));
+				problem.setProperty("code", "UNSUPPORTED_MEDIA_TYPE");
+				yield problem;
+			}
+		};
+	}
+
+	/**
+	 * Fallo al leer el archivo recibido; el detalle técnico queda únicamente en los logs.
+	 */
+	@ExceptionHandler(EvidenceFileReadException.class)
+	public ProblemDetail handleEvidenceFileRead(EvidenceFileReadException ex, HttpServletRequest request) {
+		String traceId = resolveTraceId(request);
+		log.error("[TraceID: {}] No se pudo leer la imagen recibida en {}", traceId, request.getRequestURI(), ex);
+
+		ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+		problem.setType(URI.create(ApiErrorType.INTERNAL_ERROR.getUri()));
+		problem.setTitle(ApiErrorType.INTERNAL_ERROR.getTitle());
+		problem.setDetail("No se pudo procesar la imagen recibida. Contacte al soporte con el TraceID: " + traceId);
+		problem.setInstance(URI.create(request.getRequestURI()));
+		problem.setProperty("code", ApiErrorType.INTERNAL_ERROR.getCode());
+		return problem;
+	}
+
+	/**
+	 * Fallo del servicio externo de almacenamiento o respuesta inválida de este.
+	 */
+	@ExceptionHandler(EvidenceStorageException.class)
+	public ProblemDetail handleEvidenceStorage(EvidenceStorageException ex, HttpServletRequest request) {
+		String traceId = resolveTraceId(request);
+		log.error("[TraceID: {}] Error del almacenamiento de evidencias en {}", traceId, request.getRequestURI(), ex);
+
+		ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.BAD_GATEWAY);
+		problem.setType(URI.create("urn:fieldflow:error:evidence-storage-error"));
+		problem.setTitle("Error del almacenamiento de evidencias");
+		problem.setDetail("No se pudo completar la operación con el almacenamiento de evidencias. TraceID: " + traceId);
+		problem.setInstance(URI.create(request.getRequestURI()));
+		problem.setProperty("code", "EVIDENCE_STORAGE_ERROR");
+		return problem;
+	}
+
+	private ProblemDetail buildUploadTooLargeProblem(HttpServletRequest request) {
+		ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.CONTENT_TOO_LARGE);
+		problem.setType(URI.create("urn:fieldflow:error:upload-too-large"));
+		problem.setTitle("Archivo demasiado grande");
+		problem.setDetail("La imagen no puede superar 12 MiB.");
+		problem.setInstance(URI.create(request.getRequestURI()));
+		problem.setProperty("code", "UPLOAD_TOO_LARGE");
+		return problem;
+	}
+
 	/**
 	 * Recurso HTTP inexistente.
 	 * <p>
@@ -186,9 +256,7 @@ public class GlobalExceptionHandler {
 	 */
 	@ExceptionHandler(Exception.class)
 	public ProblemDetail handleUnexpected(Exception ex, HttpServletRequest request) {
-		String traceId = Optional.ofNullable(MDC.get("traceId"))
-				.orElseGet(() -> Optional.ofNullable(request.getHeader("X-Trace-Id"))
-						.orElseGet(() -> UUID.randomUUID().toString().substring(0, 8)));
+		String traceId = resolveTraceId(request);
 
 		log.error("[TraceID: {}] Error no controlado en la ruta {}: ", traceId, request.getRequestURI(), ex);
 
@@ -199,6 +267,12 @@ public class GlobalExceptionHandler {
 		problem.setInstance(URI.create(request.getRequestURI()));
 		problem.setProperty("code", ApiErrorType.INTERNAL_ERROR.getCode());
 		return problem;
+	}
+
+	private String resolveTraceId(HttpServletRequest request) {
+		return Optional.ofNullable(MDC.get("traceId"))
+				.orElseGet(() -> Optional.ofNullable(request.getHeader("X-Trace-Id"))
+						.orElseGet(() -> UUID.randomUUID().toString().substring(0, 8)));
 	}
 
 	/**

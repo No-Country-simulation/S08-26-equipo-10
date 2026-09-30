@@ -56,8 +56,8 @@ spring:
 
   servlet:
     multipart:
-      max-file-size: 5MB
-      max-request-size: 6MB
+      max-file-size: 12MB
+      max-request-size: 13MB
   web:
     error:
       include-message: never
@@ -81,6 +81,10 @@ app:
     show-details: ${DB_STATUS_DETAILS:true}
   security:
     jwt-secret: ${JWT_SECRET:} # obligatorio en producción
+  supabase:
+    url: ${SUPABASE_URL}
+    secret-key: ${SUPABASE_SECRET_KEY}
+    bucket-name: fieldflow-evidence
 
 springdoc:
   swagger-ui:

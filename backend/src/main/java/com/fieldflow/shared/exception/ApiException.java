@@ -56,17 +56,16 @@ public class ApiException extends RuntimeException {
 	}
 
 	/**
-	 * Crea una excepción de error de solicitud incorrecta con un tipo específico.
+	 * Crea una excepción de conflicto de estado de recurso.
 	 * <p>
-	 * Nota: Esta función permite especificar un tipo de error más detallado para solicitudes incorrectas,
-	 * como errores de validación específicos o conflictos de programación.
+	 * Nota: Esta función permite especificar un tipo de error más detallado para conflictos de estado de recurso,
+	 * como conflictos de transición de estado o conflictos de estado actual.
 	 *
 	 * @param message el mensaje de error
-	 * @param type    el tipo de error
-	 * @return una instancia de ApiException con estado 400 y el tipo especificado
+	 * @return una instancia de ApiException con estado 409 y tipo RESOURCE_STATE_CONFLICT
 	 */
-	public static ApiException badRequest(String message, ApiErrorType type) {
-		return new ApiException(HttpStatus.BAD_REQUEST, type, message);
+	public static ApiException resourceStateConflict(String message) {
+		return new ApiException(HttpStatus.CONFLICT, ApiErrorType.RESOURCE_STATE_CONFLICT, message);
 	}
 
 	/**
