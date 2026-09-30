@@ -522,7 +522,32 @@ Respuesta `200`:
 
 ### GET `/technicians`
 
-Devuelve los técnicos existentes para planificación y asignación.
+Devuelve los técnicos registrados para planificación y asignación. Permite filtrar por disponibilidad mediante un
+intervalo de fecha y hora.
+
+Query parameters:
+
+| Parámetro | Tipo                             | Obligatorio | Descripción                      |
+|-----------|----------------------------------|-------------|----------------------------------|
+| `from`    | Fecha y hora ISO-8601 con offset | No          | Inicio del intervalo solicitado. |
+| `to`      | Fecha y hora ISO-8601 con offset | No          | Fin del intervalo solicitado.    |
+
+Reglas:
+
+1. Sin `from` ni `to`, devuelve todos los técnicos, independientemente de sus asignaciones y disponibilidades
+   registradas.
+2. `from` y `to` deben enviarse juntos y cumplir `from < to`.
+3. Con ambos parámetros, devuelve únicamente técnicos que:
+    - Tienen un intervalo de disponibilidad que contiene todo el rango solicitado.
+    - No tienen ninguna asignación registrada, incluso fuera del rango solicitado.
+4. Cada técnico aparece una sola vez.
+5. Si no hay resultados, devuelve `200` con `[]`.
+
+Ejemplo con filtros:
+
+```http
+GET /technicians?from=2026-10-01T09:00:00-03:00&to=2026-10-01T13:00:00-03:00
+```
 
 Respuesta `200`:
 
@@ -534,6 +559,12 @@ Respuesta `200`:
   }
 ]
 ```
+
+Errores `400 VALIDATION_ERROR`:
+
+- Solo se envía uno de los parámetros: «Los parámetros 'from' y 'to' deben enviarse juntos.»
+- `from >= to`: «La fecha 'from' debe ser anterior a 'to'.»
+- Fecha con formato o tipo inválido: se identifica el parámetro afectado en `errors`.
 
 ---
 
