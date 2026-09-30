@@ -13,7 +13,7 @@ public interface SchedulingService {
 
 	Assignment createAssignment(WorkOrder workOrder, AssignmentRequest request);
 
-	List<TechnicianSummaryResponse> getAllTechnicians();
+	List<TechnicianSummaryResponse> getAllTechnicians(OffsetDateTime from, OffsetDateTime to);
 
 	TechnicianAvailabilityResponse createTechnicianAvailability(UUID id, CreateTechnicianAvailabilityRequest request);
 

@@ -80,8 +80,22 @@ public class SchedulingServiceImp implements SchedulingService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<TechnicianSummaryResponse> getAllTechnicians() {
-		return technicianRepository.findAll().stream()
+	public List<TechnicianSummaryResponse> getAllTechnicians(OffsetDateTime from, OffsetDateTime to) {
+		if ((from == null) != (to == null)) {
+			throw ApiException.badRequest("Los parámetros 'from' y 'to' deben enviarse juntos.");
+		}
+
+		if (from == null) {
+			return technicianRepository.findAll().stream()
+					.map(TechnicianMapper::toSummaryResponse)
+					.toList();
+		}
+
+		if (!from.isBefore(to)) {
+			throw ApiException.badRequest("La fecha 'from' debe ser anterior a 'to'.");
+		}
+
+		return technicianRepository.findAvailableInRange(from, to).stream()
 				.map(TechnicianMapper::toSummaryResponse)
 				.toList();
 	}
