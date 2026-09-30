@@ -1067,7 +1067,7 @@ Request:
       "description": "Se ajustaron fijaciones."
     }
   ],
-  "checklistResponses": [
+  "checklistAnswers": [
     {
       "checklistItemId": "00c9c86e-eb8a-4e16-9694-16cb40866dfc",
       "value": "OK",

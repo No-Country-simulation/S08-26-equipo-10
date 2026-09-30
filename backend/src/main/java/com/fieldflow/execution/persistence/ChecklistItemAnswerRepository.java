@@ -21,4 +21,12 @@ public interface ChecklistItemAnswerRepository extends JpaRepository<ChecklistIt
 			""")
 	List<ChecklistItemAnswer> findAllWithItemByInterventionIds(
 			@Param("interventionIds") Collection<UUID> interventionIds);
+
+	@Query("""
+			SELECT COUNT(answer)
+			FROM ChecklistItemAnswer answer
+			WHERE answer.intervention.id = :interventionId
+			  AND answer.checklistItem.id IN :itemIds
+			""")
+	long countExistingAnswers(@Param("interventionId") UUID interventionId, @Param("itemIds") Collection<UUID> itemIds);
 }

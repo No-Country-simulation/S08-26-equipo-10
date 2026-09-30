@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -79,5 +80,18 @@ public class EvidenceUpload {
 		if (uploadedAt == null) {
 			uploadedAt = OffsetDateTime.now(ZoneOffset.UTC);
 		}
+	}
+
+	public void attachTo(UUID evidenceId, OffsetDateTime attachedAt) {
+		if (uploadedAt == null || this.attachedAt != null || this.evidenceId != null) {
+			throw new IllegalStateException(
+					"La subida no está disponible para asociarse.");
+		}
+
+		UUID validEvidenceId = Objects.requireNonNull(evidenceId, "evidenceId");
+		OffsetDateTime validAttachedAt = Objects.requireNonNull(attachedAt, "attachedAt");
+
+		this.evidenceId = validEvidenceId;
+		this.attachedAt = validAttachedAt;
 	}
 }

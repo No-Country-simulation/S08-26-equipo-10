@@ -1,7 +1,9 @@
 package com.fieldflow.execution.persistence;
 
 import com.fieldflow.execution.domain.Intervention;
+import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -30,4 +32,12 @@ public interface InterventionRepository extends JpaRepository<Intervention, UUID
 			WHERE i.id = :interventionId
 			""")
 	Optional<Intervention> findByIdWithWorkOrder(UUID interventionId);
+
+	@Lock(LockModeType.PESSIMISTIC_WRITE)
+	@Query("""
+			SELECT i
+			FROM Intervention i
+			WHERE i.id = :interventionId
+			""")
+	Optional<Intervention> findForReportUpdate(@Param("interventionId") UUID interventionId);
 }
