@@ -1,7 +1,7 @@
 import { Navigate, Route, Routes } from "react-router"
 import MainLayout from "../components/layouts/MainLayout"
 import OrdenesTrabajoPage from "../features/workOrders/pages/WorkOrdersPage"
-import Dashboard from "../features/dashboard/Dashboard"
+import Dashboard from "@/features/dashboard/pages/Dashboard"
 import Login from "../features/auth/Login"
 import TechniciansPage from "@/features/technicians/pages/TechniciansPage"
 import ClientsPage from "../features/clients/pages/ClientsPage"
