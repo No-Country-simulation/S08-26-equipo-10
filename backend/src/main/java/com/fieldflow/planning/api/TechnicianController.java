@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -34,22 +35,30 @@ public class TechnicianController {
 	}
 
 	@Operation(
-			summary = "Obtener todos los técnicos",
+			summary = "Obtener técnicos",
 			description = """
-					Devuelve una lista de todos los técnicos registrados en el sistema.
-					Si no hay técnicos, devuelve una lista vacía.
+					Devuelve todos los técnicos si no se indican fechas.
+					Con from y to, devuelve los disponibles durante todo el intervalo,
+					sin asignaciones solapadas. Ambos parámetros deben enviarse juntos.
 					"""
 	)
 	@ApiResponse(responseCode = "200", description = "Lista de técnicos obtenida correctamente.")
 	@ApiJsonExample(
-			description = "Lista de técnicos presentes en la plataforma.",
+			description = "Lista de técnicos que cumplen los filtros.",
 			path = "/static/swagger/examples/planning/list-technicians-200.json",
 			summary = "Lista de técnicos"
 	)
 	@GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<List<TechnicianSummaryResponse>> getAllTechnicians() {
-		List<TechnicianSummaryResponse> technicians = schedulingService.getAllTechnicians();
-		return ResponseEntity.ok(technicians);
+	public ResponseEntity<List<TechnicianSummaryResponse>> getAllTechnicians(
+			@RequestParam(name = "from", required = false)
+			@DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+			OffsetDateTime from,
+			@RequestParam(name = "to", required = false)
+			@DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+			OffsetDateTime to
+	) {
+		var response = schedulingService.getAllTechnicians(from, to);
+		return ResponseEntity.ok(response);
 	}
 
 	@Operation(
