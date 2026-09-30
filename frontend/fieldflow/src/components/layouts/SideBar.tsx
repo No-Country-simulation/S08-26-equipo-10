@@ -7,64 +7,71 @@ import {
     CalendarDays,
     Package,
     Settings,
-} from 'lucide-react'
-import { NavLink } from 'react-router'
+} from "lucide-react";
+import { NavLink, useNavigate } from "react-router";
 import fieldflowLogo from "@/assets/logo.svg";
+import { useRoleStore } from "@/store/useRolStore";
 
 const navigationItems = [
     {
-        label: 'Dashboard',
-        path: '/fieldflow/dashboard',
+        label: "Dashboard",
+        path: "/fieldflow/dashboard",
         icon: LayoutDashboard,
-        disabled: false,
+        roles: ["ADMIN"],
     },
     {
-        label: 'Órdenes de Trabajo',
-        path: '/fieldflow/ordenesDeTrabajo',
+        label: "Órdenes de Trabajo",
+        path: "/fieldflow/ordenesDeTrabajo",
         icon: ClipboardList,
-
-        disabled: false,
+        roles: ["ADMIN"],
     },
     {
-        label: 'Agenda',
-        path: '/fieldflow/agenda',
+        label: "Asignaciones",
+        path: "/fieldflow/asignaciones",
+        icon: ClipboardList,
+        roles: ["TECHNICIAN"],
+    },
+    {
+        label: "Agenda",
+        path: "/fieldflow/agenda",
         icon: CalendarDays,
-        disabled: false,
-
+        roles: ["TECHNICIAN"],
     },
     {
-        label: 'Técnicos',
-        path: '/fieldflow/tecnicos',
+        label: "Técnicos",
+        path: "/fieldflow/tecnicos",
         icon: Users,
-        disabled: false,
+        roles: ["ADMIN"],
     },
     {
-        label: 'Clientes',
-        path: '/fieldflow/clientes',
+        label: "Clientes",
+        path: "/fieldflow/clientes",
         icon: Building2,
-        disabled: false,
+        roles: ["ADMIN"],
     },
     {
-        label: 'Equipos',
-        path: '/fieldflow/equipos',
+        label: "Equipos",
+        path: "/fieldflow/equipos",
         icon: Package,
-        disabled: false,
-
+        roles: ["ADMIN"],
     },
     {
-        label: 'Mantenimiento',
-        path: '/fieldflow/mantenimientos',
+        label: "Mantenimiento",
+        path: "/fieldflow/mantenimientos",
         icon: Wrench,
-        disabled: false,
+        roles: ["ADMIN"],
     },
-]
-
+];
 function Sidebar() {
+    const { role, setRole } = useRoleStore();
+
+    const isAdmin = role === "ADMIN";
+    const navigate = useNavigate();
     return (
         <aside className="flex h-screen w-60 flex-col border-r border-slate-800 bg-slate-950 text-slate-300">
             {/* Brand */}
             <div className="flex h-16 items-center gap-3 border-b border-slate-800 px-4">
-                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-white-600">
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg">
                     <img
                         src={fieldflowLogo}
                         alt="FieldFlow"
@@ -88,14 +95,29 @@ function Sidebar() {
                 <div className="flex overflow-hidden rounded-md border border-slate-700 bg-slate-900">
                     <button
                         type="button"
-                        className="flex-1 bg-blue-600 px-3 py-1.5 text-xs font-medium text-white"
+                        onClick={() => {
+                            setRole("ADMIN");
+                            navigate("dashboard")
+                        }}
+                        className={`flex-1 px-3 py-1.5 text-xs font-medium cursor-pointer transition ${isAdmin
+                            ? "bg-blue-600 text-white"
+                            : "text-slate-400 hover:text-white"
+                            }`}
                     >
                         Admin
                     </button>
 
                     <button
                         type="button"
-                        className="flex-1 px-3 py-1.5 text-xs font-medium text-slate-400 transition hover:text-white"
+                        onClick={() => {
+                            setRole("TECHNICIAN");
+                            navigate("asignaciones")
+
+                        }}
+                        className={`flex-1 px-3 py-1.5 text-xs font-medium cursor-pointer transition ${!isAdmin
+                            ? "bg-blue-600 text-white"
+                            : "text-slate-400 hover:text-white"
+                            }`}
                     >
                         Técnico
                     </button>
@@ -104,43 +126,29 @@ function Sidebar() {
 
             {/* Navigation */}
             <nav className="flex-1 space-y-1 px-2 py-3">
-                {navigationItems.map((item) => {
-                    const Icon = item.icon
+                {navigationItems
+                    .filter((item) => item.roles.includes(role))
+                    .map((item) => {
+                        const Icon = item.icon;
 
-                    if (item.disabled) {
                         return (
-                            <div
+                            <NavLink
                                 key={item.label}
-                                className="flex cursor-not-allowed items-center gap-3 rounded-md px-3 py-2.5 text-sm text-slate-600"
+                                to={item.path}
+                                className={({ isActive }) =>
+                                    [
+                                        "group flex items-center gap-3 rounded-md px-3 py-2.5 text-sm transition-colors",
+                                        isActive
+                                            ? "bg-blue-600/25 text-blue-400"
+                                            : "text-slate-400 hover:bg-slate-900 hover:text-white",
+                                    ].join(" ")
+                                }
                             >
-                                <Icon className="h-4 w-4" />
-
-                                <span>{item.label}</span>
-                            </div>
-                        )
-                    }
-
-                    return (
-                        <NavLink
-                            key={item.label}
-                            to={item.path}
-                            className={({ isActive }) =>
-                                [
-                                    'group flex items-center gap-3 rounded-md px-3 py-2.5 text-sm transition-colors',
-                                    isActive
-                                        ? 'bg-blue-600/25 text-blue-400'
-                                        : 'text-slate-400 hover:bg-slate-900 hover:text-white',
-                                ].join(' ')
-                            }
-                        >
-                            <Icon className="h-4 w-4 shrink-0" />
-
-                            <span className="flex-1">{item.label}</span>
-
-
-                        </NavLink>
-                    )
-                })}
+                                <Icon className="h-4 w-4 shrink-0" />
+                                <span className="flex-1">{item.label}</span>
+                            </NavLink>
+                        );
+                    })}
             </nav>
 
             {/* Bottom actions */}
@@ -165,7 +173,7 @@ function Sidebar() {
                         </p>
 
                         <p className="truncate text-[10px] text-slate-500">
-                            Coordinadora · Admin
+                            Coordinadora · {isAdmin ? "Admin" : "Técnico"}
                         </p>
                     </div>
 
@@ -179,7 +187,7 @@ function Sidebar() {
                 </div>
             </div>
         </aside>
-    )
+    );
 }
 
-export default Sidebar
+export default Sidebar;
