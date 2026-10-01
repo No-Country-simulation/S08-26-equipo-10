@@ -17,27 +17,31 @@ public record InterventionReportRequest(
 		@NotBlank(message = "Especifique el resultado de la intervención")
 		String result,
 
+		@NotBlank(message = "Especifique al menos una observación")
 		String observations,
 
-		@NotNull(message = "Especifique las fallas")
 		List<@NotNull @Valid FailureRequest> failures,
 
-		@NotNull(message = "Especifique las reparaciones")
 		List<@NotNull @Valid RepairRequest> repairs,
 
-		@NotNull(message = "Especifique los componentes")
 		List<@NotNull @Valid ComponentsRequest> components,
 
-		@NotNull(message = "Especifique las respuestas del checklist")
 		List<@NotNull @Valid ChecklistAnswerRequest> checklistAnswers,
 
-		@NotNull(message = "Especifique las notas técnicas")
 		List<@NotNull @Valid TechnicalNotesRequest> technicalNotes,
 
-		@NotNull(message = "Especifique las evidencias")
 		@Size(max = 5, message = "Máximo 5 evidencias permitidas")
 		List<@NotNull @Valid EvidenceRequest> evidence
 ) {
+
+	public InterventionReportRequest {
+		failures = failures == null ? List.of() : failures;
+		repairs = repairs == null ? List.of() : repairs;
+		components = components == null ? List.of() : components;
+		checklistAnswers = checklistAnswers == null ? List.of() : checklistAnswers;
+		technicalNotes = technicalNotes == null ? List.of() : technicalNotes;
+		evidence = evidence == null ? List.of() : evidence;
+	}
 
 	public record FailureRequest(
 			@NotNull(message = "Especifique la descripción de la falla")
@@ -62,7 +66,8 @@ public record InterventionReportRequest(
 
 			@NotNull(message = "Especifique la descripción del componente")
 			String description
-	) {}
+	) {
+	}
 
 	public record ChecklistAnswerRequest(
 			@NotNull(message = "Especifique el id del item del checklist")
@@ -91,5 +96,6 @@ public record InterventionReportRequest(
 			String reference,
 
 			String description
-	) {}
+	) {
+	}
 }
