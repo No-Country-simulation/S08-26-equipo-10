@@ -13,6 +13,7 @@ import com.fieldflow.execution.domain.*;
 import com.fieldflow.execution.persistence.*;
 import com.fieldflow.planning.application.SchedulingService;
 import com.fieldflow.shared.exception.ApiException;
+import com.fieldflow.storage.EvidenceStorage;
 import com.fieldflow.storage.EvidenceUpload;
 import com.fieldflow.storage.EvidenceUploadRepository;
 import com.fieldflow.workorders.domain.WorkOrder;
@@ -20,6 +21,7 @@ import com.fieldflow.workorders.domain.WorkOrderStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.net.URI;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.*;
@@ -42,6 +44,7 @@ public class InterventionServiceImpl implements InterventionService {
 	private final EvidenceUploadRepository evidenceUploadRepository;
 
 	private final SchedulingService schedulingService;
+	private final EvidenceStorage evidenceStorage;
 
 	public InterventionServiceImpl(InterventionRepository repository,
 	                               FailureRepository failureRepository,
@@ -52,7 +55,8 @@ public class InterventionServiceImpl implements InterventionService {
 	                               EvidenceRepository evidenceRepository,
 	                               ChecklistItemRepository checklistItemRepository,
 	                               EvidenceUploadRepository evidenceUploadRepository,
-	                               SchedulingService schedulingService) {
+	                               SchedulingService schedulingService,
+	                               EvidenceStorage evidenceStorage) {
 		this.repository = repository;
 		this.failureRepository = failureRepository;
 		this.repairRepository = repairRepository;
@@ -63,6 +67,7 @@ public class InterventionServiceImpl implements InterventionService {
 		this.checklistItemRepository = checklistItemRepository;
 		this.evidenceUploadRepository = evidenceUploadRepository;
 		this.schedulingService = schedulingService;
+		this.evidenceStorage = evidenceStorage;
 	}
 
 	@Override
@@ -73,11 +78,22 @@ public class InterventionServiceImpl implements InterventionService {
 
 		Map<UUID, InterventionDetails> detailsByInterventionId = getDetailsByInterventionIds(interventionIds);
 
+		Map<String, URI> urlsByReference = new HashMap<>();
+
+		for (InterventionDetails details : detailsByInterventionId.values()) {
+			for (Evidence evidence : details.evidence()) {
+				urlsByReference.computeIfAbsent(
+						evidence.getReference(),
+						evidenceStorage::signedUrl
+				);
+			}
+		}
+
 		return interventions.stream()
 				.map(intervention -> {
 					InterventionDetails details = detailsByInterventionId.getOrDefault(intervention.getId(),
 							InterventionDetails.empty());
-					return InterventionMapper.toDetailResponse(intervention, details);
+					return InterventionMapper.toDetailResponse(intervention, details, urlsByReference);
 				}).toList();
 	}
 
