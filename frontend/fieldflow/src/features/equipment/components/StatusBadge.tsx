@@ -6,25 +6,25 @@ interface StatusBadgeProps {
 
 export function StatusBadge({ status }: StatusBadgeProps) {
     const config = {
-        OPERATIONAL: {
+        Operativo: {
             label: "Operativo",
             className:
                 "border-green-500/30 bg-green-500/10 text-green-400",
         },
 
-        UNDER_MAINTENANCE: {
-            label: "En mantenimiento",
+        "Requiere mantenimiento": {
+            label: "Requiere mantenimiento",
             className:
                 "border-blue-500/30 bg-blue-500/10 text-blue-400",
         },
 
-        REQUIRES_ATTENTION: {
+        "Por revisar": {
             label: "Por revisar",
             className:
                 "border-yellow-500/30 bg-yellow-500/10 text-yellow-400",
         },
 
-        OUT_OF_SERVICE: {
+        "Fuera de servicio": {
             label: "Fuera de servicio",
             className:
                 "border-red-500/30 bg-red-500/10 text-red-400",

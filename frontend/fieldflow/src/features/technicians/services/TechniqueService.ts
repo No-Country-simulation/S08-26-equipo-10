@@ -11,3 +11,26 @@ export async function getTechniques(): Promise<Technique[]> {
 
     return response.json();
 }
+
+
+
+
+export async function getTechniciansByDates(
+    from: string,
+    to: string
+): Promise<Technique[]> {
+    const params = new URLSearchParams({
+        from,
+        to,
+    });
+
+    console.info(`Fetching technicians from ${from} to ${to}`);
+
+    const response = await fetch(`${API_URL}/technicians?${params}`);
+
+    if (!response.ok) {
+        throw new Error(`HTTP error: ${response.status}`);
+    }
+
+    return response.json();
+}

@@ -1,3 +1,4 @@
+import type { AddWorkOrder } from "../types/addWorkOder";
 import type { WorkOrder } from "../types/workOrder";
 import type { WorkOrderDetail } from "../types/workOrderDetail";
 import type { WorkOderServiceType } from "../types/workOrderService";
@@ -35,3 +36,52 @@ export async function getWorkOrderServiceType(): Promise<WorkOderServiceType[]> 
     return response.json();
 }
 
+
+export async function createWorkOrder(
+    addWorkOrderData: AddWorkOrder
+): Promise<string> {
+    const response = await fetch(`${API_URL}/work-orders`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(addWorkOrderData),
+    });
+
+    if (!response.ok) {
+        throw new Error(`HTTP error: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    return data.id;
+}
+
+
+export interface CreateAssignmentData {
+    technicianId: string;
+    plannedStartAt: string;
+    plannedEndAt: string;
+}
+
+export async function createWorkOrderAssignment(
+    workOrderId: string,
+    assignmentData: CreateAssignmentData
+) {
+    const response = await fetch(
+        `${API_URL}/work-orders/${workOrderId}/assignment`,
+        {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(assignmentData),
+        }
+    );
+
+    if (!response.ok) {
+        throw new Error(`HTTP error: ${response.status}`);
+    }
+
+    return response.json();
+}

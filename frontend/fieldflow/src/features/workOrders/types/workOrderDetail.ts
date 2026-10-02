@@ -141,6 +141,7 @@ export interface Evidence {
     type: string;
     reference: string;
     description: string;
+    url: string;
 }
 
 export interface Conformity {
