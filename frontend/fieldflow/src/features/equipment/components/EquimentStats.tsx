@@ -8,17 +8,17 @@ export function EquipmentStats({
     equipment,
 }: EquipmentStatsProps) {
     const operational = equipment.filter(
-        (item) => item.currentStatus === "OPERATIONAL"
+        (item) => item.currentStatus === "Operativo"
     ).length;
 
     const maintenance = equipment.filter(
-        (item) => item.currentStatus === "REQUIRES_ATTENTION"
+        (item) => item.currentStatus === "Requiere mantenimiento"
     ).length;
 
 
 
     const outOfService = equipment.filter(
-        (item) => item.currentStatus === "OUT_OF_SERVICE"
+        (item) => item.currentStatus === "Fuera de servicio"
     ).length;
 
     const stats = [
