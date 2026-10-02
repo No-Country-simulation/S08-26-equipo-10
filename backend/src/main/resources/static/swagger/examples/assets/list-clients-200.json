@@ -1,0 +1,14 @@
+[
+  {
+    "id": "51000000-0000-4000-8000-000000000001",
+    "name": "Industrias del Sur",
+    "siteCount": 3,
+    "equipmentCount": 18
+  },
+  {
+    "id": "51000000-0000-4000-8000-000000000002",
+    "name": "Metalúrgica Central",
+    "siteCount": 1,
+    "equipmentCount": 6
+  }
+]

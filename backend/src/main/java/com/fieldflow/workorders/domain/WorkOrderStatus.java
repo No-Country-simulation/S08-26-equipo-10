@@ -8,5 +8,9 @@ public enum WorkOrderStatus {
 	IN_PROGRESS,
 	PENDING_CUSTOMER_CONFIRMATION,
 	COMPLETED,
-	RESCHEDULED
+	RESCHEDULED;
+
+	public boolean canStartIntervention() {
+		return this == ASSIGNED || this == EN_ROUTE || this == IN_PROGRESS;
+	}
 }

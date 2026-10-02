@@ -1,7 +1,7 @@
 import type {
     WorkOrderPriority,
     WorkOrderStatus,
-} from '@/types/workOrder';
+} from '@/features/workOrders/types/workOrder';
 
 export const workOrderStatusLabels: Record<WorkOrderStatus, string> = {
     PENDING: 'Pendiente',

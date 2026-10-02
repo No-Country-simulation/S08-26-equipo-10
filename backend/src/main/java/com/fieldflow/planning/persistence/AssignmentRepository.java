@@ -41,4 +41,12 @@ public interface AssignmentRepository extends JpaRepository<Assignment, UUID> {
 	List<Assignment> findAgendaByTechnicianIdAndRange(@Param("technicianId") UUID technicianId,
 	                                                  @Param("from") OffsetDateTime from,
 	                                                  @Param("to") OffsetDateTime to);
+
+	@Query("""
+			SELECT a
+			FROM Assignment a
+			JOIN FETCH a.technician
+			WHERE a.workOrder.id = :workOrderId
+			""")
+	Optional<Assignment> findByWorkOrderIdWithTechnician(@Param("workOrderId") UUID workOrderId);
 }

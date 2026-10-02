@@ -1,4 +1,4 @@
-import type { WorkOrderStatus } from "@/types/workOrder";
+import type { WorkOrderStatus } from "@/features/workOrders/types/workOrder";
 import { Badge } from "../common/Badge";
 import { workOrderStatusLabels } from "@/utils/workOrderTranslation";
 

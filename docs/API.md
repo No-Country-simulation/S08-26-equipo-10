@@ -436,7 +436,34 @@ cada operación o en el catálogo global de errores.
 
 ## 5.1 Catálogos operativos
 
-### GET `/equipment`
+### GET `/clients`
+
+Devuelve los clientes disponibles.
+
+Respuesta `200`:
+
+```json
+[
+  {
+    "id": "51000000-0000-4000-8000-000000000001",
+    "name": "Industrias del Sur",
+    "siteCount": 3,
+    "equipmentCount": 18
+  },
+  {
+    "id": "51000000-0000-4000-8000-000000000002",
+    "name": "Metalúrgica Central",
+    "siteCount": 1,
+    "equipmentCount": 6
+  }
+]
+```
+
+Si no existen clientes se devuelve una lista vacía.
+
+---
+
+### GET `/equipments/{equipmentId}`
 
 Devuelve los equipos disponibles para seleccionar al crear una Orden de Trabajo (OT), incluyendo contexto de cliente y
 ubicación.
@@ -495,7 +522,32 @@ Respuesta `200`:
 
 ### GET `/technicians`
 
-Devuelve los técnicos existentes para planificación y asignación.
+Devuelve los técnicos registrados para planificación y asignación. Permite filtrar por disponibilidad mediante un
+intervalo de fecha y hora.
+
+Query parameters:
+
+| Parámetro | Tipo                             | Obligatorio | Descripción                      |
+|-----------|----------------------------------|-------------|----------------------------------|
+| `from`    | Fecha y hora ISO-8601 con offset | No          | Inicio del intervalo solicitado. |
+| `to`      | Fecha y hora ISO-8601 con offset | No          | Fin del intervalo solicitado.    |
+
+Reglas:
+
+1. Sin `from` ni `to`, devuelve todos los técnicos, independientemente de sus asignaciones y disponibilidades
+   registradas.
+2. `from` y `to` deben enviarse juntos y cumplir `from < to`.
+3. Con ambos parámetros, devuelve únicamente técnicos que:
+    - Tienen un intervalo de disponibilidad que contiene todo el rango solicitado.
+    - No tienen ninguna asignación registrada, incluso fuera del rango solicitado.
+4. Cada técnico aparece una sola vez.
+5. Si no hay resultados, devuelve `200` con `[]`.
+
+Ejemplo con filtros:
+
+```http
+GET /technicians?from=2026-10-01T09:00:00-03:00&to=2026-10-01T13:00:00-03:00
+```
 
 Respuesta `200`:
 
@@ -507,6 +559,12 @@ Respuesta `200`:
   }
 ]
 ```
+
+Errores `400 VALIDATION_ERROR`:
+
+- Solo se envía uno de los parámetros: «Los parámetros 'from' y 'to' deben enviarse juntos.»
+- `from >= to`: «La fecha 'from' debe ser anterior a 'to'.»
+- Fecha con formato o tipo inválido: se identifica el parámetro afectado en `errors`.
 
 ---
 
@@ -957,10 +1015,54 @@ Respuesta `201`:
 ```json
 {
   "id": "0b915a57-61f5-4c38-b42d-461162e70698",
-  "workOrderId": "8c9fb9c4-93c7-4d13-a347-33262872b95a",
-  "technicianId": "1e1d6a75-b50d-4daa-8a76-c4409302a575",
   "startedAt": "2026-09-14T09:05:00-03:00",
-  "status": "IN_PROGRESS"
+  "endedAt": null,
+  "status": "IN_PROGRESS",
+  "technician": {
+    "id": "1e1d6a75-b50d-4daa-8a76-c4409302a575",
+    "name": "Técnico Uno"
+  },
+  "workOrder": {
+    "id": "8c9fb9c4-93c7-4d13-a347-33262872b95a",
+    "equipment": {
+      "id": "1fc79768-93cd-4f66-a225-08b30153b5de",
+      "identifier": "EQ-001",
+      "name": "Compresor principal"
+    },
+    "serviceType": {
+      "id": "4cc315c5-0b93-4e19-a02d-3902ab688d02",
+      "name": "Mantenimiento preventivo"
+    },
+    "instructions": "Revisar vibración y temperatura del equipo.",
+    "priority": "HIGH",
+    "estimatedDurationMinutes": 90,
+    "status": "IN_PROGRESS"
+  }
+}
+```
+
+---
+
+### POST `/interventions/{interventionId}/evidence-uploads`
+
+Carga una imagen como evidencia para una intervención específica.
+
+Reglas:
+
+- la intervención debe existir
+- la intervención y su orden de trabajo deben estar en estado `IN_PROGRESS`
+- `endedAt` de la intervención no debe estar definido ya que indica que la intervención ya fue finalizada
+- el archivo debe ser de tipo `image/jpeg` o `image/png`
+- la referencia a devolver en `reference` debe seguir el formato `evidence/{interventionId}/{uuid}.jpg|png`
+- el tamaño del archivo no debe exceder los 12MB
+- una vez cargada la evidencia al storage, dejar registro en la tabla `evidence_upload` con `created_at` y `uploaded_at`
+  en el momento de la carga
+
+Respuesta `201`:
+
+```json
+{
+  "reference": "evidence/0b915a57-61f5-4c38-b42d-461162e70698/3a0ddd52-3f15-4fb9-a455-c2d0ea0ddb0c.jpg"
 }
 ```
 
@@ -996,7 +1098,7 @@ Request:
       "description": "Se ajustaron fijaciones."
     }
   ],
-  "checklistResponses": [
+  "checklistAnswers": [
     {
       "checklistItemId": "00c9c86e-eb8a-4e16-9694-16cb40866dfc",
       "value": "OK",
@@ -1079,7 +1181,7 @@ Conflicto:
 
 ## 5.8 Historial de mantenimiento
 
-### GET `/equipment/{equipmentId}/maintenance-history`
+### GET `/equipments/{equipmentId}/maintenance-history`
 
 El historial no corresponde a una tabla independiente. Se construye consultando las Órdenes de Trabajo e intervenciones
 del equipo.
@@ -1128,7 +1230,7 @@ No se crea ni actualiza una entidad `maintenance_history`.
 
 ## 5.9 Mantenimiento preventivo
 
-### POST `/equipment/{equipmentId}/preventive-maintenance-plans`
+### POST `/equipments/{equipmentId}/preventive-maintenance-plans`
 
 Crea un plan preventivo y su recurrencia simple en una única operación.
 
@@ -1156,8 +1258,10 @@ Respuesta `201`:
 ```json
 {
   "id": "0dd493de-e301-4e43-b04e-f7006eb0ad0d",
-  "equipmentId": "1fc79768-93cd-4f66-a225-08b30153b5de",
-  "serviceTypeId": "4cc315c5-0b93-4e19-a02d-3902ab688d02",
+  "serviceType": {
+    "id": "4cc315c5-0b93-4e19-a02d-3902ab688d02",
+    "name": "Mantenimiento preventivo"
+  },
   "nextExecutionAt": "2026-10-15T09:00:00-03:00",
   "recurrence": {
     "id": "4868476d-f452-40b7-a9df-154027776ffe",
@@ -1169,7 +1273,7 @@ Respuesta `201`:
 
 ---
 
-### GET `/equipment/{equipmentId}/preventive-maintenance-plans`
+### GET `/equipments/{equipmentId}/preventive-maintenance-plans`
 
 Lista los planes preventivos del equipo.
 
@@ -1185,6 +1289,7 @@ Respuesta `200`:
     },
     "nextExecutionAt": "2026-10-15T09:00:00-03:00",
     "recurrence": {
+      "id": "4868476d-f452-40b7-a9df-154027776ffe",
       "frequency": "MONTH",
       "interval": 1
     }
@@ -1198,26 +1303,26 @@ El MVP no incluye un scheduler avanzado ni una API independiente para reglas de 
 
 # 6. Resumen del contrato
 
-|  # | Método | Ruta                                           | Objetivo                                 |
-|---:|--------|------------------------------------------------|------------------------------------------|
-|  1 | GET    | `/equipment`                                   | Seleccionar equipo con cliente/ubicación |
-|  2 | GET    | `/service-types`                               | Consultar tipos de servicio              |
-|  3 | GET    | `/technicians`                                 | Consultar técnicos                       |
-|  4 | POST   | `/technicians/{id}/availability`               | Registrar disponibilidad                 |
-|  5 | GET    | `/technicians/{id}/availability`               | Consultar disponibilidad                 |
-|  6 | POST   | `/work-orders`                                 | Crear OT                                 |
-|  7 | GET    | `/work-orders`                                 | Seguimiento de OTs                       |
-|  8 | GET    | `/work-orders/{id}`                            | Vista completa y trazabilidad de una OT  |
-|  9 | PUT    | `/work-orders/{id}/assignment`                 | Asignar/reprogramar técnico              |
-| 10 | GET    | `/technicians/{id}/agenda`                     | Obtener agenda desde asignaciones        |
-| 11 | PATCH  | `/work-orders/{id}/status`                     | `EN_ROUTE` / `RESCHEDULED`               |
-| 12 | POST   | `/work-orders/{id}/checklist`                  | Crear checklist e ítems                  |
-| 13 | POST   | `/work-orders/{id}/interventions`              | Iniciar intervención                     |
-| 14 | PUT    | `/interventions/{id}/report`                   | Registrar ejecución completa             |
-| 15 | POST   | `/interventions/{id}/conformity`               | Registrar conformidad                    |
-| 16 | GET    | `/equipment/{id}/maintenance-history`          | Consultar historial derivado             |
-| 17 | POST   | `/equipment/{id}/preventive-maintenance-plans` | Crear mantenimiento preventivo           |
-| 18 | GET    | `/equipment/{id}/preventive-maintenance-plans` | Consultar planes preventivos             |
+|  # | Método | Ruta                                            | Objetivo                                 |
+|---:|--------|-------------------------------------------------|------------------------------------------|
+|  1 | GET    | `/equipments/{equipmentId}`                     | Seleccionar equipo con cliente/ubicación |
+|  2 | GET    | `/service-types`                                | Consultar tipos de servicio              |
+|  3 | GET    | `/technicians`                                  | Consultar técnicos                       |
+|  4 | POST   | `/technicians/{id}/availability`                | Registrar disponibilidad                 |
+|  5 | GET    | `/technicians/{id}/availability`                | Consultar disponibilidad                 |
+|  6 | POST   | `/work-orders`                                  | Crear OT                                 |
+|  7 | GET    | `/work-orders`                                  | Seguimiento de OTs                       |
+|  8 | GET    | `/work-orders/{id}`                             | Vista completa y trazabilidad de una OT  |
+|  9 | PUT    | `/work-orders/{id}/assignment`                  | Asignar/reprogramar técnico              |
+| 10 | GET    | `/technicians/{id}/agenda`                      | Obtener agenda desde asignaciones        |
+| 11 | PATCH  | `/work-orders/{id}/status`                      | `EN_ROUTE` / `RESCHEDULED`               |
+| 12 | POST   | `/work-orders/{id}/checklist`                   | Crear checklist e ítems                  |
+| 13 | POST   | `/work-orders/{id}/interventions`               | Iniciar intervención                     |
+| 14 | PUT    | `/interventions/{id}/report`                    | Registrar ejecución completa             |
+| 15 | POST   | `/interventions/{id}/conformity`                | Registrar conformidad                    |
+| 16 | GET    | `/equipments/{id}/maintenance-history`          | Consultar historial derivado             |
+| 17 | POST   | `/equipments/{id}/preventive-maintenance-plans` | Crear mantenimiento preventivo           |
+| 18 | GET    | `/equipments/{id}/preventive-maintenance-plans` | Consultar planes preventivos             |
 
 **Total del contrato MVP: 18 endpoints.**
 
@@ -1232,7 +1337,7 @@ probado y congelado:
 POST/PATCH/DELETE /clients/**
 POST/PATCH/DELETE /sites/**
 POST/PATCH/DELETE /installations/**
-POST/PATCH/DELETE /equipment/**
+POST/PATCH/DELETE /equipments/**
 POST/PATCH/DELETE /service-types/**
 POST/PATCH/DELETE /technicians/**
 DELETE /work-orders/**

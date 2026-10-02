@@ -27,7 +27,12 @@ public class PreventiveMaintenancePlan {
 	@Column(name = "next_execution_at", nullable = false)
 	private OffsetDateTime nextExecutionAt;
 
-	@OneToOne(mappedBy = "preventiveMaintenancePlan")
+	@OneToOne(
+			mappedBy = "preventiveMaintenancePlan",
+			cascade = CascadeType.ALL,
+			orphanRemoval = true,
+			optional = false
+	)
 	private Recurrence recurrence;
 
 	protected PreventiveMaintenancePlan() {
@@ -61,5 +66,10 @@ public class PreventiveMaintenancePlan {
 
 	public Recurrence getRecurrence() {
 		return recurrence;
+	}
+
+	public void assignRecurrence(Recurrence recurrence) {
+		this.recurrence = recurrence;
+		recurrence.assignPlan(this);
 	}
 }

@@ -1,0 +1,41 @@
+[
+  {
+    "id": "0dd493de-e301-4e43-b04e-f7006eb0ad0d",
+    "serviceType": {
+      "id": "4cc315c5-0b93-4e19-a02d-3902ab688d02",
+      "name": "Mantenimiento preventivo"
+    },
+    "nextExecutionAt": "2026-10-15T09:00:00-03:00",
+    "recurrence": {
+      "id": "4868476d-f452-40b7-a9df-154027776ffe",
+      "frequency": "MONTH",
+      "interval": 1
+    }
+  },
+  {
+    "id": "b593e29a-89e1-4c10-9f87-59d93b982e41",
+    "serviceType": {
+      "id": "7776a77a-980d-4b21-a8bd-73b595410e52",
+      "name": "Inspección preventiva"
+    },
+    "nextExecutionAt": "2026-10-02T08:30:00-03:00",
+    "recurrence": {
+      "id": "a3f6a6a1-1c68-454e-8d3c-63ef35347b18",
+      "frequency": "WEEK",
+      "interval": 2
+    }
+  },
+  {
+    "id": "a12fe3b7-5218-4582-961b-8b443e90a285",
+    "serviceType": {
+      "id": "33b23f0c-7c3b-4e47-aab0-107784bea918",
+      "name": "Calibración preventiva"
+    },
+    "nextExecutionAt": "2026-12-01T10:00:00-03:00",
+    "recurrence": {
+      "id": "f7616d44-a92c-48ec-b574-58b1ccf0ec64",
+      "frequency": "YEAR",
+      "interval": 1
+    }
+  }
+]

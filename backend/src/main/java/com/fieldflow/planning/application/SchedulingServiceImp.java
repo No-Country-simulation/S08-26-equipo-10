@@ -4,6 +4,7 @@ import com.fieldflow.planning.api.dto.*;
 import com.fieldflow.planning.application.mapper.AssignmentMapper;
 import com.fieldflow.planning.application.mapper.TechnicianMapper;
 import com.fieldflow.planning.domain.Assignment;
+import com.fieldflow.planning.domain.Technician;
 import com.fieldflow.planning.domain.TechnicianAvailability;
 import com.fieldflow.planning.persistence.AssignmentRepository;
 import com.fieldflow.planning.persistence.TechnicianAvailabilityRepository;
@@ -38,6 +39,7 @@ public class SchedulingServiceImp implements SchedulingService {
 
 
 	@Override
+	@Transactional
 	public Assignment createAssignment(WorkOrder workOrder, AssignmentRequest request) {
 		var technician = technicianRepository.findById(request.technicianId())
 				.orElseThrow(() -> ApiException.notFound("No existe técnico asociado al ID " + request.technicianId()));
@@ -78,8 +80,22 @@ public class SchedulingServiceImp implements SchedulingService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<TechnicianSummaryResponse> getAllTechnicians() {
-		return technicianRepository.findAll().stream()
+	public List<TechnicianSummaryResponse> getAllTechnicians(OffsetDateTime from, OffsetDateTime to) {
+		if ((from == null) != (to == null)) {
+			throw ApiException.badRequest("Los parámetros 'from' y 'to' deben enviarse juntos.");
+		}
+
+		if (from == null) {
+			return technicianRepository.findAll().stream()
+					.map(TechnicianMapper::toSummaryResponse)
+					.toList();
+		}
+
+		if (!from.isBefore(to)) {
+			throw ApiException.badRequest("La fecha 'from' debe ser anterior a 'to'.");
+		}
+
+		return technicianRepository.findAvailableInRange(from, to).stream()
 				.map(TechnicianMapper::toSummaryResponse)
 				.toList();
 	}
@@ -147,5 +163,14 @@ public class SchedulingServiceImp implements SchedulingService {
 		return agenda.stream()
 				.map(AssignmentMapper::toTechnicianAgendaResponse)
 				.toList();
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public Technician getAssignedTechnicianForWorkOrder(UUID workOrderId) {
+		return assignmentRepository.findByWorkOrderIdWithTechnician(workOrderId)
+				.orElseThrow(() -> ApiException.technicianNotAssigned(
+						"No existe asignación asociada a la orden de trabajo " + workOrderId
+				)).getTechnician();
 	}
 }

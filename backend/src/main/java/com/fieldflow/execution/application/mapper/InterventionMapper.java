@@ -8,13 +8,19 @@ import com.fieldflow.execution.api.dto.*;
 import com.fieldflow.execution.application.InterventionDetails;
 import com.fieldflow.execution.domain.*;
 import com.fieldflow.planning.application.mapper.TechnicianMapper;
+import com.fieldflow.workorders.application.mapper.WorkOrderMapper;
+
+import java.net.URI;
+import java.util.Map;
 
 public final class InterventionMapper {
 
 	private InterventionMapper() {
 	}
 
-	public static InterventionDetailResponse toDetailResponse(Intervention entity, InterventionDetails details) {
+	public static InterventionDetailResponse toDetailResponse(Intervention entity,
+	                                                          InterventionDetails details,
+	                                                          Map<String, URI> urlsByReference) {
 		return entity == null ? null : new InterventionDetailResponse(
 				entity.getId(),
 
@@ -33,10 +39,24 @@ public final class InterventionMapper {
 				details.components().stream().map(InterventionMapper::toComponentSummaryResponse).toList(), // components
 				details.answers().stream().map(ChecklistMapper::toSummaryResponse).toList(), // answers
 				details.technicalNotes().stream().map(InterventionMapper::toTechnicalNoteSummaryResponse).toList(), // technicalNotes
-				details.evidence().stream().map(InterventionMapper::toEvidenceSummaryResponse).toList(), // evidence
+				details.evidence().stream().map(evidence -> toEvidenceSummaryResponse(
+						evidence,
+						urlsByReference.get(evidence.getReference())
+				)).toList(), // evidence
 
 				// ----------------------- conformity -----------------------
 				toConformitySummaryResponse(entity.getConformity())
+		);
+	}
+
+	public static InterventionCreatedResponse toCreatedResponse(Intervention entity) {
+		return entity == null ? null : new InterventionCreatedResponse(
+				entity.getId(),
+				entity.getStartedAt(),
+				entity.getEndedAt(),
+				entity.getStatus(),
+				TechnicianMapper.toSummaryResponse(entity.getTechnician()),
+				WorkOrderMapper.toSummaryResponse(entity.getWorkOrder())
 		);
 	}
 
@@ -70,12 +90,13 @@ public final class InterventionMapper {
 		);
 	}
 
-	private static EvidenceSummaryResponse toEvidenceSummaryResponse(Evidence entity) {
+	private static EvidenceSummaryResponse toEvidenceSummaryResponse(Evidence entity, URI url) {
 		return entity == null ? null : new EvidenceSummaryResponse(
 				entity.getId(),
 				entity.getType(),
 				entity.getReference(),
-				entity.getDescription()
+				entity.getDescription(),
+				url
 		);
 	}
 

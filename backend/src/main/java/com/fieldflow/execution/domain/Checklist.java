@@ -23,7 +23,7 @@ public class Checklist {
 	@Column(name = "name", nullable = false, length = 200)
 	private String name;
 
-	@OneToMany(mappedBy = "checklist", fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "checklist", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
 	private List<ChecklistItem> items = new ArrayList<>();
 
 	protected Checklist() {
@@ -48,5 +48,9 @@ public class Checklist {
 
 	public List<ChecklistItem> getItems() {
 		return items;
+	}
+
+	public void addItem(String label) {
+		items.add(new ChecklistItem(this, label));
 	}
 }
