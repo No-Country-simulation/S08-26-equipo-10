@@ -1,7 +1,7 @@
 export type EquipmentStatus =
-    | "OPERATIONAL"
-    | "REQUIRES_ATTENTION"
-    | "OUT_OF_SERVICE";
+    | "Operativo"
+    | "Requiere mantenimiento"
+    | "Fuera de servicio";
 
 export interface EquipmentClient {
     id: string;

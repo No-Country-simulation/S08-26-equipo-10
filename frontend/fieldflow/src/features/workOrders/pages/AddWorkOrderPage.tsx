@@ -14,6 +14,7 @@ import { useEquipment } from "@/features/equipment/hook/useEquiments";
 import { ErrorMessage } from "@/components/common/ErrorMessage";
 import { Loading } from "@/components/common/loading";
 import { useTechniciansByDates } from "@/features/technicians/hook/useTechniquesByDates";
+import { useCreateWorkOrder } from "../hook/useAddWorkOrder";
 
 
 
@@ -82,6 +83,8 @@ function AddWorkOrderPage() {
         setTechnicianId("");
     };
 
+    const { mutate: createWorkOrder } = useCreateWorkOrder();
+
 
     const validateForm = (): FormErrors => {
         const newErrors: FormErrors = {};
@@ -146,9 +149,9 @@ function AddWorkOrderPage() {
         try {
             setIsSubmitting(true);
 
+            createWorkOrder({ equipmentId, serviceTypeId, instructions, priority, estimatedDurationMinutes: estimatedDuration });
 
 
-            navigate("/fieldflow/ordenesDeTrabajo");
         } catch (error) {
             setApiError(
                 "No fue posible crear la orden de trabajo. Inténtalo nuevamente."
@@ -415,7 +418,7 @@ function AddWorkOrderPage() {
                                 type="button"
                                 onClick={handleSearchTechnicians}
                                 disabled={!date || !time || isLoadingTechnicians}
-                                className="rounded-md bg-cyan-500 px-4 py-2 text-sm font-medium text-slate-950 transition hover:bg-cyan-400 disabled:cursor-not-allowed disabled:opacity-50"
+                                className="rounded-md bg-cyan-500 px-4 py-2 text-sm cursor-pointer font-medium text-slate-950 transition hover:bg-cyan-400 disabled:cursor-not-allowed disabled:opacity-50"
                             >
                                 {isLoadingTechnicians
                                     ? 'Buscando...'

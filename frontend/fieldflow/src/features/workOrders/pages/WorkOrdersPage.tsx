@@ -71,21 +71,7 @@ function OrdenesTrabajoPage() {
             ),
         }),
 
-        column({
-            header: "CLIENTE / SEDE",
-            accessor: "client",
-            render: (value) => (
-                <div>
-                    <p className="font-semibold text-white">
-                        {value?.name ?? "-"}
-                    </p>
 
-                    <p className="text-sm text-slate-400">
-                        {value?.site.name ?? "-"}
-                    </p>
-                </div>
-            ),
-        }),
 
         column({
             header: "EQUIPO",
@@ -124,34 +110,17 @@ function OrdenesTrabajoPage() {
         }),
 
 
-        column({
-            header: "TÉCNICO",
-            accessor: "technician",
-            render: (value) => (
-                <span
-                    className={
-                        value
-                            ? "text-white"
-                            : "text-slate-500"
-                    }
-                >
-                    {value?.nombre ?? "Sin asignar"}
-                </span>
-            ),
-        }),
 
         column({
-            header: "FECHA",
+            header: "ESTIMADO (MIN)",
             accessor: "estimatedDurationMinutes",
-            render: (value, row) => (
+            render: (value) => (
                 <div className="font-mono text-xs flex flex-col gap-1 items-center">
                     <p className="text-blue-300">
-                        {value}
+                        {`${value} min`}
                     </p>
 
-                    <p className="text-slate-500">
-                        {row.estimatedDurationMinutes}
-                    </p>
+
                 </div>
             ),
         }),

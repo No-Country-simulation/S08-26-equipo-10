@@ -24,6 +24,8 @@ export async function getTechniciansByDates(
         to,
     });
 
+    console.info(`Fetching technicians from ${from} to ${to}`);
+
     const response = await fetch(`${API_URL}/technicians?${params}`);
 
     if (!response.ok) {
