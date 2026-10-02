@@ -13,7 +13,7 @@ import { useWorkOrdersServiceType } from "../hook/userWorkOderServiceType";
 import { useEquipment } from "@/features/equipment/hook/useEquiments";
 import { ErrorMessage } from "@/components/common/ErrorMessage";
 import { Loading } from "@/components/common/loading";
-import { useTechniques } from "@/features/technicians/hook/useTechniques";
+import { useTechniciansByDates } from "@/features/technicians/hook/useTechniquesByDates";
 
 
 
@@ -29,7 +29,7 @@ function AddWorkOrderPage() {
 
     const [equipmentId, setEquipmentId] = useState("");
     const [serviceTypeId, setServiceTypeId] = useState("");
-    const [estimatedDuration, setEstimatedDuration] = useState("");
+    const [estimatedDuration, setEstimatedDuration] = useState(0);
     const [priority, setPriority] = useState<WorkOrderPriority>("MEDIUM");
 
     const [schedule, setSchedule] = useState(false);
@@ -38,6 +38,10 @@ function AddWorkOrderPage() {
     const [technicianId, setTechnicianId] = useState("");
 
     const [instructions, setInstructions] = useState("");
+
+    const [searchedFrom, setSearchedFrom] = useState('');
+    const [searchedTo, setSearchedTo] = useState('');
+
 
     const {
         data: workOrderServicesType = [],
@@ -53,13 +57,30 @@ function AddWorkOrderPage() {
 
     const {
         data: techniques = [],
-
-    } = useTechniques();
+        isLoading: isLoadingTechnicians,
+        isError: isTechniciansError,
+    } = useTechniciansByDates(searchedFrom, searchedTo);
 
 
     const selectedEquipment = equipments.find(
         (equipment) => equipment.id === equipmentId
     );
+
+    const handleSearchTechnicians = () => {
+        if (!date || !time) return;
+
+        const start = new Date(`${date}T${time}`);
+
+        const end = new Date(
+            start.getTime() + estimatedDuration * 60 * 1000
+        );
+
+        setSearchedFrom(start.toISOString());
+        setSearchedTo(end.toISOString());
+
+        // Opcional: limpiar técnico seleccionado
+        setTechnicianId("");
+    };
 
 
     const validateForm = (): FormErrors => {
@@ -294,7 +315,7 @@ function AddWorkOrderPage() {
                                     value={estimatedDuration}
                                     onChange={(event) =>
                                         setEstimatedDuration(
-                                            event.target.value
+                                            parseInt(event.target.value) || 0
                                         )
                                     }
                                     placeholder="Ej. 120"
@@ -348,8 +369,7 @@ function AddWorkOrderPage() {
                         </h2>
 
                         <p className="mt-1 text-sm text-slate-500">
-                            La programación es opcional. Puedes asignarla
-                            posteriormente.
+                            La programación es opcional. Puedes asignarla posteriormente.
                         </p>
                     </div>
 
@@ -357,9 +377,7 @@ function AddWorkOrderPage() {
                         <input
                             type="checkbox"
                             checked={schedule}
-                            onChange={(event) =>
-                                setSchedule(event.target.checked)
-                            }
+                            onChange={(event) => setSchedule(event.target.checked)}
                             className="h-4 w-4 accent-cyan-500"
                         />
 
@@ -370,86 +388,104 @@ function AddWorkOrderPage() {
 
                     {schedule && (
                         <div className="mt-5 space-y-5">
+
+                            {/* Fecha y hora */}
                             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                                <FormField
-                                    label="Fecha"
-                                    icon={Calendar}
-                                >
+                                <FormField label="Fecha" icon={Calendar}>
                                     <input
                                         type="date"
                                         value={date}
-                                        onChange={(event) =>
-                                            setDate(event.target.value)
-                                        }
+                                        onChange={(event) => setDate(event.target.value)}
                                         className="h-9 w-full rounded-md border border-slate-700 bg-slate-800 px-3 text-sm text-white outline-none focus:border-cyan-500"
                                     />
                                 </FormField>
 
-                                <FormField
-                                    label="Hora"
-                                    icon={Clock}
-                                >
+                                <FormField label="Hora" icon={Clock}>
                                     <input
                                         type="time"
                                         value={time}
-                                        onChange={(event) =>
-                                            setTime(event.target.value)
-                                        }
+                                        onChange={(event) => setTime(event.target.value)}
                                         className="h-9 w-full rounded-md border border-slate-700 bg-slate-800 px-3 text-sm text-white outline-none focus:border-cyan-500"
                                     />
                                 </FormField>
                             </div>
 
-                            <div>
-                                <div className="mb-3 flex items-center justify-between">
-                                    <div>
+                            {/* Buscar técnicos */}
+                            <button
+                                type="button"
+                                onClick={handleSearchTechnicians}
+                                disabled={!date || !time || isLoadingTechnicians}
+                                className="rounded-md bg-cyan-500 px-4 py-2 text-sm font-medium text-slate-950 transition hover:bg-cyan-400 disabled:cursor-not-allowed disabled:opacity-50"
+                            >
+                                {isLoadingTechnicians
+                                    ? 'Buscando...'
+                                    : 'Buscar técnicos'}
+                            </button>
+
+                            {/* Resultados */}
+                            {searchedFrom && searchedTo && (
+                                <div>
+                                    <div className="mb-3">
                                         <label className="text-sm font-medium text-slate-300">
                                             Técnicos disponibles
                                         </label>
 
                                         <p className="mt-1 text-xs text-slate-500">
-                                            Selecciona el técnico que realizará
-                                            la orden.
+                                            Selecciona el técnico que realizará la orden.
                                         </p>
                                     </div>
-                                </div>
 
-                                <div className="space-y-2">
-                                    {techniques.map((technician) => (
-                                        <button
-                                            key={technician.id}
-                                            type="button"
-                                            onClick={() =>
-                                                setTechnicianId(technician.id)
-                                            }
-                                            className={`flex w-full items-center justify-between rounded-md border p-3 text-left transition ${technicianId === technician.id
-                                                ? "border-cyan-500 bg-slate-800"
-                                                : "border-slate-700 bg-slate-900 hover:border-slate-600"
-                                                }`}
-                                        >
-                                            <div className="flex items-center gap-3">
-                                                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-800 text-slate-400">
-                                                    <UserRound className="h-4 w-4" />
+                                    {isTechniciansError && (
+                                        <p className="text-sm text-red-400">
+                                            No se pudieron consultar los técnicos.
+                                        </p>
+                                    )}
+
+                                    {!isLoadingTechnicians &&
+                                        !isTechniciansError &&
+                                        techniques.length === 0 && (
+                                            <p className="rounded-md border border-slate-700 bg-slate-900 p-4 text-sm text-slate-500">
+                                                No hay técnicos disponibles para este horario.
+                                            </p>
+                                        )}
+
+                                    <div className="space-y-2">
+                                        {techniques.map((technician) => (
+                                            <button
+                                                key={technician.id}
+                                                type="button"
+                                                onClick={() =>
+                                                    setTechnicianId(technician.id)
+                                                }
+                                                className={`flex w-full items-center justify-between rounded-md border p-3 text-left transition ${technicianId === technician.id
+                                                    ? 'border-cyan-500 bg-slate-800'
+                                                    : 'border-slate-700 bg-slate-900 hover:border-slate-600'
+                                                    }`}
+                                            >
+                                                <div className="flex items-center gap-3">
+                                                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-800 text-slate-400">
+                                                        <UserRound className="h-4 w-4" />
+                                                    </div>
+
+                                                    <div>
+                                                        <p className="text-sm font-medium text-white">
+                                                            {technician.name}
+                                                        </p>
+
+                                                        <p className="text-xs text-slate-500">
+                                                            {technician.id}
+                                                        </p>
+                                                    </div>
                                                 </div>
 
-                                                <div>
-                                                    <p className="text-sm font-medium text-white">
-                                                        {technician.name}
-                                                    </p>
-
-                                                    <p className="text-xs text-slate-500">
-                                                        {technician.id}
-                                                    </p>
-                                                </div>
-                                            </div>
-
-                                            <span className="text-xs text-emerald-400">
-                                                Disponible
-                                            </span>
-                                        </button>
-                                    ))}
+                                                <span className="text-xs text-emerald-400">
+                                                    Disponible
+                                                </span>
+                                            </button>
+                                        ))}
+                                    </div>
                                 </div>
-                            </div>
+                            )}
                         </div>
                     )}
                 </section>
